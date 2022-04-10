@@ -75,12 +75,12 @@ function CampingGroup() {
               <span>團長</span>
               <span>{item.header_name}</span>
             </div>
-            <h1>{item.group_Title}</h1>
+            <h1>{item.group_title}</h1>
             <div>
-              <span>{item.date_start}</span>~ <span>{item.date_end}</span>
+              <span>{item.date}</span>
             </div>
             <div>
-              <div>新竹五峰</div>
+              <div>{item.city}</div>
               <div>
                 <span>{item.current_number}</span>/
                 <span>{item.max_member_number}</span>人

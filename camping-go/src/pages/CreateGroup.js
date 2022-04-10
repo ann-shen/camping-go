@@ -34,6 +34,10 @@ const Select = styled.select`
   width: 150px;
 `;
 
+const Button = styled.button`
+  width: 150px;
+`;
+
 function CreateGroup(params) {
 
   const [groupInfo, setGroupInfo] = useState({
@@ -138,7 +142,7 @@ function CreateGroup(params) {
     const docRef = doc(collection(db, "homeTest"));
     await setDoc(docRef, groupInfo);
     console.log("Document written with ID: ", docRef.id);
-    
+
     updateDoc(doc(db, "homeTest", docRef.id), {
       id: docRef.id,
     });
@@ -226,7 +230,7 @@ function CreateGroup(params) {
       <Tent />
       <br />
       <CampSupplies />
-      <button onClick={setUpGroup}>建立露營團</button>
+      <Button onClick={setUpGroup}>建立露營團</Button>
     </Wrap>
   );
 }
