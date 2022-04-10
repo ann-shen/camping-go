@@ -1,5 +1,7 @@
 import styled from "styled-components";
-import React, { useState, useRef, useEffect } from "react";
+import { db } from "../utils/firebase";
+import { setDoc, doc, collection, updateDoc } from "firebase/firestore";
+import React, { useState, useEffect } from "react";
 import {
   DatePicker,
   Uploader,
@@ -9,6 +11,7 @@ import {
 } from "rsuite";
 import Tent from "../component/Tent";
 import CampSupplies from "../component/CampSupplies";
+import { async } from "@firebase/util";
 
 const Wrap = styled.div`
   display: flex;
@@ -32,6 +35,7 @@ const Select = styled.select`
 `;
 
 function CreateGroup(params) {
+
   const [groupInfo, setGroupInfo] = useState({
     status: "進行中",
     group_header: "12345",
@@ -41,14 +45,13 @@ function CreateGroup(params) {
     group_title: "",
     site: "",
     date: "",
-    position: "詳細地址",
+    position: "",
     city: "",
-    meeting_time: "12:00PM",
+    meeting_time: "",
     max_member_number: 0,
     current_number: 0,
     announcement: "",
     notice: ["營區提供租借帳篷", "自行準備晚餐/隔天早餐"],
-    id: "",
   });
 
   const [dateValue, setDateValue] = useState([
@@ -56,20 +59,29 @@ function CreateGroup(params) {
     new Date("2022-04-03"),
   ]);
   const [timeValue, setTimeValue] = useState(new Date());
-  console.log(timeValue);
+  const [groupId, setGroupID] = useState("");
 
   useEffect(() => {
     let startDate = dateValue[0].toLocaleString("zh-tw");
     let endDate = dateValue[1].toLocaleString("zh-tw");
     startDate = startDate.split(" ")[0];
     endDate = endDate.split(" ")[0];
-    console.log(startDate);
-    console.log(endDate);
     setGroupInfo((prevState) => ({
       ...prevState,
       date: `${startDate}~ ${endDate}`,
     }));
   }, [dateValue]);
+
+  useEffect(() => {
+    // console.log(timeValue.toLocaleString("zh-tw"));
+    let time = timeValue.toLocaleString("zh-tw");
+    // console.log(time.split(" ")[1])
+    time = time.split(" ")[1];
+    setGroupInfo((prevState) => ({
+      ...prevState,
+      meeting_time: time,
+    }));
+  }, [timeValue]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,10 +90,10 @@ function CreateGroup(params) {
       [name]: value,
     }));
   };
-  
-  const handleTimeChange = ((date)=>{
-    setTimeValue(date)
-  })
+
+  const handleTimeChange = (date) => {
+    setTimeValue(date);
+  };
 
   const CampDate = () => {
     return (
@@ -96,10 +108,11 @@ function CreateGroup(params) {
       value: new Date(),
     },
   ];
-  const TimeDatePicker = () => (
+  const App = () => (
     <div>
       <DatePicker
-        format='hh:mm aa'
+        format='hh:mm'
+        onChange={handleTimeChange}
         showMeridian
         ranges={ranges}
         style={{ width: 260 }}
@@ -112,14 +125,45 @@ function CreateGroup(params) {
     lineHeight: "200px",
   };
 
-  // console.log(groupInfo.date);
-
   const Upload = () => {
     return (
       <Uploader action='//jsonplaceholder.typicode.com/posts/' draggable>
         <div style={styles}>Click or Drag files to this area to upload</div>
       </Uploader>
     );
+  };
+  console.log(groupInfo.meeting_time);
+
+  const setUpGroup = async () => {
+    const docRef = doc(collection(db, "homeTest"));
+    await setDoc(docRef, groupInfo);
+    console.log("Document written with ID: ", docRef.id);
+    
+    updateDoc(doc(db, "homeTest", docRef.id), {
+      id: docRef.id,
+    });
+
+    //tent
+    const docRefTent = await doc(db, "homeTest", docRef.id, "帳篷", docRef.id);
+    setDoc(docRefTent, {
+      member: ["ann", "shen"],
+      max_number: 4,
+      current_number: 2,
+    });
+
+    //object
+    const docRefObject = await doc(
+      db,
+      "homeTest",
+      docRef.id,
+      "物品",
+      docRef.id
+    );
+    setDoc(docRefObject, {
+      object_name: "露營燈",
+      note: "記得檢查電池",
+      bring_person: "",
+    });
   };
 
   return (
@@ -149,6 +193,8 @@ function CreateGroup(params) {
       <Label>時間</Label>
       <CampDate />
       <br />
+      <Label>縣市</Label>
+      <Input name='city' value={groupInfo.city} onChange={handleChange}></Input>
       <Label>地點</Label>
       <Input
         name='position'
@@ -156,7 +202,7 @@ function CreateGroup(params) {
         onChange={handleChange}></Input>
       <br />
       <Label>集合時間</Label>
-      <TimeDatePicker />
+      <App />
       <br />
       <Label>最多幾人</Label>
       <Input
@@ -180,6 +226,7 @@ function CreateGroup(params) {
       <Tent />
       <br />
       <CampSupplies />
+      <button onClick={setUpGroup}>建立露營團</button>
     </Wrap>
   );
 }
