@@ -12,17 +12,19 @@ const Wrap = styled.div`
 
 const Label = styled.label`
   font-size: 16px;
-  margin-left: 30px;
+  margin-left: 20px;
+  margin-bottom: 5px;
 `;
 const Input = styled.input`
   font-size: 16px;
   width: 150px;
   height: 30px;
-  margin: 20px;
+  margin: 0px 20px 30px 20px;
 `;
 
 const Select = styled.select`
   width: 150px;
+  margin-left: 20px;
 `;
 
 function CreateGroup(params) {
