@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { db } from "../utils/firebase";
-import { setDoc, doc, collection, updateDoc } from "firebase/firestore";
+import { setDoc, doc, collection, updateDoc, getDoc } from "firebase/firestore";
 import React, { useState, useEffect } from "react";
 import {
   DatePicker,
@@ -34,16 +34,29 @@ const Select = styled.select`
   width: 150px;
 `;
 
-const Button = styled.button`
+const AddButton = styled.button`
   width: 150px;
 `;
 
-function CreateGroup(params) {
+function CreateGroup({ userId }) {
+  console.log(userId);
+  const [userName, setUserName] = useState("");
+
+  useEffect(async () => {
+      const docRef = doc(db, "joinGroup", userId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        console.log(docSnap.data().info.user_name);
+        setUserName(docSnap.data().info.user_name);
+      } else {
+        console.log("No such document!");
+      }
+  }, [userId]);
 
   const [groupInfo, setGroupInfo] = useState({
-    status: "進行中",
-    group_header: "12345",
+    header_id: userId,
     header_name: "",
+    status: "進行中",
     privacy: "",
     password: "",
     group_title: "",
@@ -53,17 +66,16 @@ function CreateGroup(params) {
     city: "",
     meeting_time: "",
     max_member_number: 0,
-    current_number: 0,
+    current_number: 1,
     announcement: "",
     notice: ["營區提供租借帳篷", "自行準備晚餐/隔天早餐"],
   });
-
   const [dateValue, setDateValue] = useState([
     new Date("2022-04-01"),
     new Date("2022-04-03"),
   ]);
   const [timeValue, setTimeValue] = useState(new Date());
-  const [groupId, setGroupID] = useState("");
+  // const [groupId, setGroupID] = useState("");
 
   useEffect(() => {
     let startDate = dateValue[0].toLocaleString("zh-tw");
@@ -77,9 +89,7 @@ function CreateGroup(params) {
   }, [dateValue]);
 
   useEffect(() => {
-    // console.log(timeValue.toLocaleString("zh-tw"));
     let time = timeValue.toLocaleString("zh-tw");
-    // console.log(time.split(" ")[1])
     time = time.split(" ")[1];
     setGroupInfo((prevState) => ({
       ...prevState,
@@ -139,16 +149,22 @@ function CreateGroup(params) {
   console.log(groupInfo.meeting_time);
 
   const setUpGroup = async () => {
-    const docRef = doc(collection(db, "homeTest"));
+    //group
+    const docRef = doc(collection(db, "CreateCampingGroup"));
     await setDoc(docRef, groupInfo);
-    console.log("Document written with ID: ", docRef.id);
-
-    updateDoc(doc(db, "homeTest", docRef.id), {
-      id: docRef.id,
+    updateDoc(doc(db, "CreateCampingGroup", docRef.id), {
+      group_id: docRef.id,
+      header_name: userName,
     });
 
     //tent
-    const docRefTent = await doc(db, "homeTest", docRef.id, "帳篷", docRef.id);
+    const docRefTent = await doc(
+      db,
+      "CreateCampingGroup",
+      docRef.id,
+      "tent",
+      docRef.id
+    );
     setDoc(docRefTent, {
       member: ["ann", "shen"],
       max_number: 4,
@@ -158,9 +174,9 @@ function CreateGroup(params) {
     //object
     const docRefObject = await doc(
       db,
-      "homeTest",
+      "CreateCampingGroup",
       docRef.id,
-      "物品",
+      "object",
       docRef.id
     );
     setDoc(docRefObject, {
@@ -168,6 +184,20 @@ function CreateGroup(params) {
       note: "記得檢查電池",
       bring_person: "",
     });
+    //member
+    const docRefMember = await doc(
+      db,
+      "CreateCampingGroup",
+      docRef.id,
+      "member",
+      docRef.id
+    );
+    setDoc(docRefMember, {
+      role: "header",
+      member_name: userName,
+      member_id: userId,
+    });
+    alert("已成功建立")
   };
 
   return (
@@ -230,7 +260,7 @@ function CreateGroup(params) {
       <Tent />
       <br />
       <CampSupplies />
-      <Button onClick={setUpGroup}>建立露營團</Button>
+      <AddButton onClick={setUpGroup}>建立露營團</AddButton>
     </Wrap>
   );
 }

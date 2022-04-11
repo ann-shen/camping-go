@@ -28,7 +28,7 @@ function Taiwan() {
 
   useEffect(async () => {
     const q = query(
-      collection(db, "homeTest"),
+      collection(db, "CreateCampingGroup"),
       where("city", "==", targetCity)
     );
     const querySnapshot = await getDocs(q);
@@ -222,6 +222,7 @@ function Taiwan() {
   const handleMove = (e) => {
     e.persist();
     console.log(e.target.getAttribute("data-name"));
+    
     let tagname = e.target.getAttribute("data-name");
     let result = place_data.filter((obj) => {
       return obj.tag == tagname;

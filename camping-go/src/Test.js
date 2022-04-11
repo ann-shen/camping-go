@@ -2,6 +2,12 @@ import { db } from "./utils/firebase";
 import { setDoc, doc, getDoc, collection, addDoc } from "firebase/firestore";
 import { useState } from "react";
 import CampingGroup from "./component/CampingGroup";
+import styled from "styled-components";
+
+const CampWrap = styled.div`
+  display: flex;
+`;
+
 
 function Test({ token }) {
   const [groupId, setGroupID] = useState("");
@@ -69,13 +75,9 @@ function Test({ token }) {
   };
 
   return (
-    <div>
+    <CampWrap>
       <CampingGroup />
-      <button onClick={getData}>click</button>
-      <br />
-      <button onClick={addTent}>add tent</button>
-      <input id='date' type='date'></input>
-    </div>
+    </CampWrap>
   );
 }
 // useEffect(async () => {

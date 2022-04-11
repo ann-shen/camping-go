@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import React from "react";
+import { useState, useEffect } from "react";
 import {
   DatePicker,
   Uploader,
@@ -22,16 +23,15 @@ const Input = styled.input`
 `;
 
 function Tent() {
-
   const HandleValue = () => {
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = useState(0);
     const handleMinus = () => {
       setValue(parseInt(value, 10) - 1);
     };
     const handlePlus = () => {
       setValue(parseInt(value, 10) + 1);
     };
-
+    console.log(value);
     return (
       <div style={{ width: 160 }}>
         <InputGroup>
@@ -60,7 +60,6 @@ function Tent() {
       <Label>入住團友</Label>
       <Input />
       <button>加入</button>
-
     </div>
   );
 }

@@ -1,32 +1,43 @@
 import styled from "styled-components";
 import { db } from "../utils/firebase";
 import {
-  setDoc,
   doc,
   getDoc,
   getDocs,
   collection,
-  addDoc,
-  query, where,
+  query,
+  where,
   updateDoc,
 } from "firebase/firestore";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { async } from "@firebase/util";
 
-const GroupWrap = styled.div`
-  flex-direction: column;
-  width: 300px;
-  height: 200px;
-  margin: 100px 200px 200px 400px;
+const LinkRoute = styled(Link)`
+  text-decoration: none;
+  margin: 20px 5px;
+  font-size: 20px;
+  color: gray;
 `;
 
-function CampingGroup() {
+const GroupWrap = styled.div`
+  display: flex;
+  /* flex-direction: column; */
+  margin: 100px;
+`;
+
+const Group = styled.div`
+  width: 200px;
+  margin-left: 100px;
+`;
+
+function CampingGroup({ setGroupId, userId, groupId }) {
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
-  // const docRef = doc(db, "homeTest", "yTabKtzodj5PK1Rz7lLR");
-  
+
+  //render all camping group
   useEffect(async () => {
-    let arr=[]
-    const querySnapshot = await getDocs(collection(db, "homeTest"));
+    let arr = [];
+    const querySnapshot = await getDocs(collection(db, "CreateCampingGroup"));
     querySnapshot.forEach((doc) => {
       arr.push(doc.data());
     });
@@ -35,41 +46,64 @@ function CampingGroup() {
 
   //particular city
   useEffect(async () => {
-    const q = query(collection(db, "homeTest"), where("city", "==", "新竹縣"));
+    const q = query(
+      collection(db, "CreateCampingGroup"),
+      where("city", "==", "新竹縣")
+    );
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
       // console.log(doc.id, " => ", doc.data());
     });
-
-  },[])
+  }, []);
 
   const addCurrentMember = async (index) => {
     let currentNumber;
-    console.log(index);
+
+    //current_number+1
     const docRef = await doc(
       db,
-      "homeTest",
-      homePageCampGroup[index].id.toString()
+      "CreateCampingGroup",
+      homePageCampGroup[index].group_id.toString()
     );
     const docSnap = await getDoc(docRef);
+
     if (docSnap.exists()) {
       console.log("Document data:", docSnap.data().current_number);
-      currentNumber = docSnap.data().current_number+1
+      currentNumber = docSnap.data().current_number + 1;
+      setGroupId(docSnap.data().group_id);
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
     }
+
+
     updateDoc(docRef, {
       current_number: currentNumber,
     });
+
+      console.log(groupId);
+
   };
+
+  useEffect(async () => {
+    //set JoinGroup
+      const docRefJoinGroup = await doc(db, "joinGroup", userId);
+      console.log(groupId);
+      updateDoc(docRefJoinGroup, {
+        group: [
+          {
+            group_id: groupId,
+          },
+        ],
+      });
+  }, [groupId]);
 
   // console.log(homePageCampGroup[0].id);
   return (
     <div>
       <GroupWrap>
         {homePageCampGroup.map((item, index) => (
-          <div key={index}>
+          <Group key={index}>
             <img src='' alt='' />
             <div>
               <span>團長</span>
@@ -90,9 +124,9 @@ function CampingGroup() {
               onClick={(e) => {
                 addCurrentMember(index);
               }}>
-              我要加入
+              <LinkRoute to={`joinGroup/${item.group_id}`}>我要加入</LinkRoute>
             </button>
-          </div>
+          </Group>
         ))}
       </GroupWrap>
     </div>
