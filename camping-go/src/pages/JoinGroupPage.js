@@ -1,15 +1,7 @@
 import { db } from "../utils/firebase";
 import {
-  setDoc,
   doc,
-  getDoc,
   onSnapshot,
-  getDocs,
-  collection,
-  addDoc,
-  query,
-  where,
-  updateDoc,
 } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { Routes, Route, useParams } from "react-router-dom";

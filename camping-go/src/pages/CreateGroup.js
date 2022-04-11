@@ -6,12 +6,11 @@ import {
   DatePicker,
   Uploader,
   DateRangePicker,
-  InputGroup,
-  InputNumber,
 } from "rsuite";
 import Tent from "../component/Tent";
 import CampSupplies from "../component/CampSupplies";
-import { async } from "@firebase/util";
+import { DateRange } from "react-date-range";
+
 
 const Wrap = styled.div`
   display: flex;
@@ -43,6 +42,7 @@ function CreateGroup({ userId }) {
   const [userName, setUserName] = useState("");
 
   useEffect(async () => {
+    if(userId){
       const docRef = doc(db, "joinGroup", userId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
@@ -51,6 +51,7 @@ function CreateGroup({ userId }) {
       } else {
         console.log("No such document!");
       }
+    }
   }, [userId]);
 
   const [groupInfo, setGroupInfo] = useState({
@@ -75,7 +76,29 @@ function CreateGroup({ userId }) {
     new Date("2022-04-03"),
   ]);
   const [timeValue, setTimeValue] = useState(new Date());
-  // const [groupId, setGroupID] = useState("");
+  //calnader
+  
+  function MyComponent() {
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
+    const handleSelect = (ranges) => {
+      console.log(ranges);
+      setStartDate(ranges.selection.startDate);
+      setEndDate(ranges.selection.endDate);
+    };
+    const selectionRange = {
+      startDate: startDate,
+      endDate: endDate,
+      key: "selection",
+    };
+    return (
+      <DateRange
+        ranges={[selectionRange]}
+        onChange={handleSelect}
+        moveRangeOnFirstSelection={false}
+      />
+    );
+  }
 
   useEffect(() => {
     let startDate = dateValue[0].toLocaleString("zh-tw");
@@ -225,7 +248,13 @@ function CreateGroup({ userId }) {
       <Input name='site' value={groupInfo.site} onChange={handleChange}></Input>
       <br />
       <Label>時間</Label>
-      <CampDate />
+      <MyComponent />
+
+      {/* <DateRange
+        ranges={[selectionRange]}
+        onChange={handleSelect}
+        moveRangeOnFirstSelection={false}
+      /> */}
       <br />
       <Label>縣市</Label>
       <Input name='city' value={groupInfo.city} onChange={handleChange}></Input>
@@ -259,7 +288,6 @@ function CreateGroup({ userId }) {
       <br />
       <Tent />
       <br />
-      <CampSupplies />
       <AddButton onClick={setUpGroup}>建立露營團</AddButton>
     </Wrap>
   );
