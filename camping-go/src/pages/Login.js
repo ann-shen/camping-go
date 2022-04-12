@@ -40,10 +40,10 @@ const LoginWrap = styled.div`
   width: 30%;
 `;
 
-function Loogin({ setUserId }) {
+function Loogin({ setUserId, setUserName, userName }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userName, setUserName] = useState("");
+  // const [userName, setUserName] = useState("");
 
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();

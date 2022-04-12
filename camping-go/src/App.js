@@ -12,9 +12,10 @@ import Login from "./pages/Login";
 import MaterialUIPickers from "./component/Calanders";
 
 function App() {
+  const [userName, setUserName] = useState("");
   const [groupId, setGroupId] = useState("");
   const [userId, setUserId] = useState("");
-
+console.log(userName);
   const auth = getAuth();
   // console.log(groupId);
   useEffect(() => {
@@ -44,7 +45,11 @@ function App() {
           <Route
             path='/createGroup'
             element={
-              <CreateGroup userId={userId}  />
+              <CreateGroup
+                userId={userId}
+                setUserName={setUserName}
+                userName={userName}
+              />
             }></Route>
           <Route
             path='/'
@@ -53,11 +58,21 @@ function App() {
                 setGroupId={setGroupId}
                 userId={userId}
                 groupId={groupId}
+                setUserName={setUserName}
+                userName={userName}
               />
             }></Route>
           <Route path='/taiwan' element={<Taiwan />}></Route>
           <Route path='joinGroup/:id' element={<JoinGroupPage />}></Route>
-          <Route path='login' element={<Login setUserId={setUserId} />}></Route>
+          <Route
+            path='login'
+            element={
+              <Login
+                setUserId={setUserId}
+                setUserName={setUserName}
+                userName={userName}
+              />
+            }></Route>
         </Routes>
         <button onClick={getLogout}>登出</button>
       </BrowserRouter>

@@ -32,29 +32,9 @@ const Group = styled.div`
   margin-left: 100px;
 `;
 
-function CampingGroup({ setGroupId, userId, groupId,}) {
+function CampingGroup({ setGroupId, userId, groupId,userName}) {
+  console.log(userName);
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
-
-  const [groupInfo, setGroupInfo] = useState({
-    header_id: userId,
-    header_name: "",
-    status: "進行中",
-    privacy: "",
-    password: "",
-    group_title: "",
-    site: "",
-    start_date: "",
-    end_date: "",
-    position: "",
-    city: "",
-    meeting_time: "",
-    max_member_number: 0,
-    current_number: 1,
-    announcement: "",
-    notice: ["營區提供租借帳篷", "自行準備晚餐/隔天早餐"],
-    tent: "",
-  });
-
   //render all camping group
   useEffect(async () => {
     let arr = [];
@@ -79,7 +59,6 @@ function CampingGroup({ setGroupId, userId, groupId,}) {
 
   const addCurrentMember = async (index) => {
     let currentNumber;
-
     //current_number+1
     const docRef = await doc(
       db,
@@ -107,7 +86,7 @@ function CampingGroup({ setGroupId, userId, groupId,}) {
 
     setDoc(docRefMember, {
       role: "member",
-      member_name: "test",
+      member_name: userName,
       member_id: userId,
     });
 
@@ -130,11 +109,6 @@ function CampingGroup({ setGroupId, userId, groupId,}) {
       ],
     });
   }, [groupId]);
-
-  const GrpupInitialData = async () => {
-    const docRef = doc(collection(db, "CreateCampingGroup"));
-    await setDoc(docRef, groupInfo);
-  };
 
   // console.log(homePageCampGroup[0].id);
   return (
@@ -162,15 +136,11 @@ function CampingGroup({ setGroupId, userId, groupId,}) {
               onClick={(e) => {
                 addCurrentMember(index);
               }}>
-              {/* <LinkRoute to={`joinGroup/${item.group_id}`}>我要加入</LinkRoute> */}
-              我要加入
+              <LinkRoute to={`joinGroup/${item.group_id}`}>我要加入</LinkRoute>
             </button>
           </Group>
         ))}
       </GroupWrap>
-      <button onClick={GrpupInitialData}>
-        <LinkRoute to={`/createGroup`}>+</LinkRoute>
-      </button>
     </div>
   );
 }

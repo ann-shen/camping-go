@@ -7,8 +7,6 @@ import {
   updateDoc,
   getDoc,
   addDoc,
-  query,
-  onSnapshot,
 } from "firebase/firestore";
 import React, { useState, useEffect, useCallback } from "react";
 import Tent from "../component/Tent";
@@ -97,11 +95,10 @@ function MaterialUIPickers() {
   );
 }
 
-function CreateGroup({ userId }) {
-  const [userName, setUserName] = useState("");
+function CreateGroup({ userId, setUserName, userName }) {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [groupId,setGroupID] = useState("")
+  const [groupId, setGroupID] = useState("");
   const [groupInfo, setGroupInfo] = useState({
     header_id: userId,
     header_name: "",
@@ -132,7 +129,7 @@ function CreateGroup({ userId }) {
     member: [],
   });
   const [arr, setArr] = useState([]);
-  const [clickConfirm,setClickConfirm]=useState("")
+  const [clickConfirm, setClickConfirm] = useState(false);
   useEffect(async () => {
     if (userId) {
       const docRef = doc(db, "joinGroup", userId);
@@ -154,14 +151,13 @@ function CreateGroup({ userId }) {
     }));
   };
 
-  
   const addNewGroup = async () => {
     const docRef = doc(collection(db, "CreateCampingGroup"));
     await setDoc(docRef, groupInfo);
     setGroupID(docRef.id);
+    setClickConfirm(true);
   };
 
-  
   console.log(groupId);
   const setUpGroup = async () => {
     //group
@@ -238,65 +234,75 @@ function CreateGroup({ userId }) {
       <br />
       <Label>密碼</Label>
       <button onClick={addNewGroup}>確認</button>
-      <Input
-        name='password'
-        value={groupInfo.password}
-        onChange={handleChange}></Input>
-      <Label>營區網站</Label>
-      <Input name='site' value={groupInfo.site} onChange={handleChange}></Input>
-      <br />
-      <Label>時間</Label>
-      <Calander
-        setStartDate={setStartDate}
-        setEndDate={setEndDate}
-        startDate={startDate}
-        endDate={endDate}
-      />
-      <br />
-      <Label>縣市</Label>
-      <Input name='city' value={groupInfo.city} onChange={handleChange}></Input>
-      <Label>地點</Label>
-      <Input
-        name='position'
-        value={groupInfo.position}
-        onChange={handleChange}></Input>
-      <br />
-      <Label>集合時間</Label>
-      <br />
-      <MaterialUIPickers />
-      <br />
-      <Label>最多幾人</Label>
-      <Input
-        name='max_member_number'
-        value={groupInfo.max_member_number}
-        onChange={handleChange}></Input>
-      <br />
-      <Label>公告</Label>
-      <Input
-        maxlength='150'
-        name='announcement'
-        value={groupInfo.announcement}
-        onChange={handleChange}></Input>
-      <Label>注意事項</Label>
-      <Input
-        maxlength='150'
-        name='notice'
-        value={groupInfo.notice}
-        onChange={handleChange}></Input>
-      <br />
-      <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
-      {arr.map((item, index) => (
-        <div key={index}>
+      {clickConfirm && (
+        <div>
+          <Input
+            name='password'
+            value={groupInfo.password}
+            onChange={handleChange}></Input>
+          <Label>營區網站</Label>
+          <Input
+            name='site'
+            value={groupInfo.site}
+            onChange={handleChange}></Input>
+          <br />
+          <Label>時間</Label>
+          <Calander
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
+            startDate={startDate}
+            endDate={endDate}
+          />
+          <br />
+          <Label>縣市</Label>
+          <Input
+            name='city'
+            value={groupInfo.city}
+            onChange={handleChange}></Input>
+          <Label>地點</Label>
+          <Input
+            name='position'
+            value={groupInfo.position}
+            onChange={handleChange}></Input>
+          <br />
+          <Label>集合時間</Label>
+          <br />
+          <MaterialUIPickers />
+          <br />
+          <Label>最多幾人</Label>
+          <Input
+            name='max_member_number'
+            value={groupInfo.max_member_number}
+            onChange={handleChange}></Input>
+          <br />
+          <Label>公告</Label>
+          <Input
+            maxlength='150'
+            name='announcement'
+            value={groupInfo.announcement}
+            onChange={handleChange}></Input>
+          <Label>注意事項</Label>
+          <Input
+            maxlength='150'
+            name='notice'
+            value={groupInfo.notice}
+            onChange={handleChange}></Input>
+          <br />
           <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
+          {arr.map((item, index) => (
+            <div key={index}>
+              <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
+            </div>
+          ))}
+          <AddButton onClick={addNewTent}>新增</AddButton>
+          <br />
+          <CampSupplies
+            setCampSupplies={setCampSupplies}
+            campSupplies={campSupplies}
+          />
+          <AddButton onClick={setUpGroup}>建立露營團</AddButton>
         </div>
-      ))}
-      <AddButton onClick={addNewTent}>新增</AddButton>
-      <br />
-      <CampSupplies
-        setCampSupplies={setCampSupplies}
-        campSupplies={campSupplies}
-      />
-      <AddButton onClick={setUpGroup}>建立露營團</AddButton>
+      )}
     </Wrap>
   );
 }
