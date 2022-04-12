@@ -9,7 +9,7 @@ import JoinGroupPage from "./pages/JoinGroupPage";
 import CampingGroup from "./component/CampingGroup";
 import Taiwan from "./component/Taiwan";
 import Login from "./pages/Login";
-import MyComponentnp from "./component/Calanders";
+import MaterialUIPickers from "./component/Calanders";
 
 function App() {
   const [groupId, setGroupId] = useState("");
@@ -59,7 +59,7 @@ console.log(groupId);
         </Routes>
         <button onClick={getLogout}>登出</button>
       </BrowserRouter>
-      {/* <MyComponentnp></MyComponentnp> */}
+      {/* <MaterialUIPickers></MaterialUIPickers> */}
     </div>
   );
 }

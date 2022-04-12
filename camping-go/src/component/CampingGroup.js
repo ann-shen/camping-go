@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { db } from "../utils/firebase";
 import {
+  setDoc,
   doc,
   getDoc,
   getDocs,
@@ -65,8 +66,16 @@ function CampingGroup({ setGroupId, userId, groupId }) {
       "CreateCampingGroup",
       homePageCampGroup[index].group_id.toString()
     );
+    
+    const docRefMember = await doc(
+      db,
+      "CreateCampingGroup",
+      homePageCampGroup[index].group_id.toString(),
+      "member",
+      userId
+    );
+    
     const docSnap = await getDoc(docRef);
-
     if (docSnap.exists()) {
       console.log("Document data:", docSnap.data().current_number);
       currentNumber = docSnap.data().current_number + 1;
@@ -76,12 +85,19 @@ function CampingGroup({ setGroupId, userId, groupId }) {
       console.log("No such document!");
     }
 
+    setDoc(docRefMember, {
+      role: "member",
+      member_name: "test",
+      member_id: userId,
+    });
+
 
     updateDoc(docRef, {
       current_number: currentNumber,
     });
 
-      console.log(groupId);
+
+      // console.log(groupId);
 
   };
 
@@ -124,7 +140,8 @@ function CampingGroup({ setGroupId, userId, groupId }) {
               onClick={(e) => {
                 addCurrentMember(index);
               }}>
-              <LinkRoute to={`joinGroup/${item.group_id}`}>我要加入</LinkRoute>
+              {/* <LinkRoute to={`joinGroup/${item.group_id}`}>我要加入</LinkRoute> */}
+              我要加入
             </button>
           </Group>
         ))}

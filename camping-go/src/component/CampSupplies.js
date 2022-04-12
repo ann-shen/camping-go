@@ -12,13 +12,27 @@ const Input = styled.input`
   height: 30px;
   margin: 20px;
 `;
-function CampSupplies() {
+function CampSupplies({ setCampSupplies,campSupplies }) {
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCampSupplies((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
   return (
     <div>
       <Label>要帶的物品</Label>
-      <Input></Input>
+      <Input
+        value={campSupplies.supplies}
+        name='supplies'
+        onChange={handleChange}></Input>
       <Label>備註</Label>
-      <Input></Input>
+      <Input value={campSupplies.note}
+        name='note'
+        onChange={handleChange}></Input>
     </div>
   );
 }
