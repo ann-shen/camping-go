@@ -37,7 +37,7 @@ function FormPropsTextFields({ tentInfo, setTentInfo }) {
         <div>
           <TextField
             name='max_number'
-            value={Number(tentInfo.max_number)}
+            // value={tentInfo.max_number}
             id='standard-number'
             label='Number'
             type='number'
@@ -71,7 +71,7 @@ function FormPropsTextFieldsStorage({ tentInfo, setTentInfo }) {
         <div>
           <TextField
             name='current_number'
-            value={Number(tentInfo.current_number)}
+            // value={Number(tentInfo.current_number)}
             id='standard-number'
             label='Number'
             type='number'

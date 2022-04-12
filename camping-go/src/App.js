@@ -1,9 +1,9 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import "rsuite/dist/rsuite.min.css";
-import 'react-date-range/dist/styles.css'; // main style file
-import 'react-date-range/dist/theme/default.css'; // theme css file
-import { useState,useEffect } from "react";
+import "react-date-range/dist/styles.css"; // main style file
+import "react-date-range/dist/theme/default.css"; // theme css file
+import { useState, useEffect } from "react";
 import CreateGroup from "./pages/CreateGroup";
 import JoinGroupPage from "./pages/JoinGroupPage";
 import CampingGroup from "./component/CampingGroup";
@@ -14,14 +14,14 @@ import MaterialUIPickers from "./component/Calanders";
 function App() {
   const [groupId, setGroupId] = useState("");
   const [userId, setUserId] = useState("");
+
   const auth = getAuth();
-console.log(groupId);
+  // console.log(groupId);
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const uid = user.uid;
         setUserId(user.uid);
-        console.log(user.email);
         console.log("yes");
       } else {
         console.log("no!");
@@ -43,7 +43,9 @@ console.log(groupId);
         <Routes>
           <Route
             path='/createGroup'
-            element={<CreateGroup userId={userId} />}></Route>
+            element={
+              <CreateGroup userId={userId}  />
+            }></Route>
           <Route
             path='/'
             element={

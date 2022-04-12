@@ -32,8 +32,28 @@ const Group = styled.div`
   margin-left: 100px;
 `;
 
-function CampingGroup({ setGroupId, userId, groupId }) {
+function CampingGroup({ setGroupId, userId, groupId,}) {
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
+
+  const [groupInfo, setGroupInfo] = useState({
+    header_id: userId,
+    header_name: "",
+    status: "進行中",
+    privacy: "",
+    password: "",
+    group_title: "",
+    site: "",
+    start_date: "",
+    end_date: "",
+    position: "",
+    city: "",
+    meeting_time: "",
+    max_member_number: 0,
+    current_number: 1,
+    announcement: "",
+    notice: ["營區提供租借帳篷", "自行準備晚餐/隔天早餐"],
+    tent: "",
+  });
 
   //render all camping group
   useEffect(async () => {
@@ -66,7 +86,7 @@ function CampingGroup({ setGroupId, userId, groupId }) {
       "CreateCampingGroup",
       homePageCampGroup[index].group_id.toString()
     );
-    
+
     const docRefMember = await doc(
       db,
       "CreateCampingGroup",
@@ -74,7 +94,7 @@ function CampingGroup({ setGroupId, userId, groupId }) {
       "member",
       userId
     );
-    
+
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       console.log("Document data:", docSnap.data().current_number);
@@ -91,28 +111,30 @@ function CampingGroup({ setGroupId, userId, groupId }) {
       member_id: userId,
     });
 
-
     updateDoc(docRef, {
       current_number: currentNumber,
     });
 
-
-      // console.log(groupId);
-
+    // console.log(groupId);
   };
 
   useEffect(async () => {
     //set JoinGroup
-      const docRefJoinGroup = await doc(db, "joinGroup", userId);
-      console.log(groupId);
-      updateDoc(docRefJoinGroup, {
-        group: [
-          {
-            group_id: groupId,
-          },
-        ],
-      });
+    const docRefJoinGroup = await doc(db, "joinGroup", userId);
+    console.log(groupId);
+    updateDoc(docRefJoinGroup, {
+      group: [
+        {
+          group_id: groupId,
+        },
+      ],
+    });
   }, [groupId]);
+
+  const GrpupInitialData = async () => {
+    const docRef = doc(collection(db, "CreateCampingGroup"));
+    await setDoc(docRef, groupInfo);
+  };
 
   // console.log(homePageCampGroup[0].id);
   return (
@@ -146,6 +168,9 @@ function CampingGroup({ setGroupId, userId, groupId }) {
           </Group>
         ))}
       </GroupWrap>
+      <button onClick={GrpupInitialData}>
+        <LinkRoute to={`/createGroup`}>+</LinkRoute>
+      </button>
     </div>
   );
 }
