@@ -37,7 +37,7 @@ const AddButton = styled.button`
   width: 150px;
 `;
 
-const CalanderWrap = styled.div`
+const CalendarWrap = styled.div`
   width: 250px;
 `;
 
@@ -58,14 +58,14 @@ const CalanderWrap = styled.div`
       key: "selection",
     };
     return (
-      <CalanderWrap>
+      <CalendarWrap>
         <DateRange
           editableDateInputs={true}
           ranges={[selectionRange]}
           onChange={handleSelect}
           moveRangeOnFirstSelection={false}
         />
-      </CalanderWrap>
+      </CalendarWrap>
     );
   }
 
