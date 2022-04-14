@@ -15,7 +15,9 @@ function App() {
   const [userName, setUserName] = useState("");
   const [groupId, setGroupId] = useState("");
   const [userId, setUserId] = useState("");
-console.log(userName);
+  const [allMemberArr, setAllMemberArr] = useState([]);
+
+  console.log(userName);
   const auth = getAuth();
   // console.log(groupId);
   useEffect(() => {
@@ -49,6 +51,8 @@ console.log(userName);
                 userId={userId}
                 setUserName={setUserName}
                 userName={userName}
+                setAllMemberArr={setAllMemberArr}
+                allMemberArr={allMemberArr}
               />
             }></Route>
           <Route
@@ -63,7 +67,14 @@ console.log(userName);
               />
             }></Route>
           <Route path='/taiwan' element={<Taiwan />}></Route>
-          <Route path='joinGroup/:id' element={<JoinGroupPage />}></Route>
+          <Route
+            path='joinGroup/:id'
+            element={
+              <JoinGroupPage
+                setAllMemberArr={setAllMemberArr}
+                allMemberArr={allMemberArr}
+              />
+            }></Route>
           <Route
             path='login'
             element={

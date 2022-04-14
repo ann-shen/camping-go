@@ -8,6 +8,7 @@ import {
   where,
   updateDoc,
   setDoc,
+  getDocs,
 } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { Routes, Route, useParams } from "react-router-dom";
@@ -29,11 +30,10 @@ const AddButton = styled.button`
   width: 150px;
 `;
 
-function JoinGroupPage() {
+function JoinGroupPage({ setAllMemberArr, allMemberArr }) {
   const [homePageCampGroup, setHomePageCampGroup] = useState("");
   const [allTentArr, setAllTentArr] = useState([]);
   const [allSupplies, setAllSupplies] = useState([]);
-  const [tentArr, setTentArr] = useState([]);
   const [tentInfo, setTentInfo] = useState({
     current_number: 0,
     max_number: 0,
@@ -42,6 +42,7 @@ function JoinGroupPage() {
   const [tentMember, setTentMember] = useState([]);
 
   let params = useParams();
+
   //render all camping group
 
   // useEffect(() => {
@@ -59,23 +60,33 @@ function JoinGroupPage() {
       }
     );
   }, []);
-
-  useEffect(() => {
-    const eventListenerpage = query(
+  //getTentData
+  useEffect(async () => {
+    let tentsArr = [];
+    const querySnapshot = await getDocs(
       collection(db, "CreateCampingGroup", params.id, "tent")
     );
-    onSnapshot(eventListenerpage, (snapshot) => {
-      let tentsArr = [];
-      snapshot.docChanges().forEach(async (change) => {
-        if (change.type === "added") {
-          // console.log(change.doc.data());
-          tentsArr.push(change.doc.data());
-        }
-      });
-      setAllTentArr(tentsArr);
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      console.log(doc.id, " => ", doc.data());
+      tentsArr.push(doc.data());
     });
-  }, []);
+    setAllTentArr(tentsArr);
 
+    // const eventListenerpage = query(
+    //   collection(db, "CreateCampingGroup", params.id, "tent")
+    // );
+    // onSnapshot(eventListenerpage, (snapshot) => {
+    //   snapshot.docChanges().forEach(async (change) => {
+    //     // if (change.type === "added") {
+    //     console.log(change.doc.data());
+    //     tentsArr.push(change.doc.data());
+    //     // }
+    //   });
+    //   console.log(tentsArr);
+    // });
+  }, []);
+  //getSuppliesData
   useEffect(() => {
     const eventListenerpage = query(
       collection(db, "CreateCampingGroup", params.id, "supplies")
@@ -114,7 +125,6 @@ function JoinGroupPage() {
   };
 
   const addNewTent = async () => {
-    // setTentArr((prev) => [...prev, 1]);
     const ondocRefNewTent = doc(
       collection(db, "CreateCampingGroup", params.id, "tent")
     );
@@ -123,25 +133,38 @@ function JoinGroupPage() {
       doc(db, "CreateCampingGroup", params.id, "tent", ondocRefNewTent.id),
       {
         tent_id: ondocRefNewTent.id,
-        member: tentMember,
+        member: allMemberArr,
       }
-    );
-
-    const eventListenerpage = query(
+    ).then(async() => {
+      console.log("next");
+      let tentsArr = [];
+    const querySnapshot = await getDocs(
       collection(db, "CreateCampingGroup", params.id, "tent")
     );
-    onSnapshot(eventListenerpage, (snapshot) => {
-      let tentsArr = [];
-      snapshot.docChanges().forEach(async (change) => {
-        if (change.type === "added") {
-          // console.log(change.doc.data());
-          tentsArr.push(change.doc.data());
-        }
-      });
-      setAllTentArr(tentsArr);
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      console.log(doc.id, " => ", doc.data());
+      tentsArr.push(doc.data());
     });
-  };
+    setAllTentArr(tentsArr);
+    });
+    setAllMemberArr("");
 
+    // const eventListenerpage = query(
+    //   collection(db, "CreateCampingGroup", params.id, "tent")
+    // );
+    // onSnapshot(eventListenerpage, (snapshot) => {
+    //   let tentsArr = [];
+    //   snapshot.docChanges().forEach(async (change) => {
+    //     if (change.type === "added") {
+    //       console.log(change.doc.data());
+    //       tentsArr.push(change.doc.data());
+    //     }
+    //   });
+    //   setAllMemberArr(tentsArr);
+    // });
+    console.log(allMemberArr);
+  };
   return (
     <div>
       {
@@ -180,7 +203,7 @@ function JoinGroupPage() {
           <Tent
             setTentInfo={setTentInfo}
             tentInfo={tentInfo}
-            setTentMember={setTentMember}
+            setAllMemberArr={setAllMemberArr}
           />
           {/* {tentArr.map((_, index) => (
             <div key={index}>

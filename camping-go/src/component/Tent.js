@@ -111,8 +111,6 @@ function Member({setAllMemberArr,allMemberArr }) {
 }
 
 function Tent({ tentInfo, setTentInfo,setAllMemberArr,allMemberArr }) {
-  // const [tentMember, setTentMember] = useState([]);
-  // console.log(memberName);
   return (
     <div>
       <Label>帳篷</Label>

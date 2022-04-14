@@ -94,7 +94,13 @@ function MaterialUIPickers({ setTime }) {
   );
 }
 
-function CreateGroup({ userId, setUserName, userName }) {
+function CreateGroup({
+  userId,
+  setUserName,
+  userName,
+  allMemberArr,
+  setAllMemberArr,
+}) {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [groupId, setGroupID] = useState("");
@@ -132,7 +138,7 @@ function CreateGroup({ userId, setUserName, userName }) {
   const [time, setTime] = useState("");
   const [clickConfirm, setClickConfirm] = useState(false);
   const [tentMember, setTentMember] = useState([]);
-  const [allMemberArr,setAllMemberArr]=useState([])
+  // const [allMemberArr, setAllMemberArr] = useState([]);
 
   useEffect(async () => {
     if (userId) {
@@ -216,7 +222,6 @@ function CreateGroup({ userId, setUserName, userName }) {
     alert("已成功建立");
   };
 
-
   console.log(tentMember);
 
   const addNewTent = async () => {
@@ -231,8 +236,8 @@ function CreateGroup({ userId, setUserName, userName }) {
         tent_id: ondocRefNewTent.id,
         member: allMemberArr,
       }
-      );
-      setAllMemberArr("")
+    );
+    setAllMemberArr("");
   };
 
   const addSupplies = async () => {
