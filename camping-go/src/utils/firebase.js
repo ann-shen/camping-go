@@ -3,6 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
+  //:process.env.REACT_APP_FIREBASE_APP_KEY
   apiKey: "AIzaSyAcjKT79s2sfxjX0t2jLw0qCZrOQTaknZs",
   authDomain: "camping-go-14942.firebaseapp.com",
   projectId: "camping-go-14942",
