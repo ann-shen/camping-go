@@ -26,11 +26,12 @@ function CampSupplies({ setCampSupplies,campSupplies }) {
     <div>
       <Label>要帶的物品</Label>
       <Input
-        value={campSupplies.supplies}
+        // value={campSupplies.supplies}
         name='supplies'
         onChange={handleChange}></Input>
       <Label>備註</Label>
-      <Input value={campSupplies.note}
+      <Input 
+      // value={campSupplies.note}
         name='note'
         onChange={handleChange}></Input>
     </div>

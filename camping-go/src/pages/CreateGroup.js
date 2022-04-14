@@ -8,17 +8,15 @@ import {
   getDoc,
   addDoc,
 } from "firebase/firestore";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import Tent from "../component/Tent";
 import CampSupplies from "../component/CampSupplies";
 import { DateRange } from "react-date-range";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { async } from "@firebase/util";
 
 const Wrap = styled.div`
   display: flex;
@@ -73,11 +71,12 @@ function Calander({ setEndDate, setStartDate, startDate, endDate }) {
 }
 
 //time
-function MaterialUIPickers() {
-  const [value, setValue] = React.useState(new Date("2014-08-18T21:11:54"));
+function MaterialUIPickers({ setTime }) {
+  const [value, setValue] = React.useState(new Date());
 
   const handleChange = (newValue) => {
-    setValue(newValue);
+    setTime(newValue);
+    // setValue(newValue);
   };
   // console.log(value);
 
@@ -128,8 +127,11 @@ function CreateGroup({ userId, setUserName, userName }) {
     max_number: 0,
     member: [],
   });
-  const [arr, setArr] = useState([]);
+  const [tentArr, setTentArr] = useState([]);
+  const [suppliesArr, setSuppliesArr] = useState([]);
+  const [time, setTime] = useState("");
   const [clickConfirm, setClickConfirm] = useState(false);
+
   useEffect(async () => {
     if (userId) {
       const docRef = doc(db, "joinGroup", userId);
@@ -158,6 +160,9 @@ function CreateGroup({ userId, setUserName, userName }) {
     setClickConfirm(true);
   };
 
+
+  
+
   console.log(groupId);
   const setUpGroup = async () => {
     //group
@@ -167,6 +172,7 @@ function CreateGroup({ userId, setUserName, userName }) {
       header_name: userName,
       start_date: startDate,
       end_date: endDate,
+      meeting_time: time,
     });
     //tent
     const docRefTent = await doc(
@@ -177,6 +183,9 @@ function CreateGroup({ userId, setUserName, userName }) {
       groupId
     );
     setDoc(docRefTent, tentInfo);
+    updateDoc(doc(db, "CreateCampingGroup", groupId, "tent", groupId), {
+      tent_id: docRefTent.id
+    });
     //supplies
     const docRefObject = await doc(
       db,
@@ -186,6 +195,9 @@ function CreateGroup({ userId, setUserName, userName }) {
       groupId
     );
     setDoc(docRefObject, campSupplies);
+    updateDoc(doc(db, "CreateCampingGroup", groupId, "supplies", groupId), {
+      supplies_id: docRefObject.id,
+    });
     //member
     const docRefMember = await doc(
       db,
@@ -199,18 +211,37 @@ function CreateGroup({ userId, setUserName, userName }) {
       member_name: userName,
       member_id: userId,
     });
+    
     alert("已成功建立");
   };
 
   const addNewTent = async () => {
-    setArr((prev) => [...prev, 1]);
-    const docRefNewTent = await collection(
-      db,
-      "CreateCampingGroup",
-      groupId,
-      "tent"
+    setTentArr((prev) => [...prev, 1]);
+    const ondocRefNewTent = doc(collection(db, "CreateCampingGroup",groupId,"tent"));
+    await setDoc(ondocRefNewTent, tentInfo);
+    updateDoc(doc(db, "CreateCampingGroup", groupId, "tent", ondocRefNewTent.id), {
+      tent_id: ondocRefNewTent.id,
+    });
+  };
+
+  const addSupplies = async () => {
+    setSuppliesArr((prev) => [...prev, 1]);
+    const ondocRefNewSupplies = doc(
+      collection(db, "CreateCampingGroup", groupId, "supplies")
     );
-    addDoc(docRefNewTent, tentInfo);
+    await setDoc(ondocRefNewSupplies, campSupplies);
+    updateDoc(
+      doc(
+        db,
+        "CreateCampingGroup",
+        groupId,
+        "supplies",
+        ondocRefNewSupplies.id
+      ),
+      {
+        supplies_id: ondocRefNewSupplies.id,
+      }
+    );
   };
   // console.log(allTent);
 
@@ -267,7 +298,7 @@ function CreateGroup({ userId, setUserName, userName }) {
           <br />
           <Label>集合時間</Label>
           <br />
-          <MaterialUIPickers />
+          <MaterialUIPickers setTime={setTime} />
           <br />
           <Label>最多幾人</Label>
           <Input
@@ -289,7 +320,7 @@ function CreateGroup({ userId, setUserName, userName }) {
             onChange={handleChange}></Input>
           <br />
           <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
-          {arr.map((item, index) => (
+          {tentArr.map((_, index) => (
             <div key={index}>
               <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
             </div>
@@ -300,6 +331,17 @@ function CreateGroup({ userId, setUserName, userName }) {
             setCampSupplies={setCampSupplies}
             campSupplies={campSupplies}
           />
+          {suppliesArr.map((_, index) => (
+            <div key={index}>
+              <CampSupplies
+                setCampSupplies={setCampSupplies}
+                campSupplies={campSupplies}
+              />
+            </div>
+          ))}
+          <AddButton onClick={addSupplies}>新增物品</AddButton>
+          <br />
+          <br />
           <AddButton onClick={setUpGroup}>建立露營團</AddButton>
         </div>
       )}
