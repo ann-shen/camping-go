@@ -92,15 +92,33 @@ function FormPropsTextFieldsStorage({ tentInfo, setTentInfo }) {
   );
 }
 
-function Tent({ tentInfo, setTentInfo }) {
+function Member({setAllMemberArr,allMemberArr }) {
+  const [memberName, setMemberName] = useState("");
+  const addTentMember = () => {
+    setAllMemberArr((prev)=>[...prev,memberName])
+  };
+  console.log(allMemberArr);
+  return (
+    <div>
+      <Input
+        onChange={(e) => {
+          setMemberName(e.target.value);
+        }}
+      />
+      <button onClick={addTentMember}>加入</button>
+    </div>
+  );
+}
 
+function Tent({ tentInfo, setTentInfo,setAllMemberArr,allMemberArr }) {
+  // const [tentMember, setTentMember] = useState([]);
+  // console.log(memberName);
   return (
     <div>
       <Label>帳篷</Label>
       <br />
       <Label>可容納</Label>
       <FormPropsTextFields setTentInfo={setTentInfo} tentInfo={tentInfo} />
-
       <Label>已有</Label>
       <FormPropsTextFieldsStorage
         setTentInfo={setTentInfo}
@@ -108,8 +126,10 @@ function Tent({ tentInfo, setTentInfo }) {
       />
       <br />
       <Label>入住團友</Label>
-      <Input />
-      <button>加入</button>
+      <Member
+        setAllMemberArr={setAllMemberArr}
+        allMemberArr={allMemberArr}
+      />
     </div>
   );
 }

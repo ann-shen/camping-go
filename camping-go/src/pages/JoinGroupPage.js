@@ -29,8 +29,6 @@ const AddButton = styled.button`
   width: 150px;
 `;
 
-
-
 function JoinGroupPage() {
   const [homePageCampGroup, setHomePageCampGroup] = useState("");
   const [allTentArr, setAllTentArr] = useState([]);
@@ -41,6 +39,7 @@ function JoinGroupPage() {
     max_number: 0,
     member: [],
   });
+  const [tentMember, setTentMember] = useState([]);
 
   let params = useParams();
   //render all camping group
@@ -115,7 +114,7 @@ function JoinGroupPage() {
   };
 
   const addNewTent = async () => {
-    setTentArr((prev) => [...prev, 1]);
+    // setTentArr((prev) => [...prev, 1]);
     const ondocRefNewTent = doc(
       collection(db, "CreateCampingGroup", params.id, "tent")
     );
@@ -124,8 +123,23 @@ function JoinGroupPage() {
       doc(db, "CreateCampingGroup", params.id, "tent", ondocRefNewTent.id),
       {
         tent_id: ondocRefNewTent.id,
+        member: tentMember,
       }
     );
+
+    const eventListenerpage = query(
+      collection(db, "CreateCampingGroup", params.id, "tent")
+    );
+    onSnapshot(eventListenerpage, (snapshot) => {
+      let tentsArr = [];
+      snapshot.docChanges().forEach(async (change) => {
+        if (change.type === "added") {
+          // console.log(change.doc.data());
+          tentsArr.push(change.doc.data());
+        }
+      });
+      setAllTentArr(tentsArr);
+    });
   };
 
   return (
@@ -163,12 +177,16 @@ function JoinGroupPage() {
           ))}
           <br />
           <AddButton onClick={addNewTent}>新增</AddButton>
-          <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
-          {tentArr.map((_, index) => (
+          <Tent
+            setTentInfo={setTentInfo}
+            tentInfo={tentInfo}
+            setTentMember={setTentMember}
+          />
+          {/* {tentArr.map((_, index) => (
             <div key={index}>
               <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
             </div>
-          ))}
+          ))} */}
           <br />
           <br />
           <Label>需要幫忙認領的物品</Label>

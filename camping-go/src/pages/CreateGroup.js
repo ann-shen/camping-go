@@ -131,6 +131,8 @@ function CreateGroup({ userId, setUserName, userName }) {
   const [suppliesArr, setSuppliesArr] = useState([]);
   const [time, setTime] = useState("");
   const [clickConfirm, setClickConfirm] = useState(false);
+  const [tentMember, setTentMember] = useState([]);
+  const [allMemberArr,setAllMemberArr]=useState([])
 
   useEffect(async () => {
     if (userId) {
@@ -160,9 +162,6 @@ function CreateGroup({ userId, setUserName, userName }) {
     setClickConfirm(true);
   };
 
-
-  
-
   console.log(groupId);
   const setUpGroup = async () => {
     //group
@@ -184,8 +183,10 @@ function CreateGroup({ userId, setUserName, userName }) {
     );
     setDoc(docRefTent, tentInfo);
     updateDoc(doc(db, "CreateCampingGroup", groupId, "tent", groupId), {
-      tent_id: docRefTent.id
+      tent_id: docRefTent.id,
+      member: allMemberArr,
     });
+    console.log(tentInfo);
     //supplies
     const docRefObject = await doc(
       db,
@@ -211,17 +212,27 @@ function CreateGroup({ userId, setUserName, userName }) {
       member_name: userName,
       member_id: userId,
     });
-    
+
     alert("已成功建立");
   };
 
+
+  console.log(tentMember);
+
   const addNewTent = async () => {
     setTentArr((prev) => [...prev, 1]);
-    const ondocRefNewTent = doc(collection(db, "CreateCampingGroup",groupId,"tent"));
+    const ondocRefNewTent = doc(
+      collection(db, "CreateCampingGroup", groupId, "tent")
+    );
     await setDoc(ondocRefNewTent, tentInfo);
-    updateDoc(doc(db, "CreateCampingGroup", groupId, "tent", ondocRefNewTent.id), {
-      tent_id: ondocRefNewTent.id,
-    });
+    updateDoc(
+      doc(db, "CreateCampingGroup", groupId, "tent", ondocRefNewTent.id),
+      {
+        tent_id: ondocRefNewTent.id,
+        member: allMemberArr,
+      }
+      );
+      setAllMemberArr("")
   };
 
   const addSupplies = async () => {
@@ -319,10 +330,20 @@ function CreateGroup({ userId, setUserName, userName }) {
             value={groupInfo.notice}
             onChange={handleChange}></Input>
           <br />
-          <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
+          <Tent
+            setTentInfo={setTentInfo}
+            tentInfo={tentInfo}
+            setAllMemberArr={setAllMemberArr}
+            allMemberArr={allMemberArr}
+          />
           {tentArr.map((_, index) => (
             <div key={index}>
-              <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
+              <Tent
+                setTentInfo={setTentInfo}
+                tentInfo={tentInfo}
+                setAllMemberArr={setAllMemberArr}
+                allMemberArr={allMemberArr}
+              />
             </div>
           ))}
           <AddButton onClick={addNewTent}>新增</AddButton>
