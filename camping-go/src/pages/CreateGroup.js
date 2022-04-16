@@ -19,6 +19,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import GoogleMapBasic from "../component/GoogleMapBasic";
 
+
 const Wrap = styled.div`
   display: flex;
   flex-direction: column;
@@ -312,7 +313,6 @@ function CreateGroup({
             name='position'
             value={groupInfo.position}
             onChange={handleChange}></Input>
-            <GoogleMapBasic/>
           <br />
           <Label>集合時間</Label>
           <br />

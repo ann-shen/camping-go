@@ -7,7 +7,10 @@ import {
 } from "react-google-maps";
 import Geocode from "react-geocode";
 import { useState, useRef, useEffect } from "react";
-import AutoComplete from "react-google-autocomplete";
+import Autocomplete from "react-google-autocomplete";
+// import {
+//     Autocomplete,
+// } from "@react-google-maps/api";
 
 Geocode.setApiKey("AIzaSyDGyok70ayGPpyAyxeyAwcVdoQ0rzW5bCo");
 
@@ -46,49 +49,49 @@ function GoogleMapBasic() {
   // };
 
   useEffect(() => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          setState(
-            {
-              mapPosition: {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              },
-              markerPosition: {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              },
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        setState(
+          {
+            mapPosition: {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
             },
-            () => {
-              Geocode.fromLatLng(
-                position.coords.latitude,
-                position.coords.longitude
-              ).then(
-                (response) => {
-                  console.log(response);
-                  const address = response.results[0].formatted_address,
-                    addressArray = response.results[0].address_components,
-                    city = getCity(addressArray),
-                    area = getArea(addressArray),
-                    state = getState(addressArray);
-                  console.log("city", city, area, state);
-                  setState({
-                    address: address ? address : "",
-                    area: area ? area : "",
-                    city: city ? city : "",
-                    state: state ? state : "",
-                  });
-                },
-                (error) => {
-                  console.error(error);
-                }
-              );
-            }
-          );
-        });
-      } else {
-        console.error("Geolocation is not supported by this browser!");
-      }
+            markerPosition: {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            },
+          },
+          () => {
+            Geocode.fromLatLng(
+              position.coords.latitude,
+              position.coords.longitude
+            ).then(
+              (response) => {
+                console.log(response);
+                const address = response.results[0].formatted_address,
+                  addressArray = response.results[0].address_components,
+                  city = getCity(addressArray),
+                  area = getArea(addressArray),
+                  state = getState(addressArray);
+                console.log("city", city, area, state);
+                setState({
+                  address: address ? address : "",
+                  area: area ? area : "",
+                  city: city ? city : "",
+                  state: state ? state : "",
+                });
+              },
+              (error) => {
+                console.error(error);
+              }
+            );
+          }
+        );
+      });
+    } else {
+      console.error("Geolocation is not supported by this browser!");
+    }
   }, []);
 
   // componentDidMount()
@@ -215,8 +218,13 @@ function GoogleMapBasic() {
           <InfoWindow>
             <div>{state.address}</div>
           </InfoWindow>
-          <AutoComplete
-            types={["(regions)"]}
+          {/* <Autocomplete
+            // types={["(regions)"]}
+            onPlaceSelected={onPlaceSelected} >
+            <input type='text' />
+          </Autocomplete> */}
+          <Autocomplete
+            types={["geocode", "establishment"]}
             onPlaceSelected={onPlaceSelected}
           />
         </Marker>
