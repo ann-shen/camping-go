@@ -10,6 +10,10 @@ import CampingGroup from "./component/CampingGroup";
 import Taiwan from "./component/Taiwan";
 import Login from "./pages/Login";
 import MaterialUIPickers from "./component/Calanders";
+import { GoogleMap } from "@react-google-maps/api";
+import GoogleMapTest from "./component/GoogleMapTest";
+import GoogleMapBasic from "./component/GoogleMapBasic";
+import LocationSearchModal from "./component/LocationSearchModal"
 
 function App() {
   const [userName, setUserName] = useState("");
@@ -84,6 +88,10 @@ function App() {
                 userName={userName}
               />
             }></Route>
+          <Route path='googlemap' element={<GoogleMapTest />}></Route>
+          <Route
+            path='googlemap_basic'
+            element={<GoogleMapBasic />}></Route>
         </Routes>
         <button onClick={getLogout}>登出</button>
       </BrowserRouter>
