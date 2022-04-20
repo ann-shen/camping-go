@@ -1,13 +1,6 @@
 import styled from "styled-components";
 import React from "react";
-import { useState, useEffect } from "react";
-import {
-  DatePicker,
-  Uploader,
-  DateRangePicker,
-  InputGroup,
-  InputNumber,
-} from "rsuite";
+import { useState} from "react";
 import "../pages/reuite.css";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
@@ -48,7 +41,7 @@ function FormPropsTextFields({ tentInfo, setTentInfo, setSeat }) {
               console.log(e.target.value);
               setTentInfo((prevState) => ({
                 ...prevState,
-                max_number: e.target.value,
+                max_number: Number(e.target.value),
               }));
               setSeat(e.target.value);
             }}
@@ -83,7 +76,7 @@ function FormPropsTextFieldsStorage({ tentInfo, setTentInfo, seat }) {
               console.log(e.target.value);
               setTentInfo((prevState) => ({
                 ...prevState,
-                current_number: e.target.value,
+                current_number: Number(e.target.value),
                 seat: seat - Number(e.target.value),
               }));
             }}
@@ -111,12 +104,12 @@ function Member({ setAllMemberArr, allMemberArr }) {
         }}
       />
       <button onClick={addTentMember}>加入</button>
-      <div>{allMemberArr && allMemberArr.map((item) => <div>{item}</div>)}</div>
+      <div>{allMemberArr && allMemberArr.map((item,index) => <div key={index}>{item}</div>)}</div>
     </div>
   );
 }
 
-function Tent({ tentInfo, setTentInfo, setAllMemberArr, allMemberArr }) {
+function Tent({ tentInfo, setTentInfo, setAllMemberArr, allMemberArr}) {
   const [seat, setSeat] = useState(0);
   
 

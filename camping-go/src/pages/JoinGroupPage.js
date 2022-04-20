@@ -17,21 +17,14 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import "../utils/data";
-import {
-  Label,
-  AddButton,
-  Font,
-  Img,
-  Display,
-  Button,
-} from "../css/style";
+import { Label, AddButton, Font, Img, Display, Button } from "../css/style";
 import Tent from "../component/Tent";
 import Header from "../component/Header";
 import { Box, Paper } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import location from "../image/location.png";
 import tent from "../image/tent.png";
-import { uuid } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 const TargetContainer = {
   display: "flex",
@@ -83,27 +76,49 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     e.dataTransfer.setData("text/plain", e.target.id);
     let targetTentId = e.target.getAttribute("data-key");
     console.log("dragStart");
-    if (targetTentId) {
-      console.log(targetTentId);
-      await updateDoc(
-        doc(db, "CreateCampingGroup", params.id, "tent", targetTentId),
-        {
-          member: arrayRemove(userName),
-          current_number: increment(-1),
-        }
-      );
-    }
+    console.log(currentTentId);
+
+    // if (currentTentId !== "") {
+    //   await updateDoc(
+    //     doc(db, "CreateCampingGroup", params.id, "tent", currentTentId),
+    //     {
+    //       current_number: increment(-1),
+    //       member: arrayRemove(userName),
+    //     }
+    //   ).then(async () => {
+    //     console.log("-1");
+    //     let tentsArr = [];
+    //     const citiesRef = collection(
+    //       db,
+    //       "CreateCampingGroup",
+    //       params.id,
+    //       "tent"
+    //     );
+    //     const q = query(citiesRef, orderBy("create_time", "desc"));
+    //     const querySnapshot = await getDocs(
+    //       collection(db, "CreateCampingGroup", params.id, "tent")
+    //     );
+    //     querySnapshot.forEach((doc) => {
+    //       // console.log(doc.id, " => ", doc.data());
+    //       tentsArr.push(doc.data());
+    //     });
+    //     setAllTentArr(tentsArr);
+    //   });
+    // }
   };
+
   const drop = async (e) => {
     onDragOver(e);
+    //前一頂帳篷
     console.log(currentTentId);
+    console.log("drop");
     let id = e.dataTransfer.getData("text");
     e.target.appendChild(document.querySelector("#" + id));
     e.target.style.backgroundColor = "white";
     e.target.style.border = "4px solid #f5f4e8";
     let targetTentId = e.target.getAttribute("data-key");
     console.log(targetTentId);
-    
+
     await updateDoc(
       doc(db, "CreateCampingGroup", params.id, "tent", targetTentId),
       {
@@ -124,7 +139,37 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
       });
       setAllTentArr(tentsArr);
     });
+    //設定前一頂帳篷進state
     setCurrentTentId(targetTentId);
+    if (currentTentId !== "") {
+      await updateDoc(
+        doc(db, "CreateCampingGroup", params.id, "tent", currentTentId),
+        {
+          current_number: increment(-1),
+          member: arrayRemove(userName),
+        }
+      ).then(async () => {
+        console.log("+1");
+        let tentsArr = [];
+        const citiesRef = collection(
+          db,
+          "CreateCampingGroup",
+          params.id,
+          "tent"
+        );
+        const q = query(citiesRef, orderBy("create_time", "desc"));
+        const querySnapshot = await getDocs(
+          collection(db, "CreateCampingGroup", params.id, "tent")
+        );
+        querySnapshot.forEach((doc) => {
+          // console.log(doc.id, " => ", doc.data());
+          tentsArr.push(doc.data());
+        });
+        setAllTentArr(tentsArr);
+      });
+    }else{
+      return
+    }
   };
 
   const onDragOver = (e) => {
@@ -134,6 +179,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   };
 
   const onDragEnter = (e) => {
+    console.log("enter");
     e.target.style.transform = "scale(1.1)";
     e.target.style.backgroundColor = "#426765";
     e.target.style.transition =
@@ -146,17 +192,17 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   const onDragLeave = async (e) => {
     // console.log(e.target.getAttribute("data-key"));
     let targetTentId = e.target.getAttribute("data-key");
-    await updateDoc(
-      doc(db, "CreateCampingGroup", params.id, "tent", targetTentId),
-      {
-        member: arrayRemove(userName),
-        current_number: increment(-1),
-      }
-    );
+    console.log("leave");
+    // await updateDoc(
+    //   doc(db, "CreateCampingGroup", params.id, "tent", targetTentId),
+    //   {
+    //     member: arrayRemove(userName),
+    //     current_number: increment(0),
+    //   }
+    // );
     e.target.style.backgroundColor = "#f5f4e8";
     e.target.style.border = "3px dotted #426765";
   };
-
 
   //render all camping group
   useEffect(() => {

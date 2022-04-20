@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import Tent from "../component/Tent";
 import CampSupplies from "../component/CampSupplies";
 import Stack from "@mui/material/Stack";
-import { TextField, Box} from "@mui/material";
+import { TextField, Box } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
@@ -108,7 +108,6 @@ function CreateGroup({
   allMemberArr,
   setAllMemberArr,
 }) {
-  
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [state, setState] = useState({
@@ -169,10 +168,6 @@ function CreateGroup({
 
   const navigate = useNavigate();
 
-
-
-
-
   useEffect(async () => {
     if (userId) {
       const docRef = doc(db, "joinGroup", userId);
@@ -198,15 +193,15 @@ function CreateGroup({
     const docRef = doc(collection(db, "CreateCampingGroup"));
     await setDoc(docRef, groupInfo);
 
-    
     setGroupID(docRef.id);
     setClickConfirm(true);
   };
 
   const setUpGroup = async () => {
     //group
+    console.log(upload);
     const storage = getStorage();
-    const imageRef = ref(storage, "123");
+    const imageRef = ref(storage, upload.file.name);
     uploadBytes(imageRef, upload.file)
       .then(() => {
         getDownloadURL(imageRef)
@@ -266,7 +261,6 @@ function CreateGroup({
     alert("已成功建立");
     // navigate("/");
   };
-  console.log(time);
 
   useEffect(() => {
     console.log(state.city);
@@ -286,6 +280,7 @@ function CreateGroup({
   }, [upload.url]);
 
   const addNewTent = async () => {
+    setAllMemberArr("");
     setTentArr((prev) => [...prev, 1]);
     const ondocRefNewTent = doc(
       collection(db, "CreateCampingGroup", groupId, "tent")
@@ -298,7 +293,6 @@ function CreateGroup({
         member: allMemberArr,
       }
     );
-    setAllMemberArr("");
   };
 
   const addSupplies = async () => {
@@ -323,7 +317,9 @@ function CreateGroup({
 
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
+    console.log(e.target.files[0]);
   };
+
 
   // console.log(arr);
 
@@ -336,7 +332,7 @@ function CreateGroup({
         onChange={handleChange}></Input>
       <br />
       <Label>封面照片</Label>
-      <Input type='file' accept='image/*' onChange={handleFiles}></Input>
+      <input type='file' accept='image/*' onChange={handleFiles}></input>
       {/* <Upload /> */}
       <Label>公開狀態</Label>
       <Select name='privacy' onChange={handleChange}>

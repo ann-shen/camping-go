@@ -10,7 +10,6 @@ import {
   where,
   updateDoc,
   orderBy,
-  
 } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -21,8 +20,6 @@ import { Font, Display, Img, Button } from "../css/style";
 import location from "../image/location.png";
 import landingpage from "../image/landingpage.jpeg";
 import Header from "../component/Header";
-
-
 
 const LinkRoute = styled(Link)`
   text-decoration: none;
@@ -45,6 +42,11 @@ const Group = styled.div`
 const Label = styled.label`
   font-size: 16px;
 `;
+
+const ImgWrap = styled.div`
+width: 100%;
+height: 300px;
+overflow:hidden;`
 
 function CampingGroup({ setGroupId, userId, groupId, userName }) {
   console.log(userName);
@@ -166,7 +168,9 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
               <div>
                 <span>團長{item.header_name}</span>
               </div>
-              <Img src={item.picture} width="95%" alt="圖片" />
+              <ImgWrap>
+                <Img src={item.picture} width='100%' alt='圖片' />
+              </ImgWrap>
               <Font
                 fontSize='24px'
                 color='#797659'
