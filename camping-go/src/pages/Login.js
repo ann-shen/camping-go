@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { setDoc, doc, updateDoc } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 import styled from "styled-components";
 import { db } from "../utils/firebase";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 
 const Title = styled.div`
@@ -54,7 +55,8 @@ function Loogin({ setUserId, setUserName, userName }) {
 
   function handellogin() {
     const auth = getAuth();
-    signInWithEmailAndPassword(auth, email, password, userName)
+    signInWithEmailAndPassword(auth, email, password)
+    
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
@@ -89,6 +91,9 @@ function Loogin({ setUserId, setUserName, userName }) {
       .then(async (userCredential) => {
         const user = userCredential.user;
         setUserId(user.uid);
+        updateProfile(auth.currentUser, {
+          displayName: userName,
+        });
         const newUserRef = doc(db, "joinGroup", user.uid);
         await setDoc(newUserRef, {
           info: {

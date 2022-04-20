@@ -6,19 +6,20 @@ import {
   collection,
   updateDoc,
   getDoc,
-  addDoc,
+  serverTimestamp,
 } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { DateRange } from "react-date-range";
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Tent from "../component/Tent";
 import CampSupplies from "../component/CampSupplies";
-import { DateRange } from "react-date-range";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
+import { TextField, Box} from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import GoogleMapBasic from "../component/GoogleMapBasic";
-
 
 const Wrap = styled.div`
   display: flex;
@@ -27,16 +28,20 @@ const Wrap = styled.div`
 `;
 const Label = styled.label`
   font-size: 16px;
-  margin-left: 30px;
+  margin-left: 20px;
 `;
 const Input = styled.input`
   font-size: 16px;
   width: 150px;
   height: 30px;
   margin: 20px;
+  margin-top: 10px;
 `;
 const Select = styled.select`
   width: 150px;
+  height: 30px;
+  margin: 20px;
+  margin-top: 10px;
 `;
 const AddButton = styled.button`
   width: 150px;
@@ -74,11 +79,11 @@ function Calander({ setEndDate, setStartDate, startDate, endDate }) {
 
 //time
 function MaterialUIPickers({ setTime }) {
-  const [value, setValue] = React.useState(new Date());
+  const [value, setValue] = useState(new Date());
 
   const handleChange = (newValue) => {
     setTime(newValue);
-    // setValue(newValue);
+    setValue(newValue);
   };
   // console.log(value);
 
@@ -103,8 +108,25 @@ function CreateGroup({
   allMemberArr,
   setAllMemberArr,
 }) {
+  
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const [state, setState] = useState({
+    address: "",
+    city: "",
+    area: "",
+    state: "",
+    zoom: 15,
+    height: 400,
+    mapPosition: {
+      lat: 0,
+      lng: 0,
+    },
+    markerPosition: {
+      lat: 0,
+      lng: 0,
+    },
+  });
   const [groupId, setGroupID] = useState("");
   const [groupInfo, setGroupInfo] = useState({
     header_id: userId,
@@ -119,11 +141,12 @@ function CreateGroup({
     position: "",
     city: "",
     meeting_time: "",
-    max_member_number: 0,
+    max_member_number: "",
     current_number: 1,
     announcement: "",
     notice: ["營區提供租借帳篷", "自行準備晚餐/隔天早餐"],
-    tent: "",
+    picture: "",
+    create_time: serverTimestamp(),
   });
   const [campSupplies, setCampSupplies] = useState({
     bring_person: "",
@@ -134,13 +157,21 @@ function CreateGroup({
     current_number: 0,
     max_number: 0,
     member: [],
+    seat: 0,
+    create_time: serverTimestamp(),
   });
   const [tentArr, setTentArr] = useState([]);
   const [suppliesArr, setSuppliesArr] = useState([]);
   const [time, setTime] = useState("");
   const [clickConfirm, setClickConfirm] = useState(false);
-  const [tentMember, setTentMember] = useState([]);
-  // const [allMemberArr, setAllMemberArr] = useState([]);
+  // const [tentMember, setTentMember] = useState([]);
+  const [upload, setUpLoadFile] = useState({ file: "", url: "" });
+
+  const navigate = useNavigate();
+
+
+
+
 
   useEffect(async () => {
     if (userId) {
@@ -166,21 +197,32 @@ function CreateGroup({
   const addNewGroup = async () => {
     const docRef = doc(collection(db, "CreateCampingGroup"));
     await setDoc(docRef, groupInfo);
+
+    
     setGroupID(docRef.id);
     setClickConfirm(true);
   };
 
-  console.log(groupId);
   const setUpGroup = async () => {
     //group
-    updateDoc(doc(db, "CreateCampingGroup", groupId), {
-      group_id: groupId,
-      header_id: userId,
-      header_name: userName,
-      start_date: startDate,
-      end_date: endDate,
-      meeting_time: time,
-    });
+    const storage = getStorage();
+    const imageRef = ref(storage, "123");
+    uploadBytes(imageRef, upload.file)
+      .then(() => {
+        getDownloadURL(imageRef)
+          .then((url) => {
+            console.log(url);
+            setUpLoadFile((prevState) => ({ ...prevState, url: url }));
+          })
+          .catch((error) => {
+            console.log(error.message, "error getting the img url");
+          });
+        setUpLoadFile((prevState) => ({ ...prevState, file: "" }));
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+
     //tent
     const docRefTent = await doc(
       db,
@@ -222,9 +264,26 @@ function CreateGroup({
     });
 
     alert("已成功建立");
+    // navigate("/");
   };
+  console.log(time);
 
-  console.log(tentMember);
+  useEffect(() => {
+    console.log(state.city);
+    if (groupId) {
+      updateDoc(doc(db, "CreateCampingGroup", groupId), {
+        group_id: groupId,
+        header_id: userId,
+        header_name: userName,
+        start_date: startDate,
+        end_date: endDate,
+        meeting_time: time,
+        position: state.address,
+        city: state.city,
+        picture: upload.url,
+      });
+    }
+  }, [upload.url]);
 
   const addNewTent = async () => {
     setTentArr((prev) => [...prev, 1]);
@@ -261,7 +320,10 @@ function CreateGroup({
       }
     );
   };
-  // console.log(allTent);
+
+  const handleFiles = (e) => {
+    setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
+  };
 
   // console.log(arr);
 
@@ -274,6 +336,7 @@ function CreateGroup({
         onChange={handleChange}></Input>
       <br />
       <Label>封面照片</Label>
+      <Input type='file' accept='image/*' onChange={handleFiles}></Input>
       {/* <Upload /> */}
       <Label>公開狀態</Label>
       <Select name='privacy' onChange={handleChange}>
@@ -281,15 +344,24 @@ function CreateGroup({
         <option value='私人'>私人</option>
       </Select>
       <br />
+      <br />
+      <Label>最多幾人</Label>
+      <br />
+
+      <Input
+        name='max_member_number'
+        value={groupInfo.max_member_number}
+        onChange={handleChange}></Input>
       <Label>密碼</Label>
+      <Input
+        name='password'
+        value={groupInfo.password}
+        onChange={handleChange}></Input>
       <button onClick={addNewGroup}>確認</button>
       {clickConfirm && (
         <div>
-          <Input
-            name='password'
-            value={groupInfo.password}
-            onChange={handleChange}></Input>
           <Label>營區網站</Label>
+          <br />
           <Input
             name='site'
             value={groupInfo.site}
@@ -303,71 +375,100 @@ function CreateGroup({
             endDate={endDate}
           />
           <br />
-          <Label>縣市</Label>
+          {/* <Label>縣市</Label>
           <Input
             name='city'
             value={groupInfo.city}
-            onChange={handleChange}></Input>
-          <Label>地點</Label>
-          <Input
-            name='position'
-            value={groupInfo.position}
-            onChange={handleChange}></Input>
+            onChange={handleChange}></Input> */}
+
+          <GoogleMapBasic setState={setState} state={state} />
           <br />
+          <br />
+          <br />
+
           <Label>集合時間</Label>
           <br />
-          <MaterialUIPickers setTime={setTime} />
           <br />
-          <Label>最多幾人</Label>
-          <Input
-            name='max_member_number'
-            value={groupInfo.max_member_number}
-            onChange={handleChange}></Input>
+          <MaterialUIPickers setTime={setTime} />
+
           <br />
           <Label>公告</Label>
+          <br />
           <Input
             maxlength='150'
             name='announcement'
             value={groupInfo.announcement}
             onChange={handleChange}></Input>
+          <br />
           <Label>注意事項</Label>
+          <br />
           <Input
             maxlength='150'
             name='notice'
             value={groupInfo.notice}
             onChange={handleChange}></Input>
           <br />
-          <Tent
-            setTentInfo={setTentInfo}
-            tentInfo={tentInfo}
-            setAllMemberArr={setAllMemberArr}
-            allMemberArr={allMemberArr}
-          />
-          {tentArr.map((_, index) => (
-            <div key={index}>
-              <Tent
-                setTentInfo={setTentInfo}
-                tentInfo={tentInfo}
-                setAllMemberArr={setAllMemberArr}
-                allMemberArr={allMemberArr}
-              />
-            </div>
-          ))}
-          <AddButton onClick={addNewTent}>新增</AddButton>
+          <Box
+            sx={{
+              width: "100%",
+              height: "auto",
+              "&:hover": {
+                border: 1,
+                opacity: [0.9, 0.8, 0.7],
+              },
+              boxShadow: 3,
+              overflow: "hidden",
+              borderRadius: 6,
+              padding: 3,
+              margin: 2,
+            }}>
+            <Tent
+              setTentInfo={setTentInfo}
+              tentInfo={tentInfo}
+              setAllMemberArr={setAllMemberArr}
+              allMemberArr={allMemberArr}
+            />
+            {tentArr.map((_, index) => (
+              <div key={index}>
+                <Tent
+                  setTentInfo={setTentInfo}
+                  tentInfo={tentInfo}
+                  setAllMemberArr={setAllMemberArr}
+                  allMemberArr={allMemberArr}
+                />
+              </div>
+            ))}
+            <AddButton onClick={addNewTent}>新增</AddButton>
+          </Box>
           <br />
-          <CampSupplies
-            setCampSupplies={setCampSupplies}
-            campSupplies={campSupplies}
-          />
-          {suppliesArr.map((_, index) => (
-            <div key={index}>
-              <CampSupplies
-                setCampSupplies={setCampSupplies}
-                campSupplies={campSupplies}
-              />
-            </div>
-          ))}
-          <AddButton onClick={addSupplies}>新增物品</AddButton>
+          <Box
+            sx={{
+              width: "100%",
+              height: "auto",
+              "&:hover": {
+                border: 1,
+                opacity: [0.9, 0.8, 0.7],
+              },
+              boxShadow: 3,
+              overflow: "hidden",
+              borderRadius: 6,
+              padding: 3,
+              margin: 2,
+            }}>
+            <CampSupplies
+              setCampSupplies={setCampSupplies}
+              campSupplies={campSupplies}
+            />
+            {suppliesArr.map((_, index) => (
+              <div key={index}>
+                <CampSupplies
+                  setCampSupplies={setCampSupplies}
+                  campSupplies={campSupplies}
+                />
+              </div>
+            ))}
+            <AddButton onClick={addSupplies}>新增物品</AddButton>
+          </Box>
           <br />
           <br />
           <AddButton onClick={setUpGroup}>建立露營團</AddButton>

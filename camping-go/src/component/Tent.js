@@ -24,7 +24,7 @@ const Input = styled.input`
   margin: 20px;
 `;
 
-function FormPropsTextFields({ tentInfo, setTentInfo }) {
+function FormPropsTextFields({ tentInfo, setTentInfo, setSeat }) {
   return (
     <div>
       <Box
@@ -50,6 +50,7 @@ function FormPropsTextFields({ tentInfo, setTentInfo }) {
                 ...prevState,
                 max_number: e.target.value,
               }));
+              setSeat(e.target.value);
             }}
           />
         </div>
@@ -58,7 +59,7 @@ function FormPropsTextFields({ tentInfo, setTentInfo }) {
   );
 }
 
-function FormPropsTextFieldsStorage({ tentInfo, setTentInfo }) {
+function FormPropsTextFieldsStorage({ tentInfo, setTentInfo, seat }) {
   return (
     <div>
       <Box
@@ -83,6 +84,7 @@ function FormPropsTextFieldsStorage({ tentInfo, setTentInfo }) {
               setTentInfo((prevState) => ({
                 ...prevState,
                 current_number: e.target.value,
+                seat: seat - Number(e.target.value),
               }));
             }}
           />
@@ -92,42 +94,51 @@ function FormPropsTextFieldsStorage({ tentInfo, setTentInfo }) {
   );
 }
 
-function Member({setAllMemberArr,allMemberArr }) {
+function Member({ setAllMemberArr, allMemberArr }) {
   const [memberName, setMemberName] = useState("");
+
   const addTentMember = () => {
-    setAllMemberArr((prev)=>[...prev,memberName])
+    setAllMemberArr((prev) => [...prev, memberName]);
+    setMemberName("");
   };
-  console.log(allMemberArr);
+
   return (
     <div>
       <Input
+        value={memberName}
         onChange={(e) => {
           setMemberName(e.target.value);
         }}
       />
       <button onClick={addTentMember}>加入</button>
+      <div>{allMemberArr && allMemberArr.map((item) => <div>{item}</div>)}</div>
     </div>
   );
 }
 
-function Tent({ tentInfo, setTentInfo,setAllMemberArr,allMemberArr }) {
+function Tent({ tentInfo, setTentInfo, setAllMemberArr, allMemberArr }) {
+  const [seat, setSeat] = useState(0);
+  
+
   return (
     <div>
       <Label>帳篷</Label>
       <br />
       <Label>可容納</Label>
-      <FormPropsTextFields setTentInfo={setTentInfo} tentInfo={tentInfo} />
+      <FormPropsTextFields
+        setTentInfo={setTentInfo}
+        tentInfo={tentInfo}
+        setSeat={setSeat}
+      />
       <Label>已有</Label>
       <FormPropsTextFieldsStorage
         setTentInfo={setTentInfo}
         tentInfo={tentInfo}
+        seat={seat}
       />
       <br />
       <Label>入住團友</Label>
-      <Member
-        setAllMemberArr={setAllMemberArr}
-        allMemberArr={allMemberArr}
-      />
+      <Member setAllMemberArr={setAllMemberArr} allMemberArr={allMemberArr} />
     </div>
   );
 }

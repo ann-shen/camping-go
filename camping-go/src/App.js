@@ -7,13 +7,11 @@ import { useState, useEffect } from "react";
 import CreateGroup from "./pages/CreateGroup";
 import JoinGroupPage from "./pages/JoinGroupPage";
 import CampingGroup from "./component/CampingGroup";
-import Taiwan from "./component/Taiwan";
 import Login from "./pages/Login";
-import MaterialUIPickers from "./component/Calanders";
-import { GoogleMap } from "@react-google-maps/api";
-import GoogleMapTest from "./component/GoogleMapTest";
 import GoogleMapBasic from "./component/GoogleMapBasic";
-import LocationSearchModal from "./component/LocationSearchModal"
+import Member from "./component/Member";
+import Profile from "./pages/Profile";
+import CityCamping from "./pages/CityCamping";
 
 function App() {
   const [userName, setUserName] = useState("");
@@ -21,19 +19,17 @@ function App() {
   const [userId, setUserId] = useState("");
   const [allMemberArr, setAllMemberArr] = useState([]);
 
-  console.log(userName);
   const auth = getAuth();
   // console.log(groupId);
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        const uid = user.uid;
+        // console.log(user.displayName);
+        setUserName(user.displayName);
         setUserId(user.uid);
         console.log("yes");
       } else {
         console.log("no!");
-        // User is signed out
-        // ...
       }
     });
   }, []);
@@ -70,15 +66,19 @@ function App() {
                 userName={userName}
               />
             }></Route>
-          <Route path='/taiwan' element={<Taiwan />}></Route>
+          <Route path='/member' element={<Member />}></Route>
           <Route
             path='joinGroup/:id'
             element={
               <JoinGroupPage
                 setAllMemberArr={setAllMemberArr}
                 allMemberArr={allMemberArr}
+                userName={userName}
               />
             }></Route>
+          <Route
+            path='profile/:id'
+            element={<Profile userName={userName} />}></Route>
           <Route
             path='login'
             element={
@@ -88,10 +88,8 @@ function App() {
                 userName={userName}
               />
             }></Route>
-          <Route path='googlemap' element={<GoogleMapTest />}></Route>
-          <Route
-            path='googlemap_basic'
-            element={<GoogleMapBasic />}></Route>
+          <Route path='/:city' element={<CityCamping />}></Route>
+          <Route path='googlemap_basic' element={<GoogleMapBasic />}></Route>
         </Routes>
         <button onClick={getLogout}>登出</button>
       </BrowserRouter>
