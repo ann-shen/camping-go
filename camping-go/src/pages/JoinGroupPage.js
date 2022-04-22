@@ -22,6 +22,7 @@ import Tent from "../component/Tent";
 import Header from "../component/Header";
 import { Box, Paper } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import location from "../image/location.png";
 import tent from "../image/tent.png";
 import { v4 as uuidv4 } from "uuid";
@@ -48,6 +49,17 @@ const SourseContainer = styled.div`
   margin: 10px;
 `;
 
+const PersonWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  background-color: white;
+  border: 2px solid #797659;
+  border-radius: 5px;
+`;
+
 function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   const [homePageCampGroup, setHomePageCampGroup] = useState("");
   const [allTentArr, setAllTentArr] = useState([]);
@@ -60,6 +72,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   });
   const [addNewTentSection, setAddNewTentSection] = useState(false);
   const [currentTentId, setCurrentTentId] = useState("");
+  const [alreadyTentId, setAlreadyTentId] = useState("");
 
   //------------------------DND ------------------------//
 
@@ -67,79 +80,101 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   const dropTarget = useRef();
   let params = useParams();
 
-  useEffect((e) => {
-    let dragSource = document.querySelector("#drag-source");
-  }, []);
-
   const dragStart = async (e) => {
     e.dataTransfer.setData("text/plain", e.target.id);
-    console.log("dragStart");
-    console.log(currentTentId);
-  };
+    e.target.style = "drop-shadow(0px 0px 0px white)";
 
+    let secondTargetTentId = e.target.getAttribute("data-key");
+    setAlreadyTentId(secondTargetTentId);
+    console.log("dragStart");
+    console.log("前一頂帳篷", currentTentId);
+  };
   const drop = async (e) => {
     onDragOver(e);
+    console.log("drop");
     //前一頂帳篷
     console.log(currentTentId);
-    console.log("drop");
     let id = e.dataTransfer.getData("text");
     e.target.appendChild(document.querySelector("#" + id));
-    e.target.style.backgroundColor = "white";
-    e.target.style.border = "4px solid #f5f4e8";
+    e.target.style = "backgroundColor:white ; border:4px solid #f5f4e8;";
     let targetTentId = e.target.getAttribute("data-key");
     console.log(targetTentId);
+    await updateDoc(
+      doc(db, "CreateCampingGroup", params.id, "tent", targetTentId),
+      {
+        current_number: increment(1),
+        member: arrayUnion(userName),
+      }
+    ).then(async () => {
+      let tentsArr = [];
+      const citiesRef = collection(db, "CreateCampingGroup", params.id, "tent");
+      const q = query(citiesRef, orderBy("create_time", "desc"));
+      const querySnapshot = await getDocs(
+        collection(db, "CreateCampingGroup", params.id, "tent")
+      );
+      querySnapshot.forEach((doc) => {
+        // console.log(doc.id, " => ", doc.data());
+        tentsArr.push(doc.data());
+      });
+      setAllTentArr(tentsArr);
+    });
+    //設定前一頂帳篷進state
+    setCurrentTentId(targetTentId);
 
-    // await updateDoc(
-    //   doc(db, "CreateCampingGroup", params.id, "tent", targetTentId),
-    //   {
-    //     current_number: increment(1),
-    //     member: arrayUnion(userName),
-    //   }
-    // ).then(async () => {
-    //   console.log("+1");
-    //   let tentsArr = [];
-    //   const citiesRef = collection(db, "CreateCampingGroup", params.id, "tent");
-    //   const q = query(citiesRef, orderBy("create_time", "desc"));
-    //   const querySnapshot = await getDocs(
-    //     collection(db, "CreateCampingGroup", params.id, "tent")
-    //   );
-    //   querySnapshot.forEach((doc) => {
-    //     // console.log(doc.id, " => ", doc.data());
-    //     tentsArr.push(doc.data());
-    //   });
-    //   setAllTentArr(tentsArr);
-    // });
-    // //設定前一頂帳篷進state
-    // setCurrentTentId(targetTentId);
-    // if (currentTentId !== "") {
-    //   await updateDoc(
-    //     doc(db, "CreateCampingGroup", params.id, "tent", currentTentId),
-    //     {
-    //       current_number: increment(-1),
-    //       member: arrayRemove(userName),
-    //     }
-    //   ).then(async () => {
-    //     console.log("+1");
-    //     let tentsArr = [];
-    //     const citiesRef = collection(
-    //       db,
-    //       "CreateCampingGroup",
-    //       params.id,
-    //       "tent"
-    //     );
-    //     const q = query(citiesRef, orderBy("create_time", "desc"));
-    //     const querySnapshot = await getDocs(
-    //       collection(db, "CreateCampingGroup", params.id, "tent")
-    //     );
-    //     querySnapshot.forEach((doc) => {
-    //       // console.log(doc.id, " => ", doc.data());
-    //       tentsArr.push(doc.data());
-    //     });
-    //     setAllTentArr(tentsArr);
-    //   });
-    // }else{
-    //   return
-    // }
+    if (currentTentId == " ") {
+      console.log("minus");
+      await updateDoc(
+        doc(db, "CreateCampingGroup", params.id, "tent", currentTentId),
+        {
+          current_number: increment(-1),
+          member: arrayRemove(userName),
+        }
+      ).then(async () => {
+        console.log("+1");
+        let tentsArr = [];
+        const citiesRef = collection(
+          db,
+          "CreateCampingGroup",
+          params.id,
+          "tent"
+        );
+        const q = query(citiesRef, orderBy("create_time", "desc"));
+        const querySnapshot = await getDocs(
+          collection(db, "CreateCampingGroup", params.id, "tent")
+        );
+        querySnapshot.forEach((doc) => {
+          // console.log(doc.id, " => ", doc.data());
+          tentsArr.push(doc.data());
+        });
+        setAllTentArr(tentsArr);
+      });
+    } else if (alreadyTentId) {
+      await updateDoc(
+        doc(db, "CreateCampingGroup", params.id, "tent", alreadyTentId),
+        {
+          current_number: increment(-1),
+          member: arrayRemove(userName),
+        }
+      ).then(async () => {
+        console.log("+1");
+        let tentsArr = [];
+        const citiesRef = collection(
+          db,
+          "CreateCampingGroup",
+          params.id,
+          "tent"
+        );
+        const q = query(citiesRef, orderBy("create_time", "desc"));
+        const querySnapshot = await getDocs(
+          collection(db, "CreateCampingGroup", params.id, "tent")
+        );
+        querySnapshot.forEach((doc) => {
+          // console.log(doc.id, " => ", doc.data());
+          tentsArr.push(doc.data());
+        });
+        setAllTentArr(tentsArr);
+      });
+    } else return;
   };
 
   const onDragOver = (e) => {
@@ -283,7 +318,9 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             <Paper sx={{ p: 10 }}>
               <Display ml='25px'>
                 <Img src={location} width='20px'></Img>
-                <Font marginLeft='8px'>{homePageCampGroup.city} | </Font>
+                {homePageCampGroup.city && (
+                  <Font marginLeft='8px'>{homePageCampGroup.city} | </Font>
+                )}
                 <Label>
                   {homePageCampGroup &&
                     new Date(homePageCampGroup.start_date.seconds * 1000)
@@ -360,43 +397,61 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                     </Font>
                     <Display>
                       {item.member &&
-                        item.member.map((item, index) => (
+                        item.member.map((seat, index) => (
                           <Display direction='column' justifyContent='center'>
                             <Font margin='10px' marginLeft='10px'>
-                              {item}
+                              {seat !== userName && <div>{seat}</div>}
+                              {seat === userName && <div>{seat}</div>}
                             </Font>
-                            <AccountCircleIcon
-                              key={index}
-                              color='primary'
-                              fontSize='large'></AccountCircleIcon>
+                            {seat !== userName && (
+                              <AccountCircleIcon
+                                key={index}
+                                color='primary'
+                                fontSize='large'></AccountCircleIcon>
+                            )}
+                            {seat === userName && (
+                              <div
+                                data-key={item.tent_id}
+                                id='drag-source'
+                                draggable='true'
+                                onDragStart={dragStart}>
+                                <AssignmentIndIcon fontSize='large'></AssignmentIndIcon>
+                              </div>
+                            )}
                           </Display>
                         ))}
                     </Display>
                     <Display>
                       {Array(
                         Number(item.max_number) - Number(item.current_number)
-                      ).fill(
-                        <label>
-                          <div
-                            data-key={item.tent_id}
-                            style={TargetContainer}
-                            ref={dropTarget}
-                            onDrop={drop}
-                            onDragEnter={onDragEnter}
-                            onDragOver={onDragOver}
-                            onDragLeave={onDragLeave}></div>
-                        </label>
-                      )}
+                      )
+                        .fill(null)
+                        .map(() => (
+                          <label key={uuidv4()}>
+                            <div
+                              data-key={item.tent_id}
+                              style={TargetContainer}
+                              ref={dropTarget}
+                              onDrop={drop}
+                              onDragEnter={onDragEnter}
+                              onDragOver={onDragOver}
+                              onDragLeave={onDragLeave}></div>
+                          </label>
+                        ))}
                     </Display>
                   </Display>
                 </Box>
               ))}
               <SourseContainer id='source-container' ref={dragSource}>
-                <div id='drag-source' draggable='true' onDragStart={dragStart}>
-                  <AccountCircleIcon
+                <PersonWrap
+                  id='drag-source'
+                  draggable='true'
+                  onDragStart={dragStart}>
+                  <AssignmentIndIcon
+                    sx={{ pointerEvents: "none", cursor: "not-allowed" }}
                     color='primary'
-                    fontSize='large'></AccountCircleIcon>
-                </div>
+                    fontSize='large'></AssignmentIndIcon>
+                </PersonWrap>
               </SourseContainer>
               <Button
                 width='80px'

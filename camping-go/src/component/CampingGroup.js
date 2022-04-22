@@ -16,11 +16,14 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Taiwan from "./Taiwan";
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, TextField, Alert, AlertTitle, Stack } from "@mui/material";
 import { Font, Display, Img, Button } from "../css/style";
 import location from "../image/location.png";
 import landingpage from "../image/landingpage.jpeg";
 import Header from "../component/Header";
+import Modal from "react-modal";
+
+Modal.setAppElement("#root");
 
 const LinkRoute = styled(Link)`
   text-decoration: none;
@@ -45,20 +48,86 @@ const Label = styled.label`
 `;
 
 const ImgWrap = styled.div`
-width: 100%;
-height: 300px;
-overflow:hidden;`
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+`;
+
+function IsModal({ password, modalIsOpen, setIsOpen, group_id }) {
+  const [value, setValue] = useState("");
+  const [alert, setAlert] = useState(false);
+
+  const navigate = useNavigate();
+  console.log(value);
+  // console.log(groupId);
+  const handleChange = (event) => {
+    setValue(event.target.value);
+  };
+
+  const checkPassword = () => {
+    console.log(value);
+    console.log(password);
+
+    if (value == password) {
+      navigate(`/joinGroup/${group_id}`);
+    } else {
+      setAlert(true)
+    }
+  };
+
+  return (
+    <div className='App'>
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={() => setIsOpen(false)}
+        overlayClassName={{
+          base: "overlay-base",
+          afterOpen: "overlay-after",
+          beforeClose: "overlay-before",
+        }}
+        className={{
+          base: "content-base",
+          afterOpen: "content-after",
+          beforeClose: "content-before",
+        }}
+        closeTimeoutMS={500}>
+        <Display direction='column'>
+          <TextField
+            required
+            id='outlined-required'
+            label='Required'
+            defaultValue=''
+            onChange={handleChange}
+          />
+          {alert && (
+            <Stack sx={{ width: "100%" }} spacing={2}>
+              <Alert severity='error'>
+                <AlertTitle>Error</AlertTitle>
+                密碼錯誤 <strong>請再輸入一次!</strong>
+              </Alert>
+            </Stack>
+          )}
+          <Button onClick={checkPassword} width=' 200px'>
+            送出
+          </Button>
+        </Display>
+      </Modal>
+    </div>
+  );
+}
 
 function CampingGroup({ setGroupId, userId, groupId, userName }) {
   console.log(userName);
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
+  const [modalIsOpen, setIsOpen] = useState(false);
+
   const navigate = useNavigate();
 
   //render all camping group
   useEffect(async () => {
     let arr = [];
     const citiesRef = collection(db, "CreateCampingGroup");
-    const q = query(citiesRef, orderBy("create_time", "desc"));
+    const q = query(citiesRef, orderBy("start_date"));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
       console.log(doc.data());
@@ -79,7 +148,7 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
     });
   }, []);
 
-  const addCurrentMember = async (index,e) => {
+  const addCurrentMember = async (index, e) => {
     console.log(e.target.getAttribute("group_id"));
     let currentNumber;
     //current_number+1
@@ -99,9 +168,12 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
 
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      console.log("Document data:", docSnap.data().current_number);
+      console.log(docSnap.data().privacy);
       currentNumber = docSnap.data().current_number + 1;
       setGroupId(docSnap.data().group_id);
+      if (docSnap.data().privacy == "私人") {
+        setIsOpen(true);
+      }
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -125,19 +197,6 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
 
     // console.log(groupId);
   };
-
-  useEffect(async () => {
-    //set JoinGroup
-    // const docRefJoinGroup = await doc(db, "joinGroup", userId);
-    // console.log(groupId);
-    // updateDoc(docRefJoinGroup, {
-    //   group: [
-    //     {
-    //       group_id: groupId,
-    //     },
-    //   ],
-    // });
-  }, [groupId]);
 
   // console.log(homePageCampGroup[0].id);
   return (
@@ -219,15 +278,24 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
                   </div>
                 </Display>
               </div>
+              <IsModal
+                modalIsOpen={modalIsOpen}
+                setIsOpen={setIsOpen}
+                password={item.password}
+                group_id={item.group_id}
+              />
               <Button
                 group_id={item.group_id}
                 variant='outlined'
                 onClick={(e) => {
-                  addCurrentMember(index,e);
+                  addCurrentMember(index, e);
                 }}>
-                <LinkRoute to={`joinGroup/${item.group_id}`}>
-                  我要加入
-                </LinkRoute>
+                {item.privacy == "公開" && (
+                  <LinkRoute to={`joinGroup/${item.group_id}`}>
+                    我要加入
+                  </LinkRoute>
+                )}
+                {item.privacy == "私人" && <a>我要加入</a>}
               </Button>
 
               {/* <button

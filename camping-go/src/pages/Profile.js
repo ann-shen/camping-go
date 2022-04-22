@@ -6,19 +6,17 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../utils/firebase";
 import {
-  setDoc,
   getDoc,
   getDocs,
   collection,
   query,
   where,
   doc,
-  addDoc
+  addDoc,
+  deleteDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import {
-  Label,
-  Input,
-  AddButton,
   Font,
   Img,
   Display,
@@ -28,8 +26,8 @@ import Modal from "react-modal";
 import "../css/modal.css";
 import { TextField, Alert, Collapse, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import Header from "../component/Header";
 
+import Header from "../component/Header";
 
 Modal.setAppElement("#root");
 
@@ -67,11 +65,11 @@ function IsModal({ groupId, userName, userId }) {
   const handleChange = (event) => {
     setValue(event.target.value);
   };
-  
+
   const sendComment = async () => {
     console.log(groupId);
     setAlertOpen(true);
-    const docRef = collection(db, "feedback",groupId,"comment");
+    const docRef = collection(db, "feedback", groupId, "comment");
     await addDoc(docRef, {
       name: userName,
       note: value,
@@ -146,7 +144,7 @@ function IsComment({ groupId, userName, userId }) {
     console.log(groupId);
     let commentArr = [];
     setCommentIsOpen(true);
-    const commentRef = collection(db, "feedback",groupId,"comment");
+    const commentRef = collection(db, "feedback", groupId, "comment");
     const querySnapshot = await getDocs(commentRef);
     querySnapshot.forEach((doc) => {
       // doc.data() is never undefined for query doc snapshots
@@ -158,7 +156,10 @@ function IsComment({ groupId, userName, userId }) {
 
   return (
     <div className='App'>
-      <Button width=" 200px" onClick={checkComment} setCommentIsOpen={setCommentIsOpen}>
+      <Button
+        width=' 200px'
+        onClick={checkComment}
+        setCommentIsOpen={setCommentIsOpen}>
         查看評論
       </Button>
       <Modal
@@ -178,7 +179,7 @@ function IsComment({ groupId, userName, userId }) {
         <Display direction='column'>
           <Font onClick={() => setCommentIsOpen(false)}>X</Font>
           <Font>你的評論</Font>
-          <div className="setScroll">
+          <div className='setScroll'>
             {comment &&
               comment.map((item) => (
                 <Box
@@ -208,6 +209,7 @@ export default function Profile({ userName, userId }) {
   let params = useParams();
   const [yourCreateGroup, setYourCreateGroup] = useState([]);
   const [yourParticipateGroup, setYourParticipateGroup] = useState([]);
+
   useEffect(async () => {
     const q = query(
       collection(db, "CreateCampingGroup"),
@@ -251,6 +253,27 @@ export default function Profile({ userName, userId }) {
   const handleChangeIndex = (index) => {
     setValue(index);
   };
+
+  const deleteThisGroup = async (id) => {
+    console.log(id);
+    await deleteDoc(doc(db, "CreateCampingGroup", id));
+  };
+
+  const q = query(
+    collection(db, "CreateCampingGroup"),
+    where("header_id", "==", params.id)
+  );
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const cities = [];
+      querySnapshot.forEach((doc) => {
+        cities.push(doc.data());
+        setYourCreateGroup(cities);
+      });
+      console.log(cities);
+    });
+  }, []);
 
   return (
     <Box sx={{ bgcolor: "background.paper", width: "100%" }}>
@@ -310,6 +333,13 @@ export default function Profile({ userName, userId }) {
                   <IsComment groupId={item.group_id} />
                   {/* <Button>查看評論</Button> */}
                   <Button width='200px'>查看團友名單</Button>
+                  <Button
+                    width='200px'
+                    onClick={(id) => {
+                      deleteThisGroup(item.group_id);
+                    }}>
+                    刪除此團
+                  </Button>
                 </Display>
               </Display>
             </Box>

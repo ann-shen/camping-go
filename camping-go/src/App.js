@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
-import { useState, useEffect } from "react";
+import { useState, useEffect,useContext } from "react";
 import CreateGroup from "./pages/CreateGroup";
 import JoinGroupPage from "./pages/JoinGroupPage";
 import CampingGroup from "./component/CampingGroup";
@@ -17,9 +17,8 @@ function App() {
   const [groupId, setGroupId] = useState("");
   const [userId, setUserId] = useState("");
   const [allMemberArr, setAllMemberArr] = useState([]);
-
   const auth = getAuth();
-  // console.log(groupId);
+  
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
