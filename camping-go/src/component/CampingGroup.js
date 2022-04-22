@@ -10,6 +10,7 @@ import {
   where,
   updateDoc,
   orderBy,
+  arrayUnion,
 } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -78,7 +79,8 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
     });
   }, []);
 
-  const addCurrentMember = async (index) => {
+  const addCurrentMember = async (index,e) => {
+    console.log(e.target.getAttribute("group_id"));
     let currentNumber;
     //current_number+1
     const docRef = await doc(
@@ -115,26 +117,31 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
       current_number: currentNumber,
     });
 
+    const docRefJoinGroup = await doc(db, "joinGroup", userId);
+    console.log(homePageCampGroup[index].group_id);
+    updateDoc(docRefJoinGroup, {
+      group: arrayUnion(homePageCampGroup[index].group_id),
+    });
+
     // console.log(groupId);
   };
 
   useEffect(async () => {
     //set JoinGroup
-    const docRefJoinGroup = await doc(db, "joinGroup", userId);
-    console.log(groupId);
-    updateDoc(docRefJoinGroup, {
-      group: [
-        {
-          group_id: groupId,
-        },
-      ],
-    });
+    // const docRefJoinGroup = await doc(db, "joinGroup", userId);
+    // console.log(groupId);
+    // updateDoc(docRefJoinGroup, {
+    //   group: [
+    //     {
+    //       group_id: groupId,
+    //     },
+    //   ],
+    // });
   }, [groupId]);
 
   // console.log(homePageCampGroup[0].id);
   return (
     <div>
-      <Header />
       <Box
         sx={{
           width: "100%",
@@ -200,7 +207,7 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
                   <Display>
                     <Img src={location} width='26px'></Img>
                     <Font fontSize='16px' marginLeft='10px'>
-                      {item.city}{" "}
+                      {item.city}
                     </Font>
                   </Display>
                   <div>
@@ -213,9 +220,10 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
                 </Display>
               </div>
               <Button
+                group_id={item.group_id}
                 variant='outlined'
                 onClick={(e) => {
-                  addCurrentMember(index);
+                  addCurrentMember(index,e);
                 }}>
                 <LinkRoute to={`joinGroup/${item.group_id}`}>
                   我要加入

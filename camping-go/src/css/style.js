@@ -32,9 +32,10 @@ export const Display = styled.div`
   flex-direction: ${(props) => props.direction || "flex"};
   justify-content: ${(props) => props.justifyContent || "none"};
   margin-left: ${(props) => props.ml || "0px"};
-  align-items: center;
+  align-items: ${(props) => props.alignItems || "center"};
   border-bottom: ${(props) => props.borderBottom || "none"};
   padding-bottom: ${(props) => props.paddingBottom || "0px"};
+  /* height: ${(props) => props.height || "200px"}; */
 `;
 
 export const Img = styled.img`
@@ -53,4 +54,5 @@ export const Button = styled.button`
   background-color: ${(props) => props.bgc || "#eae5be"};
   font-size: ${(props) => props.fontSize || "20px"};
   color: ${(props) => props.color || "#797659"};
+  border:none
 `;

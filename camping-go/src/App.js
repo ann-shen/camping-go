@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import "rsuite/dist/rsuite.min.css";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 import { useState, useEffect } from "react";
@@ -78,7 +77,7 @@ function App() {
             }></Route>
           <Route
             path='profile/:id'
-            element={<Profile userName={userName} />}></Route>
+            element={<Profile userName={userName} userId={userId} />}></Route>
           <Route
             path='login'
             element={

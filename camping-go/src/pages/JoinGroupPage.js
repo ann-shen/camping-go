@@ -69,15 +69,48 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
 
   useEffect((e) => {
     let dragSource = document.querySelector("#drag-source");
-    // dragSource.addEventListener("dragstart", dragStart);
   }, []);
 
   const dragStart = async (e) => {
     e.dataTransfer.setData("text/plain", e.target.id);
-    let targetTentId = e.target.getAttribute("data-key");
     console.log("dragStart");
     console.log(currentTentId);
+  };
 
+  const drop = async (e) => {
+    onDragOver(e);
+    //前一頂帳篷
+    console.log(currentTentId);
+    console.log("drop");
+    let id = e.dataTransfer.getData("text");
+    e.target.appendChild(document.querySelector("#" + id));
+    e.target.style.backgroundColor = "white";
+    e.target.style.border = "4px solid #f5f4e8";
+    let targetTentId = e.target.getAttribute("data-key");
+    console.log(targetTentId);
+
+    // await updateDoc(
+    //   doc(db, "CreateCampingGroup", params.id, "tent", targetTentId),
+    //   {
+    //     current_number: increment(1),
+    //     member: arrayUnion(userName),
+    //   }
+    // ).then(async () => {
+    //   console.log("+1");
+    //   let tentsArr = [];
+    //   const citiesRef = collection(db, "CreateCampingGroup", params.id, "tent");
+    //   const q = query(citiesRef, orderBy("create_time", "desc"));
+    //   const querySnapshot = await getDocs(
+    //     collection(db, "CreateCampingGroup", params.id, "tent")
+    //   );
+    //   querySnapshot.forEach((doc) => {
+    //     // console.log(doc.id, " => ", doc.data());
+    //     tentsArr.push(doc.data());
+    //   });
+    //   setAllTentArr(tentsArr);
+    // });
+    // //設定前一頂帳篷進state
+    // setCurrentTentId(targetTentId);
     // if (currentTentId !== "") {
     //   await updateDoc(
     //     doc(db, "CreateCampingGroup", params.id, "tent", currentTentId),
@@ -86,7 +119,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     //       member: arrayRemove(userName),
     //     }
     //   ).then(async () => {
-    //     console.log("-1");
+    //     console.log("+1");
     //     let tentsArr = [];
     //     const citiesRef = collection(
     //       db,
@@ -104,72 +137,9 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     //     });
     //     setAllTentArr(tentsArr);
     //   });
+    // }else{
+    //   return
     // }
-  };
-
-  const drop = async (e) => {
-    onDragOver(e);
-    //前一頂帳篷
-    console.log(currentTentId);
-    console.log("drop");
-    let id = e.dataTransfer.getData("text");
-    e.target.appendChild(document.querySelector("#" + id));
-    e.target.style.backgroundColor = "white";
-    e.target.style.border = "4px solid #f5f4e8";
-    let targetTentId = e.target.getAttribute("data-key");
-    console.log(targetTentId);
-
-    await updateDoc(
-      doc(db, "CreateCampingGroup", params.id, "tent", targetTentId),
-      {
-        current_number: increment(1),
-        member: arrayUnion(userName),
-      }
-    ).then(async () => {
-      console.log("+1");
-      let tentsArr = [];
-      const citiesRef = collection(db, "CreateCampingGroup", params.id, "tent");
-      const q = query(citiesRef, orderBy("create_time", "desc"));
-      const querySnapshot = await getDocs(
-        collection(db, "CreateCampingGroup", params.id, "tent")
-      );
-      querySnapshot.forEach((doc) => {
-        // console.log(doc.id, " => ", doc.data());
-        tentsArr.push(doc.data());
-      });
-      setAllTentArr(tentsArr);
-    });
-    //設定前一頂帳篷進state
-    setCurrentTentId(targetTentId);
-    if (currentTentId !== "") {
-      await updateDoc(
-        doc(db, "CreateCampingGroup", params.id, "tent", currentTentId),
-        {
-          current_number: increment(-1),
-          member: arrayRemove(userName),
-        }
-      ).then(async () => {
-        console.log("+1");
-        let tentsArr = [];
-        const citiesRef = collection(
-          db,
-          "CreateCampingGroup",
-          params.id,
-          "tent"
-        );
-        const q = query(citiesRef, orderBy("create_time", "desc"));
-        const querySnapshot = await getDocs(
-          collection(db, "CreateCampingGroup", params.id, "tent")
-        );
-        querySnapshot.forEach((doc) => {
-          // console.log(doc.id, " => ", doc.data());
-          tentsArr.push(doc.data());
-        });
-        setAllTentArr(tentsArr);
-      });
-    }else{
-      return
-    }
   };
 
   const onDragOver = (e) => {
@@ -190,16 +160,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   };
 
   const onDragLeave = async (e) => {
-    // console.log(e.target.getAttribute("data-key"));
-    let targetTentId = e.target.getAttribute("data-key");
     console.log("leave");
-    // await updateDoc(
-    //   doc(db, "CreateCampingGroup", params.id, "tent", targetTentId),
-    //   {
-    //     member: arrayRemove(userName),
-    //     current_number: increment(0),
-    //   }
-    // );
     e.target.style.backgroundColor = "#f5f4e8";
     e.target.style.border = "3px dotted #426765";
   };
@@ -304,7 +265,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     <div>
       {
         <div>
-          <Header params={params} />
+          <Header homePageCampGroup={homePageCampGroup} />
           <Box
             sx={{
               display: "flex",
@@ -398,17 +359,18 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                       個位置
                     </Font>
                     <Display>
-                      {item.member.map((item, index) => (
-                        <Display direction='column' justifyContent='center'>
-                          <Font margin='10px' marginLeft='10px'>
-                            {item}
-                          </Font>
-                          <AccountCircleIcon
-                            key={index}
-                            color='primary'
-                            fontSize='large'></AccountCircleIcon>
-                        </Display>
-                      ))}
+                      {item.member &&
+                        item.member.map((item, index) => (
+                          <Display direction='column' justifyContent='center'>
+                            <Font margin='10px' marginLeft='10px'>
+                              {item}
+                            </Font>
+                            <AccountCircleIcon
+                              key={index}
+                              color='primary'
+                              fontSize='large'></AccountCircleIcon>
+                          </Display>
+                        ))}
                     </Display>
                     <Display>
                       {Array(

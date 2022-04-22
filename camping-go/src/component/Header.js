@@ -24,15 +24,14 @@ const ALink = styled(Link)`
 `;
 
 //sf
-let id = "j4UHjWODuDbhTHY5Ys6UzFmdAq32";
-function Header() {
+function Header({ homePageCampGroup }) {
   return (
     <div>
       <Nav>
         <ALink to={"/"}>
           <LogoImg src={logo}></LogoImg>
         </ALink>
-        <ALink to={`/profile/${id}`}>我的露營趴</ALink>
+        <ALink to={`/profile/${homePageCampGroup.header_id}`}>我的露營趴</ALink>
       </Nav>
     </div>
   );

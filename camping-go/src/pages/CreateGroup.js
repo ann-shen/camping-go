@@ -168,18 +168,18 @@ function CreateGroup({
 
   const navigate = useNavigate();
 
-  useEffect(async () => {
-    if (userId) {
-      const docRef = doc(db, "joinGroup", userId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        // console.log(docSnap.data().info.user_name);
-        setUserName(docSnap.data().info.user_name);
-      } else {
-        console.log("No such document!");
-      }
-    }
-  }, [userId]);
+  // useEffect(async () => {
+  //   if (userId) {
+  //     const docRef = doc(db, "joinGroup", userId);
+  //     const docSnap = await getDoc(docRef);
+  //     if (docSnap.exists()) {
+  //       // console.log(docSnap.data().info.user_name);
+  //       setUserName(docSnap.data().info.user_name);
+  //     } else {
+  //       console.log("No such document!");
+  //     }
+  //   }
+  // }, [userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
