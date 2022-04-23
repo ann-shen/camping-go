@@ -2,7 +2,7 @@ import * as React from "react";
 import SwipeableViews from "react-swipeable-views";
 import { useTheme } from "@mui/material/styles";
 import { AppBar, Tabs, Tab, Typography, Box } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../utils/firebase";
 import {
@@ -15,18 +15,16 @@ import {
   addDoc,
   deleteDoc,
   onSnapshot,
+  updateDoc,
+  arrayRemove,
 } from "firebase/firestore";
-import {
-  Font,
-  Img,
-  Display,
-  Button,
-} from "../css/style";
+import { Font, Img, Display, Button } from "../css/style";
 import Modal from "react-modal";
 import "../css/modal.css";
 import { TextField, Alert, Collapse, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-
+import { UserContext } from "../utils/userContext";
+import Rating from "@mui/material/Rating";
 import Header from "../component/Header";
 
 Modal.setAppElement("#root");
@@ -57,10 +55,12 @@ function a11yProps(index) {
   };
 }
 
-function IsModal({ groupId, userName, userId }) {
+function SentCommentToHeader({ groupId, userName, userId }) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(true);
   const [value, setValue] = useState("Controlled");
+  const [startValue, setStartValue] = React.useState(2);
+
   // console.log(groupId);
   const handleChange = (event) => {
     setValue(event.target.value);
@@ -73,7 +73,7 @@ function IsModal({ groupId, userName, userId }) {
     await addDoc(docRef, {
       name: userName,
       note: value,
-      score: 2.3,
+      score: startValue,
       user_iD: userId,
     });
   };
@@ -127,6 +127,19 @@ function IsModal({ groupId, userName, userId }) {
               已送出
             </Alert>
           </Collapse>
+          <Box>
+            <Rating
+              name='size-large'
+              defaultValue={2}
+              size='large'
+              value={startValue}
+              onChange={(event, newValue) => {
+                console.log(newValue);
+                setStartValue(newValue);
+              }}
+            />
+          </Box>
+
           <Button bgc='#426765' color='#eae5be' onClick={sendComment}>
             送出評論
           </Button>
@@ -136,9 +149,11 @@ function IsModal({ groupId, userName, userId }) {
   );
 }
 
-function IsComment({ groupId, userName, userId }) {
+function CheckCommentFromMember({ groupId }) {
   const [commentIsOpen, setCommentIsOpen] = useState(false);
   const [comment, setComment] = useState([]);
+  const [totalScore, setTotalScore] = useState("");
+
 
   const checkComment = async () => {
     console.log(groupId);
@@ -153,6 +168,20 @@ function IsComment({ groupId, userName, userId }) {
     });
     setComment(commentArr);
   };
+
+  useEffect(() => {
+    let scoreArr = [];
+    comment.map((item) => {
+      console.log(item.score);
+      scoreArr.push(item.score);
+    });
+    console.log(scoreArr);
+      let totalScore = scoreArr.reduce(function (total, e) {
+        return total + e;
+      },0);
+
+      setTotalScore(totalScore / comment.length);
+  }, [comment]);
 
   return (
     <div className='App'>
@@ -179,6 +208,8 @@ function IsComment({ groupId, userName, userId }) {
         <Display direction='column'>
           <Font onClick={() => setCommentIsOpen(false)}>X</Font>
           <Font>你的評論</Font>
+          <Font>總分</Font>
+          <Font>{totalScore}</Font>
           <div className='setScroll'>
             {comment &&
               comment.map((item) => (
@@ -203,12 +234,105 @@ function IsComment({ groupId, userName, userId }) {
   );
 }
 
+function CheckOfGroupMember({ groupId, userId }) {
+  const [memberIsOpen, setMemberIsOpen] = useState(false);
+  const [member, setMember] = useState([]);
+  const checkMemberList = async () => {
+    setMemberIsOpen(true);
+    const docRef = await collection(
+      db,
+      "CreateCampingGroup",
+      groupId,
+      "member"
+    );
+    let memberArr = [];
+
+    const memberData = await getDocs(docRef);
+    memberData.forEach((doc) => {
+      console.log(doc.id, " => ", doc.data());
+      memberArr.push(doc.data());
+    });
+    setMember(memberArr);
+  };
+
+  const removeMember = async (index) => {
+    console.log(groupId);
+    await deleteDoc(
+      doc(db, "CreateCampingGroup", groupId, "member", member[index].member_id)
+    ).then(async () => {
+      let afterDeleteMemberArr = [];
+      const commentRef = collection(
+        db,
+        "CreateCampingGroup",
+        groupId,
+        "member"
+      );
+      const querySnapshot = await getDocs(commentRef);
+      querySnapshot.forEach((doc) => {
+        console.log(doc.id, " => ", doc.data());
+        afterDeleteMemberArr.push(doc.data());
+      });
+      setMember(afterDeleteMemberArr);
+    });
+    const docRefJoinGroup = await doc(db, "joinGroup", userId);
+    updateDoc(docRefJoinGroup, {
+      group: arrayRemove(groupId),
+    });
+  };
+
+  return (
+    <div className='App'>
+      <Button
+        width=' 200px'
+        onClick={checkMemberList}
+        setMemberIsOpen={setMemberIsOpen}>
+        查看團員名單
+      </Button>
+      <Modal
+        isOpen={memberIsOpen}
+        onRequestClose={() => setMemberIsOpen(false)}
+        overlayClassName={{
+          base: "overlay-base",
+          afterOpen: "overlay-after",
+          beforeClose: "overlay-before",
+        }}
+        className={{
+          base: "content-base",
+          afterOpen: "content-after",
+          beforeClose: "content-before",
+        }}
+        closeTimeoutMS={500}>
+        <Display direction='column'>
+          <Font onClick={() => setMemberIsOpen(false)}>X</Font>
+          <Font>你的團員</Font>
+          <div className='setScroll'>
+            {member.map((item, index) => (
+              <Display>
+                <Font>{item.member_name}</Font>
+                <Button
+                  mt='10px'
+                  bgc='white'
+                  onClick={() => {
+                    removeMember(index);
+                  }}>
+                  移除成員
+                </Button>
+              </Display>
+            ))}
+          </div>
+        </Display>
+      </Modal>
+    </div>
+  );
+}
+
 export default function Profile({ userName, userId }) {
   const theme = useTheme();
   const [value, setValue] = useState(0);
   let params = useParams();
   const [yourCreateGroup, setYourCreateGroup] = useState([]);
   const [yourParticipateGroup, setYourParticipateGroup] = useState([]);
+  const ContextByUserId = useContext(UserContext);
 
   useEffect(async () => {
     const q = query(
@@ -266,100 +390,63 @@ export default function Profile({ userName, userId }) {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const cities = [];
+      const groups = [];
       querySnapshot.forEach((doc) => {
-        cities.push(doc.data());
-        setYourCreateGroup(cities);
+        console.log(doc.data());
+        groups.push(doc.data());
       });
-      console.log(cities);
+      setYourCreateGroup(groups);
     });
   }, []);
 
   return (
-    <Box sx={{ bgcolor: "background.paper", width: "100%" }}>
-      <AppBar position='static' sx={{ bgcolor: "#426765" }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          // indicatorColor='secondary'
-          textColor='inherit'
-          variant='fullWidth'
-          aria-label='full width tabs example'
-          TabIndicatorProps={{
-            style: {
-              backgroundColor: "#CFC781",
-            },
-          }}>
-          <Tab label='我開的團' {...a11yProps(0)} />
-          <Tab label='加入的團' {...a11yProps(1)} />
-        </Tabs>
-      </AppBar>
-      <SwipeableViews
-        axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-        index={value}
-        onChangeIndex={handleChangeIndex}>
-        <TabPanel value={value} index={0} dir={theme.direction}>
-          {yourCreateGroup.map((item, index) => (
-            <Box
-              key={index}
-              sx={{
-                width: "80%",
-                height: "auto",
-                boxShadow: 2,
-                borderRadius: 6,
-                padding: 3,
-                margin: 3,
-              }}>
-              <Display justifyContent='space-around'>
-                <Display direction='column' alignItems='start'>
-                  <Img src={item.picture} width='300px'></Img>
-                  <Font>{item.group_title}</Font>
-                  <Font>
-                    {
-                      new Date(item.start_date.seconds * 1000)
-                        .toLocaleString()
-                        .split(" ")[0]
-                    }
-                    ~
-                    {
-                      new Date(item.end_date.seconds * 1000)
-                        .toLocaleString()
-                        .split(" ")[0]
-                    }
-                  </Font>
-                  <Font>{item.city}</Font>
-                </Display>
-                <Display direction='column' alignItems='end'>
-                  <IsComment groupId={item.group_id} />
-                  {/* <Button>查看評論</Button> */}
-                  <Button width='200px'>查看團友名單</Button>
-                  <Button
-                    width='200px'
-                    onClick={(id) => {
-                      deleteThisGroup(item.group_id);
-                    }}>
-                    刪除此團
-                  </Button>
-                </Display>
-              </Display>
-            </Box>
-          ))}
-        </TabPanel>
-        {yourParticipateGroup && (
-          <div>
-            {yourParticipateGroup.map((item, index) => (
+    <div>
+      <Header ContextByUserId={ContextByUserId} />
+      <Box sx={{ bgcolor: "background.paper", width: "100%" }}>
+        <AppBar position='static' sx={{ bgcolor: "#426765" }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            // indicatorColor='secondary'
+            textColor='inherit'
+            variant='fullWidth'
+            aria-label='full width tabs example'
+            TabIndicatorProps={{
+              style: {
+                backgroundColor: "#CFC781",
+              },
+            }}>
+            <Tab label='我開的團' {...a11yProps(0)} />
+            <Tab label='加入的團' {...a11yProps(1)} />
+          </Tabs>
+        </AppBar>
+        <SwipeableViews
+          axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+          index={value}
+          onChangeIndex={handleChangeIndex}>
+          <TabPanel value={value} index={0} dir={theme.direction}>
+            {yourCreateGroup.map((item, index) => (
               <Box
                 key={index}
                 sx={{
                   width: "80%",
                   height: "auto",
-                  boxShadow: 2,
+                  boxShadow:
+                    "0.8rem 0.8rem 3.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
                   borderRadius: 6,
                   padding: 3,
                   margin: 3,
                 }}>
                 <Display justifyContent='space-around'>
                   <Display direction='column' alignItems='start'>
+                    {new Date().getTime() <
+                    new Date(
+                      new Date(item.end_date.seconds * 1000)
+                        .toLocaleString()
+                        .split(" ")[0]
+                    ).getTime()
+                      ? "進行中"
+                      : "已結束"}
                     <Img src={item.picture} width='300px'></Img>
                     <Font>{item.group_title}</Font>
                     <Font>
@@ -378,19 +465,70 @@ export default function Profile({ userName, userId }) {
                     <Font>{item.city}</Font>
                   </Display>
                   <Display direction='column' alignItems='end'>
-                    <IsModal
+                    <CheckCommentFromMember groupId={item.group_id} />
+                    <CheckOfGroupMember
                       groupId={item.group_id}
-                      userName={userName}
                       userId={userId}
                     />
+                    <Button
+                      width='200px'
+                      onClick={(id) => {
+                        deleteThisGroup(item.group_id);
+                      }}>
+                      刪除此團
+                    </Button>
                   </Display>
                 </Display>
               </Box>
             ))}
-          </div>
-        )}
-        <TabPanel value={value} index={1} dir={theme.direction}></TabPanel>
-      </SwipeableViews>
-    </Box>
+          </TabPanel>
+          {yourParticipateGroup && (
+            <div>
+              {yourParticipateGroup.map((item, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    width: "80%",
+                    height: "auto",
+                    boxShadow: 2,
+                    borderRadius: 6,
+                    padding: 3,
+                    margin: 3,
+                  }}>
+                  <Display justifyContent='space-around'>
+                    <Display direction='column' alignItems='start'>
+                      <Img src={item.picture} width='300px'></Img>
+                      <Font>{item.group_title}</Font>
+                      <Font>
+                        {
+                          new Date(item.start_date.seconds * 1000)
+                            .toLocaleString()
+                            .split(" ")[0]
+                        }
+                        ~
+                        {
+                          new Date(item.end_date.seconds * 1000)
+                            .toLocaleString()
+                            .split(" ")[0]
+                        }
+                      </Font>
+                      <Font>{item.city}</Font>
+                    </Display>
+                    <Display direction='column' alignItems='end'>
+                      <SentCommentToHeader
+                        groupId={item.group_id}
+                        userName={userName}
+                        userId={userId}
+                      />
+                    </Display>
+                  </Display>
+                </Box>
+              ))}
+            </div>
+          )}
+          <TabPanel value={value} index={1} dir={theme.direction}></TabPanel>
+        </SwipeableViews>
+      </Box>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import "./taiwan.css";
+import "../css/taiwan.css";
 import { useRef, useState, useEffect } from "react";
 import { db } from "../utils/firebase";
 import styled from "styled-components";

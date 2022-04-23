@@ -12,20 +12,28 @@ import {
   orderBy,
   arrayUnion,
 } from "firebase/firestore";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import Taiwan from "./Taiwan";
+import Taiwan from "../component/Taiwan";
 import { Box, Grid, TextField, Alert, AlertTitle, Stack } from "@mui/material";
 import { Font, Display, Img, Button } from "../css/style";
 import location from "../image/location.png";
 import landingpage from "../image/landingpage.jpeg";
 import Header from "../component/Header";
 import Modal from "react-modal";
+import { UserContext } from "../utils/userContext";
 
 Modal.setAppElement("#root");
 
-const LinkRoute = styled(Link)`
+const LinkPrivate = styled(Link)`
+  text-decoration: none;
+  margin: 5px 5px;
+  font-size: 14px;
+  color: gray;
+`;
+
+const LinkOpen = styled.a`
   text-decoration: none;
   margin: 5px 5px;
   font-size: 14px;
@@ -49,29 +57,26 @@ const Label = styled.label`
 
 const ImgWrap = styled.div`
   width: 100%;
-  height: 300px;
+  height: 200px;
   overflow: hidden;
+  margin-bottom: 20px;
 `;
 
-function IsModal({ password, modalIsOpen, setIsOpen, group_id }) {
+function IsModal({ password, modalIsOpen, setIsOpen, groupId }) {
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState(false);
-
   const navigate = useNavigate();
+
   console.log(value);
-  // console.log(groupId);
   const handleChange = (event) => {
     setValue(event.target.value);
   };
 
-  const checkPassword = () => {
-    console.log(value);
-    console.log(password);
-
+  const checkPassword = (e) => {
     if (value == password) {
-      navigate(`/joinGroup/${group_id}`);
+      navigate(`/joinGroup/${groupId}`);
     } else {
-      setAlert(true)
+      setAlert(true);
     }
   };
 
@@ -116,11 +121,11 @@ function IsModal({ password, modalIsOpen, setIsOpen, group_id }) {
   );
 }
 
-function CampingGroup({ setGroupId, userId, groupId, userName }) {
-  console.log(userName);
+function CampingGroup({ setGroupId, userId, userName, groupId }) {
+  console.log(groupId);
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
-
+  const ContextByUserId = useContext(UserContext);
   const navigate = useNavigate();
 
   //render all camping group
@@ -149,7 +154,6 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
   }, []);
 
   const addCurrentMember = async (index, e) => {
-    console.log(e.target.getAttribute("group_id"));
     let currentNumber;
     //current_number+1
     const docRef = await doc(
@@ -194,13 +198,12 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
     updateDoc(docRefJoinGroup, {
       group: arrayUnion(homePageCampGroup[index].group_id),
     });
-
-    // console.log(groupId);
   };
 
   // console.log(homePageCampGroup[0].id);
   return (
     <div>
+      <Header ContextByUserId={ContextByUserId} />
       <Box
         sx={{
           width: "100%",
@@ -209,7 +212,6 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
             border: 1,
             opacity: [0.9, 0.8, 0.7],
           },
-          boxShadow: 3,
           overflow: "hidden",
         }}>
         <Img src={landingpage} width='100%'></Img>
@@ -220,47 +222,50 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
             sx={{
               width: 1000,
               height: "auto",
+              
+              boxShadow:
+                "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
               "&:hover": {
                 border: 1,
                 opacity: [0.9, 0.8, 0.7],
               },
-              boxShadow: 3,
               borderRadius: 6,
               padding: 3,
               margin: 3,
             }}
             key={index}>
             <Grid item xs={4} md={8}>
-              <div>
-                <span>團長{item.header_name}</span>
-              </div>
               <ImgWrap>
-                <Img src={item.picture} width='100%' alt='圖片' />
+                <Img src={item.picture} width='120%' alt='圖片' />
               </ImgWrap>
-              <Font
-                fontSize='24px'
-                color='#797659'
-                marginLeft='0px'
-                margin='8px'>
-                {item.group_title}
-              </Font>
-              <div>
-                <Label ml='8px'>
-                  {
-                    new Date(item.start_date.seconds * 1000)
-                      .toLocaleString()
-                      .split(" ")[0]
-                  }
-                  ~
-                </Label>
-                <Label>
-                  {
-                    new Date(item.end_date.seconds * 1000)
-                      .toLocaleString()
-                      .split(" ")[0]
-                  }
-                </Label>
-              </div>
+              <Display direction='column' alignItems='start' mb='30px'>
+                <span>團長{item.header_name}</span>
+                <Font
+                  fontSize='24px'
+                  color='#797659'
+                  marginLeft='0px'
+                  margin='8px'>
+                  {item.group_title}
+                </Font>
+                <div>
+                  <Label ml='8px'>
+                    {
+                      new Date(item.start_date.seconds * 1000)
+                        .toLocaleString()
+                        .split(" ")[0]
+                    }
+                    ~
+                  </Label>
+                  <Label>
+                    {
+                      new Date(item.end_date.seconds * 1000)
+                        .toLocaleString()
+                        .split(" ")[0]
+                    }
+                  </Label>
+                </div>
+              </Display>
+
               <div>
                 <Display justifyContent='space-between'>
                   <Display>
@@ -282,7 +287,7 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
                 modalIsOpen={modalIsOpen}
                 setIsOpen={setIsOpen}
                 password={item.password}
-                group_id={item.group_id}
+                groupId={groupId}
               />
               <Button
                 group_id={item.group_id}
@@ -291,21 +296,12 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
                   addCurrentMember(index, e);
                 }}>
                 {item.privacy == "公開" && (
-                  <LinkRoute to={`joinGroup/${item.group_id}`}>
+                  <LinkPrivate to={`joinGroup/${item.group_id}`}>
                     我要加入
-                  </LinkRoute>
+                  </LinkPrivate>
                 )}
-                {item.privacy == "私人" && <a>我要加入</a>}
+                {item.privacy == "私人" && <LinkOpen>我要加入</LinkOpen>}
               </Button>
-
-              {/* <button
-                onClick={(e) => {
-                  addCurrentMember(index);
-                }}>
-                <LinkRoute to={`joinGroup/${item.group_id}`}>
-                  我要加入
-                </LinkRoute>
-              </button> */}
             </Grid>
           </Box>
         ))}
@@ -324,6 +320,7 @@ function CampingGroup({ setGroupId, userId, groupId, userName }) {
         +
       </Button>
       <Taiwan />
+      {ContextByUserId}
     </div>
   );
 }

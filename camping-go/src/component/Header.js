@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import logo from "../image/logo.png";
 import { Link } from "react-router-dom";
+import { Label, AddButton, Font, Img, Display, Button } from "../css/style";
 
 const Nav = styled.div`
   background-color: #cfc781;
@@ -24,14 +25,17 @@ const ALink = styled(Link)`
 `;
 
 //sf
-function Header({ homePageCampGroup }) {
+function Header({ ContextByUserId }) {
   return (
     <div>
       <Nav>
         <ALink to={"/"}>
           <LogoImg src={logo}></LogoImg>
         </ALink>
-        <ALink to={`/profile/${homePageCampGroup.header_id}`}>我的露營趴</ALink>
+        <Display>
+          <ALink to={`/profile/${ContextByUserId}`}>我的露營趴</ALink>
+          <ALink to={`/login`}>登入</ALink>
+        </Display>
       </Nav>
     </div>
   );

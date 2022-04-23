@@ -14,7 +14,7 @@ import {
   arrayRemove,
   increment,
 } from "firebase/firestore";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useParams } from "react-router-dom";
 import "../utils/data";
 import { Label, AddButton, Font, Img, Display, Button } from "../css/style";
@@ -26,6 +26,8 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import location from "../image/location.png";
 import tent from "../image/tent.png";
 import { v4 as uuidv4 } from "uuid";
+import { UserContext } from "../utils/userContext";
+
 
 const TargetContainer = {
   display: "flex",
@@ -73,6 +75,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   const [addNewTentSection, setAddNewTentSection] = useState(false);
   const [currentTentId, setCurrentTentId] = useState("");
   const [alreadyTentId, setAlreadyTentId] = useState("");
+  const ContextByUserId = useContext(UserContext);
 
   //------------------------DND ------------------------//
 
@@ -300,7 +303,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     <div>
       {
         <div>
-          <Header homePageCampGroup={homePageCampGroup} />
+          <Header ContextByUserId={ContextByUserId} />
           <Box
             sx={{
               display: "flex",
@@ -410,13 +413,18 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                                 fontSize='large'></AccountCircleIcon>
                             )}
                             {seat === userName && (
-                              <div
+                              <PersonWrap
                                 data-key={item.tent_id}
                                 id='drag-source'
                                 draggable='true'
                                 onDragStart={dragStart}>
-                                <AssignmentIndIcon fontSize='large'></AssignmentIndIcon>
-                              </div>
+                                <AssignmentIndIcon
+                                  sx={{
+                                    pointerEvents: "none",
+                                    cursor: "not-allowed",
+                                  }}
+                                  fontSize='large'></AssignmentIndIcon>
+                              </PersonWrap>
                             )}
                           </Display>
                         ))}

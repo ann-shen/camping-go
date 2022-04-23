@@ -32,6 +32,8 @@ export const Display = styled.div`
   flex-direction: ${(props) => props.direction || "flex"};
   justify-content: ${(props) => props.justifyContent || "none"};
   margin-left: ${(props) => props.ml || "0px"};
+  margin-bottom: ${(props) => props.mb || "0px"};
+
   align-items: ${(props) => props.alignItems || "center"};
   border-bottom: ${(props) => props.borderBottom || "none"};
   padding-bottom: ${(props) => props.paddingBottom || "0px"};
@@ -46,13 +48,29 @@ export const Img = styled.img`
 `;
 
 export const Button = styled.button`
+  &:hover {
+    color: #ffffff;
+    background-color: #dcd8b3;
+    box-shadow: none;
+  }
+  &:active {
+    color:#797659;
+    background-color: #eae5be;
+    box-shadow: inset 0.2rem 0.2rem 1rem #dcd8b3,
+      inset -0.2rem -0.2rem 1rem #fffef4;
+  }
   margin-top: ${(props) => props.mt || "50px"};
   margin-left: ${(props) => props.ml || "0px"};
   width: ${(props) => props.width || "100%"};
   height: ${(props) => props.height || "40px"};
-  border-radius: ${(props) => props.borderRadius || "40px"};
+  border-radius: ${(props) => props.borderRadius || "16px"};
   background-color: ${(props) => props.bgc || "#eae5be"};
-  font-size: ${(props) => props.fontSize || "20px"};
+  font-size: ${(props) => props.fontSize || "16px"};
   color: ${(props) => props.color || "#797659"};
-  border:none
+  border: none;
+  box-shadow: ${(props) =>
+    props.boxShadow ||
+    "inset 0.2rem 0.2rem 1rem #FFFEF4, inset -0.2rem -0.2rem 1rem #DCD8B3, 0.2rem 0.2rem 0.3rem #D7D2AE, -0.2rem -0.2rem 0.5rem #ffffff"};
+  padding: 5px;
+  letter-spacing: 2px;
 `;

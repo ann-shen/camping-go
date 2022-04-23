@@ -61,6 +61,9 @@ function Loogin({ setUserId, setUserName, userName }) {
         // Signed in
         const user = userCredential.user;
         console.log(user);
+        updateProfile(auth.currentUser, {
+          displayName: userName,
+        });
         navigate("/");
         // ...
       })
