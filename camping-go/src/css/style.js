@@ -54,9 +54,9 @@ export const Button = styled.button`
     box-shadow: none;
   }
   &:active {
-    color:#797659;
+    color: #797659;
     background-color: #eae5be;
-    box-shadow: inset 0.2rem 0.2rem 1rem #dcd8b3,
+    box-shadow: inset 0.2rem 0.2rem 1rem #bdb991,
       inset -0.2rem -0.2rem 1rem #fffef4;
   }
   margin-top: ${(props) => props.mt || "50px"};

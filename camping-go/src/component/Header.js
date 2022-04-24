@@ -35,6 +35,7 @@ function Header({ ContextByUserId }) {
         <Display>
           <ALink to={`/profile/${ContextByUserId}`}>我的露營趴</ALink>
           <ALink to={`/login`}>登入</ALink>
+          <ALink to={`/personal_header/${ContextByUserId}`}>開團歷史紀錄</ALink>
         </Display>
       </Nav>
     </div>

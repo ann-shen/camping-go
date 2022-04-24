@@ -11,6 +11,7 @@ import {
   updateDoc,
   orderBy,
   arrayUnion,
+  onSnapshot,
 } from "firebase/firestore";
 import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
@@ -62,18 +63,17 @@ const ImgWrap = styled.div`
   margin-bottom: 20px;
 `;
 
-function IsModal({ password, modalIsOpen, setIsOpen, groupId }) {
+function IsModal({ modalIsOpen, setIsOpen, groupId, groupPassword }) {
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState(false);
   const navigate = useNavigate();
 
-  console.log(value);
   const handleChange = (event) => {
     setValue(event.target.value);
   };
 
   const checkPassword = (e) => {
-    if (value == password) {
+    if (value == groupPassword) {
       navigate(`/joinGroup/${groupId}`);
     } else {
       setAlert(true);
@@ -122,9 +122,10 @@ function IsModal({ password, modalIsOpen, setIsOpen, groupId }) {
 }
 
 function CampingGroup({ setGroupId, userId, userName, groupId }) {
-  console.log(groupId);
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [groupPassword, setGroupPassword] = useState("");
+  const [currentMemberAmount, setCurrentMemberAmount] = useState("");
   const ContextByUserId = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -135,7 +136,6 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     const q = query(citiesRef, orderBy("start_date"));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      console.log(doc.data());
       arr.push(doc.data());
     });
     sethomePageCampGroup(arr);
@@ -153,9 +153,19 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     });
   }, []);
 
-  const addCurrentMember = async (index, e) => {
+  useEffect(async () => {
+    if (currentMemberAmount) {
+      console.log(currentMemberAmount);
+      await updateDoc(doc(db, "CreateCampingGroup", groupId), {
+        current_number: currentMemberAmount,
+      });
+    }
+  }, [currentMemberAmount]);
+
+  const addCurrentMember = async (index, e, password) => {
     let currentNumber;
-    //current_number+1
+    setGroupId(homePageCampGroup[index].group_id.toString());
+    setGroupPassword(password);
     const docRef = await doc(
       db,
       "CreateCampingGroup",
@@ -172,26 +182,48 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
 
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      console.log(docSnap.data().privacy);
-      currentNumber = docSnap.data().current_number + 1;
-      setGroupId(docSnap.data().group_id);
       if (docSnap.data().privacy == "私人") {
         setIsOpen(true);
+        console.log("就是你");
       }
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
     }
-
     setDoc(docRefMember, {
       role: "member",
       member_name: userName,
       member_id: userId,
+    }).then(async () => {
+      const querySnapshot = await getDocs(
+        collection(
+          db,
+          "CreateCampingGroup",
+          homePageCampGroup[index].group_id.toString(),
+          "member"
+        )
+      );
+      let memberArrLength = [];
+      querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        console.log(doc.id, " => ", doc.data());
+        memberArrLength.push(doc.data());
+      });
+      console.log(memberArrLength.length);
+      await updateDoc(docRef, {
+        current_number: memberArrLength.length,
+      });
+      
+      // setCurrentMemberAmount(memberArrLength.length);
     });
-
-    updateDoc(docRef, {
-      current_number: currentNumber,
-    });
+    // .then(async() => {
+    //   if(currentMembeAmount !== "" ){
+    //     console.log(currentMembeAmount);
+    //     await updateDoc(docRef, {
+    //       current_number: currentMembeAmount,
+    //     });
+    //   }
+    // });
 
     const docRefJoinGroup = await doc(db, "joinGroup", userId);
     console.log(homePageCampGroup[index].group_id);
@@ -199,6 +231,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       group: arrayUnion(homePageCampGroup[index].group_id),
     });
   };
+
 
   // console.log(homePageCampGroup[0].id);
   return (
@@ -222,7 +255,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
             sx={{
               width: 1000,
               height: "auto",
-              
+
               boxShadow:
                 "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
               "&:hover": {
@@ -286,14 +319,14 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
               <IsModal
                 modalIsOpen={modalIsOpen}
                 setIsOpen={setIsOpen}
-                password={item.password}
                 groupId={groupId}
+                groupPassword={groupPassword}
               />
               <Button
                 group_id={item.group_id}
                 variant='outlined'
                 onClick={(e) => {
-                  addCurrentMember(index, e);
+                  addCurrentMember(index, e, item.password);
                 }}>
                 {item.privacy == "公開" && (
                   <LinkPrivate to={`joinGroup/${item.group_id}`}>
@@ -314,13 +347,13 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
         fontSize='30px'
         bgc='#426765'
         color='#CFC781'
+        boxShadow='none'
         onClick={() => {
           navigate("/createGroup");
         }}>
         +
       </Button>
       <Taiwan />
-      {ContextByUserId}
     </div>
   );
 }
