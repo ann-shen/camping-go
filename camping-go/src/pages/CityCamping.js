@@ -7,7 +7,7 @@ import {
   where,
   updateDoc,
   increment,
-  doc
+  doc,
 } from "firebase/firestore";
 import { Box, Grid } from "@mui/material";
 import { Font, Display, Img, Button } from "../css/style";
@@ -248,15 +248,14 @@ function CityCamping() {
     }
   }, [targetCity]);
 
-  const moveToTentGroupPage = async (e) => {
-    let id = e.target.getAttribute("tent_id");
-    await updateDoc(doc(db, "CreateCampingGroup",id), {
+
+  const addCurrentMember = async (group_id,index) => {
+    console.log(group_id);
+    await updateDoc(doc(db, "CreateCampingGroup", group_id), {
       current_number: increment(1),
     });
-    navigate(`/joinGroup/${id}`);
+    navigate(`/joinGroup/${group_id}`);
   };
-
-  const addCurrentMember = async (index) => {};
 
   return (
     <div>
@@ -319,14 +318,9 @@ function CityCamping() {
             <Button
               variant='outlined'
               onClick={(e) => {
-                addCurrentMember(index);
+                addCurrentMember(item.group_id,index);
               }}>
-              {/* <LinkRoute to={`joinGroup/${item.group_id}`}> */}
-              <div tent_id={item.group_id} onClick={moveToTentGroupPage}>
-                家家
-              </div>
               我要加入
-              {/* </LinkRoute> */}
             </Button>
           </Grid>
         </Box>

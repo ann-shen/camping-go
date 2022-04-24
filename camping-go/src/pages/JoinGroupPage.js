@@ -28,7 +28,6 @@ import tent from "../image/tent.png";
 import { v4 as uuidv4 } from "uuid";
 import { UserContext } from "../utils/userContext";
 
-
 const TargetContainer = {
   display: "flex",
   justifyContent: "center",
@@ -241,25 +240,42 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     });
   }, []);
 
+  // useEffect(()=>{
+  //   const eventListenerpage = query(
+  //     collection(db, "CreateCampingGroup", params.id, "supplies")
+  //   );
+  //   onSnapshot(eventListenerpage, (snapshot) => {
+  //     let suppliesArr = [];
+  //     snapshot.docChanges().forEach(async (change) => {
+  //         suppliesArr.push(change.doc.data());
+  //     });
+  //     console.log(suppliesArr);
+  //     setAllSupplies(suppliesArr);
+  //   });
+
+  // },[])
+
   const takeAway = async (id) => {
-    // console.log(id);
+    console.log(id);
+    console.log(userName);
+
     await updateDoc(doc(db, "CreateCampingGroup", params.id, "supplies", id), {
       bring_person: userName,
-    });
-    const eventListenerpage = query(
-      collection(db, "CreateCampingGroup", params.id, "supplies")
-    );
-    onSnapshot(eventListenerpage, (snapshot) => {
-      let suppliesArr = [];
-      snapshot.docChanges().forEach(async (change) => {
-        if (change.type === "added") {
-          // console.log(change.doc.data());
-          suppliesArr.push(change.doc.data());
-        }
+    }).then(async()=>{
+      let takeAwayArr = [];
+      const takeAwayRef = collection(
+        db,
+        "CreateCampingGroup",
+        params.id,
+        "supplies"
+      );
+      const querySnapshot = await getDocs(takeAwayRef);
+      querySnapshot.forEach((doc) => {
+        // console.log(doc.id, " => ", doc.data());
+        takeAwayArr.push(doc.data());
       });
-      setAllSupplies(suppliesArr);
-      console.log("getData");
-    });
+      setAllSupplies(takeAwayArr);
+    })
   };
 
   const addNewTent = async () => {
@@ -469,6 +485,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                 fontSize='30px'
                 bgc='#426765'
                 color='#CFC781'
+                boxShadow="none"
                 onClick={handleAddTentSection}>
                 +
               </Button>

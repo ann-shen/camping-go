@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import CreateGroup from "./pages/CreateGroup";
 import JoinGroupPage from "./pages/JoinGroupPage";
 import CampingGroup from "./pages/CampingGroup";
+import PersonalOfHeader from "./pages/PersonalOfHeader";
 import Login from "./pages/Login";
 import GoogleMapBasic from "./component/GoogleMapBasic";
 import Member from "./component/Member";
@@ -89,6 +90,9 @@ function App() {
               }></Route>
             <Route path='/:city' element={<CityCamping />}></Route>
             <Route path='googlemap_basic' element={<GoogleMapBasic />}></Route>
+            <Route
+              path='personal_header/:id'
+              element={<PersonalOfHeader />}></Route>
           </Routes>
           <button onClick={getLogout}>登出</button>
         </BrowserRouter>

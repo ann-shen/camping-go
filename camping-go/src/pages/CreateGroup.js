@@ -183,6 +183,7 @@ function CreateGroup({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(e.target.value);
     setGroupInfo((prevState) => ({
       ...prevState,
       [name]: value,
@@ -335,7 +336,10 @@ function CreateGroup({
       <input type='file' accept='image/*' onChange={handleFiles}></input>
       {/* <Upload /> */}
       <Label>公開狀態</Label>
-      <Select name='privacy' onChange={handleChange}>
+      <Select
+        name='privacy'
+        onChange={handleChange}
+        value={groupInfo.privacy}>
         <option value='公開'>公開</option>
         <option value='私人'>私人</option>
       </Select>
@@ -348,6 +352,7 @@ function CreateGroup({
         name='max_member_number'
         value={groupInfo.max_member_number}
         onChange={handleChange}></Input>
+
       <Label>密碼</Label>
       <Input
         name='password'

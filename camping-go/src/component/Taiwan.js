@@ -16,8 +16,7 @@ function Taiwan() {
   const callPath = useRef();
   const [targetCity, setTargetCity] = useState("");
   const [targetCityAmount, setTargetCityAmount] = useState("");
-  console.log(targetCity);
-  console.log(targetCityAmount);
+
 
   useEffect(async () => {
     if (targetCity) {

@@ -26,6 +26,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { UserContext } from "../utils/userContext";
 import Rating from "@mui/material/Rating";
 import Header from "../component/Header";
+import { Link } from "react-router-dom";
 
 Modal.setAppElement("#root");
 
@@ -154,7 +155,6 @@ function CheckCommentFromMember({ groupId }) {
   const [comment, setComment] = useState([]);
   const [totalScore, setTotalScore] = useState("");
 
-
   const checkComment = async () => {
     console.log(groupId);
     let commentArr = [];
@@ -175,12 +175,11 @@ function CheckCommentFromMember({ groupId }) {
       console.log(item.score);
       scoreArr.push(item.score);
     });
-    console.log(scoreArr);
-      let totalScore = scoreArr.reduce(function (total, e) {
-        return total + e;
-      },0);
+    let totalScore = scoreArr.reduce(function (total, e) {
+      return total + e;
+    }, 0);
 
-      setTotalScore(totalScore / comment.length);
+    setTotalScore(totalScore / comment.length);
   }, [comment]);
 
   return (
@@ -234,7 +233,7 @@ function CheckCommentFromMember({ groupId }) {
   );
 }
 
-function CheckOfGroupMember({ groupId, userId }) {
+function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
   const [memberIsOpen, setMemberIsOpen] = useState(false);
   const [member, setMember] = useState([]);
   const checkMemberList = async () => {
@@ -278,6 +277,7 @@ function CheckOfGroupMember({ groupId, userId }) {
     updateDoc(docRefJoinGroup, {
       group: arrayRemove(groupId),
     });
+    setRenderParticipateArr(true)
   };
 
   return (
@@ -310,8 +310,11 @@ function CheckOfGroupMember({ groupId, userId }) {
               <Display>
                 <Font>{item.member_name}</Font>
                 <Button
+                  width='150px'
                   mt='10px'
+                  ml='20px'
                   bgc='white'
+                  boxShadow='none'
                   onClick={() => {
                     removeMember(index);
                   }}>
@@ -327,11 +330,13 @@ function CheckOfGroupMember({ groupId, userId }) {
 }
 
 export default function Profile({ userName, userId }) {
+  let params = useParams();
   const theme = useTheme();
   const [value, setValue] = useState(0);
-  let params = useParams();
   const [yourCreateGroup, setYourCreateGroup] = useState([]);
   const [yourParticipateGroup, setYourParticipateGroup] = useState([]);
+  const [renderParticipateArr, setRenderParticipateArr] = useState(false);
+
   const ContextByUserId = useContext(UserContext);
 
   useEffect(async () => {
@@ -358,17 +363,30 @@ export default function Profile({ userName, userId }) {
     } else {
       console.log("No such document!");
     }
+    const groups = [];
     participateGroupArr.map(async (item) => {
-      const docRef = await doc(db, "CreateCampingGroup", item);
-      const groupData = await getDoc(docRef);
-      if (groupData.exists()) {
-        renderArr.push(groupData.data());
-        setYourParticipateGroup(renderArr);
-      } else {
-        console.log("No such document!");
-      }
+      const q = query(
+        collection(db, "CreateCampingGroup"),
+        where("group_id", "==", item)
+      );
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          console.log(doc.data());
+          groups.push(doc.data());
+        });
+        console.log(groups);
+        setYourParticipateGroup(groups);
+      });
+      // const docRef = await doc(db, "CreateCampingGroup", item);
+      // const groupData = await getDoc(docRef);
+      // if (groupData.exists()) {
+      //   renderArr.push(groupData.data());
+      //   setYourParticipateGroup(renderArr);
+      // } else {
+      //   console.log("No such document!");
+      // }
     });
-  }, []);
+  }, [renderParticipateArr]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -383,6 +401,43 @@ export default function Profile({ userName, userId }) {
     await deleteDoc(doc(db, "CreateCampingGroup", id));
   };
 
+  const memberWithdrawGroup = async (id, userId) => {
+    await updateDoc(doc(db, "joinGroup", userId), {
+      group: arrayRemove(id),
+    });
+
+    let participateGroupArr = [];
+    const q = query(doc(db, "joinGroup", params.id));
+    const docSnap = await getDoc(q);
+    if (docSnap.exists()) {
+      participateGroupArr = docSnap.data().group;
+    } else {
+      console.log("No such document!");
+    }
+    participateGroupArr.map(async (item) => {
+      console.log(item);
+      let renderArr = [];
+      const docRef = doc(db, "CreateCampingGroup", item);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+        renderArr.push(docSnap.data());
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+      console.log(renderArr);
+      setYourParticipateGroup(renderArr);
+
+      //   const unsub = onSnapshot(doc(db, "CreateCampingGroup", item), (doc) => {
+      //     console.log("Current data: ", doc.data());
+      //     renderArr.push(doc.data());
+      //     console.log(renderArr);
+      //   });
+      //   setYourParticipateGroup(renderArr);
+    });
+  };
+
   const q = query(
     collection(db, "CreateCampingGroup"),
     where("header_id", "==", params.id)
@@ -392,12 +447,15 @@ export default function Profile({ userName, userId }) {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const groups = [];
       querySnapshot.forEach((doc) => {
-        console.log(doc.data());
         groups.push(doc.data());
       });
       setYourCreateGroup(groups);
     });
   }, []);
+
+  // const unsub = onSnapshot(doc(db, "cities", "SF"), (doc) => {
+  //   console.log("Current data: ", doc.data());
+  // });
 
   return (
     <div>
@@ -465,8 +523,11 @@ export default function Profile({ userName, userId }) {
                     <Font>{item.city}</Font>
                   </Display>
                   <Display direction='column' alignItems='end'>
-                    <CheckCommentFromMember groupId={item.group_id} />
+                    <CheckCommentFromMember
+                      groupId={item.group_id}
+                      />
                     <CheckOfGroupMember
+                      setRenderParticipateArr={setRenderParticipateArr}
                       groupId={item.group_id}
                       userId={userId}
                     />
@@ -497,24 +558,36 @@ export default function Profile({ userName, userId }) {
                   }}>
                   <Display justifyContent='space-around'>
                     <Display direction='column' alignItems='start'>
+                      {new Date().getTime() <
+                      new Date(
+                        new Date(item.end_date.seconds * 1000)
+                          .toLocaleString()
+                          .split(" ")[0]
+                      ).getTime()
+                        ? "進行中"
+                        : "已結束"}
                       <Img src={item.picture} width='300px'></Img>
                       <Font>{item.group_title}</Font>
                       <Font>
-                        {
+                        {item.start_date.seconds &&
                           new Date(item.start_date.seconds * 1000)
                             .toLocaleString()
-                            .split(" ")[0]
-                        }
+                            .split(" ")[0]}
                         ~
-                        {
+                        {item.end_date.seconds &&
                           new Date(item.end_date.seconds * 1000)
                             .toLocaleString()
-                            .split(" ")[0]
-                        }
+                            .split(" ")[0]}
                       </Font>
                       <Font>{item.city}</Font>
                     </Display>
                     <Display direction='column' alignItems='end'>
+                      <Button
+                        onClick={() => {
+                          memberWithdrawGroup(item.group_id, userId);
+                        }}>
+                        我要退團
+                      </Button>
                       <SentCommentToHeader
                         groupId={item.group_id}
                         userName={userName}
