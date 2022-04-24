@@ -6,48 +6,45 @@ import {
   Marker,
 } from "react-google-maps";
 import Geocode from "react-geocode";
-import { useState, useRef, useEffect } from "react";
+import {useEffect } from "react";
 import Autocomplete from "react-google-autocomplete";
 // import {
 //     Autocomplete,
 // } from "@react-google-maps/api";
 
-Geocode.setApiKey("AIzaSyDGyok70ayGPpyAyxeyAwcVdoQ0rzW5bCo");
+let key = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+Geocode.setApiKey(`${key}`);
+const MapWithAMarker = withScriptjs(
+  withGoogleMap(({ state, onMakerDragEnd, onPlaceSelected }) => (
+    <GoogleMap
+      defaultZoom={16}
+      defaultCenter={{
+        lat: state.mapPosition.lat,
+        lng: state.mapPosition.lng,
+      }}>
+      <Marker
+        draggable={true}
+        onDragEnd={onMakerDragEnd}
+        position={{
+          lat: state.markerPosition.lat,
+          lng: state.markerPosition.lng,
+        }}>
+        <InfoWindow>
+          <div>{state.address}</div>
+        </InfoWindow>
+        <Autocomplete
+          style={{ width: "250px", height: "50px", margin: "20px" }}
+          types={["geocode", "establishment"]}
+          onPlaceSelected={onPlaceSelected}
+        />
+      </Marker>
+    </GoogleMap>
+  ))
+);
 
-function GoogleMapBasic() {
-  const [state, setState] = useState({
-    address: "",
-    city: "",
-    area: "",
-    state: "",
-    zoom: 15,
-    height: 400,
-    mapPosition: {
-      lat: 0,
-      lng: 0,
-    },
-    markerPosition: {
-      lat: 0,
-      lng: 0,
-    },
-  });
-  // const state = {
-  //   address: "",
-  //   city: "",
-  //   area: "",
-  //   state: "",
-  //   zoom: 15,
-  //   height: 400,
-  //   mapPosition: {
-  //     lat: 0,
-  //     lng: 0,
-  //   },
-  //   markerPosition: {
-  //     lat: 0,
-  //     lng: 0,
-  //   },
-  // };
+function GoogleMapBasic({ state, setState }) {
 
+  console.log(state);
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
@@ -93,8 +90,6 @@ function GoogleMapBasic() {
       console.error("Geolocation is not supported by this browser!");
     }
   }, []);
-
-  // componentDidMount()
 
   const getCity = (addressArray) => {
     let city = "";
@@ -200,50 +195,25 @@ function GoogleMapBasic() {
     });
   };
 
-  const MapWithAMarker = withScriptjs(
-    withGoogleMap((props) => (
-      <GoogleMap
-        defaultZoom={16}
-        defaultCenter={{
-          lat: state.mapPosition.lat,
-          lng: state.mapPosition.lng,
-        }}>
-        <Marker
-          draggable={true}
-          onDragEnd={onMakerDragEnd}
-          position={{
-            lat: state.markerPosition.lat,
-            lng: state.markerPosition.lng,
-          }}>
-          <InfoWindow>
-            <div>{state.address}</div>
-          </InfoWindow>
-          {/* <Autocomplete
-            // types={["(regions)"]}
-            onPlaceSelected={onPlaceSelected} >
-            <input type='text' />
-          </Autocomplete> */}
-          <Autocomplete
-            types={["geocode", "establishment"]}
-            onPlaceSelected={onPlaceSelected}
-          />
-        </Marker>
-      </GoogleMap>
-    ))
-  );
+  
 
   return (
     <div>
       <MapWithAMarker
-        googleMapURL='https://maps.googleapis.com/maps/api/js?key=AIzaSyDGyok70ayGPpyAyxeyAwcVdoQ0rzW5bCo &v=3.exp&libraries=geometry,drawing,places'
+        googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyDGyok70ayGPpyAyxeyAwcVdoQ0rzW5bCo&v=3.exp&libraries=geometry,drawing,places`}
         loadingElement={<div style={{ height: `100%` }} />}
         containerElement={<div style={{ height: `400px` }} />}
         mapElement={<div style={{ height: `100%` }} />}
+        state={state}
+        onMakerDragEnd={onMakerDragEnd}
+        onPlaceSelected={onPlaceSelected}
       />
       <br />
       <br />
+      <br />
+      <br />
       <div>{state.city}</div>
-      <div>{state.area}</div>
+      {/* <div>{state.area}</div> */}
       <div>{state.state}</div>
       <div>{state.address}</div>
     </div>
