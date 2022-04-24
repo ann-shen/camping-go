@@ -222,7 +222,6 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
             sx={{
               width: 1000,
               height: "auto",
-              
               boxShadow:
                 "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
               "&:hover": {
