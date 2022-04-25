@@ -112,7 +112,7 @@ function IsModal({ modalIsOpen, setIsOpen, groupId, groupPassword }) {
               </Alert>
             </Stack>
           )}
-          <Button onClick={checkPassword} width=' 200px'>
+          <Button onClick={checkPassword} width=' 200px' boxShadow='none'>
             送出
           </Button>
         </Display>
@@ -162,8 +162,10 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     }
   }, [currentMemberAmount]);
 
-  const addCurrentMember = async (index, e, password) => {
-    let currentNumber;
+  const joinThisGroup = async (index, password, header_name) => {
+    if (header_name == "sf") {
+      alert("你是此團團長，不能加入唷！顆顆")
+    }
     setGroupId(homePageCampGroup[index].group_id.toString());
     setGroupPassword(password);
     const docRef = await doc(
@@ -184,7 +186,6 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     if (docSnap.exists()) {
       if (docSnap.data().privacy == "私人") {
         setIsOpen(true);
-        console.log("就是你");
       }
     } else {
       // doc.data() will be undefined in this case
@@ -213,7 +214,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       await updateDoc(docRef, {
         current_number: memberArrLength.length,
       });
-      
+
       // setCurrentMemberAmount(memberArrLength.length);
     });
     // .then(async() => {
@@ -231,7 +232,6 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       group: arrayUnion(homePageCampGroup[index].group_id),
     });
   };
-
 
   // console.log(homePageCampGroup[0].id);
   return (
@@ -326,14 +326,19 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
                 group_id={item.group_id}
                 variant='outlined'
                 onClick={(e) => {
-                  addCurrentMember(index, e, item.password);
+                  joinThisGroup(index, item.password, item.header_name);
                 }}>
-                {item.privacy == "公開" && (
+                {item.privacy == "公開" && item.header_name !== userName && (
                   <LinkPrivate to={`joinGroup/${item.group_id}`}>
                     我要加入
                   </LinkPrivate>
                 )}
-                {item.privacy == "私人" && <LinkOpen>我要加入</LinkOpen>}
+                {item.privacy == "私人" && item.header_name !== userName && (
+                  <LinkOpen>我要加入</LinkOpen>
+                )}
+                {item.header_name == userName && (
+                  <LinkOpen>我要加入</LinkOpen>
+                )}
               </Button>
             </Grid>
           </Box>

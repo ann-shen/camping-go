@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import {
   getDocs,
   collection,
@@ -8,6 +8,7 @@ import {
   updateDoc,
   increment,
   doc,
+  arrayUnion,
 } from "firebase/firestore";
 import { Box, Grid } from "@mui/material";
 import { Font, Display, Img, Button } from "../css/style";
@@ -15,6 +16,9 @@ import location from "../image/location.png";
 import { db } from "../utils/firebase";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../utils/userContext";
+import Header from "../component/Header";
+
 
 const LinkRoute = styled(Link)`
   text-decoration: none;
@@ -41,6 +45,7 @@ const Label = styled.label`
 function CityCamping() {
   const [targetCity, setTargetCity] = useState("");
   const [targetCityArr, setTargetCityArr] = useState([]);
+  const ContextByUserId = useContext(UserContext);
 
   let params = useParams();
   let navigate = useNavigate();
@@ -248,17 +253,23 @@ function CityCamping() {
     }
   }, [targetCity]);
 
-
-  const addCurrentMember = async (group_id,index) => {
+  const addCurrentMember = async (group_id, index) => {
     console.log(group_id);
     await updateDoc(doc(db, "CreateCampingGroup", group_id), {
       current_number: increment(1),
     });
+    const docRefJoinGroup = doc(db, "joinGroup", ContextByUserId);
+    updateDoc(docRefJoinGroup, {
+      group: arrayUnion(group_id),
+    });
+
     navigate(`/joinGroup/${group_id}`);
   };
 
   return (
     <div>
+      <Header ContextByUserId={ContextByUserId} />
+
       {targetCityArr.map((item, index) => (
         <Box
           sx={{
@@ -318,7 +329,7 @@ function CityCamping() {
             <Button
               variant='outlined'
               onClick={(e) => {
-                addCurrentMember(item.group_id,index);
+                addCurrentMember(item.group_id, index);
               }}>
               我要加入
             </Button>
