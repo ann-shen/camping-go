@@ -63,6 +63,15 @@ const ImgWrap = styled.div`
   margin-bottom: 20px;
 `;
 
+const Tag = styled.div`
+  width: 60px;
+  height: 25px;
+  background-color: #797659;
+  color: white;
+  border-radius: 10px;
+  padding-top: 3px;
+`;
+
 function IsModal({ modalIsOpen, setIsOpen, groupId, groupPassword }) {
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState(false);
@@ -164,7 +173,8 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
 
   const joinThisGroup = async (index, password, header_name) => {
     if (header_name == "sf") {
-      alert("你是此團團長，不能加入唷！顆顆")
+      alert("你是此團團長，不能加入唷！顆顆");
+      return;
     }
     setGroupId(homePageCampGroup[index].group_id.toString());
     setGroupPassword(password);
@@ -268,6 +278,8 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
             }}
             key={index}>
             <Grid item xs={4} md={8}>
+              {item.privacy == "私人" && <Tag>私人</Tag>}
+
               <ImgWrap>
                 <Img src={item.picture} width='120%' alt='圖片' />
               </ImgWrap>
@@ -298,7 +310,6 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
                   </Label>
                 </div>
               </Display>
-
               <div>
                 <Display justifyContent='space-between'>
                   <Display>
@@ -336,9 +347,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
                 {item.privacy == "私人" && item.header_name !== userName && (
                   <LinkOpen>我要加入</LinkOpen>
                 )}
-                {item.header_name == userName && (
-                  <LinkOpen>我要加入</LinkOpen>
-                )}
+                {item.header_name == userName && <LinkOpen>我要加入</LinkOpen>}
               </Button>
             </Grid>
           </Box>

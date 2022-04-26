@@ -17,7 +17,6 @@ import {
   onSnapshot,
   updateDoc,
   arrayRemove,
-  increment,
 } from "firebase/firestore";
 import { Font, Img, Display, Button } from "../css/style";
 import Modal from "react-modal";
@@ -28,8 +27,16 @@ import { UserContext } from "../utils/userContext";
 import Rating from "@mui/material/Rating";
 import Header from "../component/Header";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
 
 Modal.setAppElement("#root");
+
+const LinkRoute = styled(Link)`
+  text-decoration: none;
+  margin: 5px 5px;
+  font-size: 14px;
+  color: gray;
+`;
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -78,7 +85,6 @@ function SentCommentToHeader({ groupId, userName, userId }) {
       score: startValue,
       user_iD: userId,
     });
-    alert("已送出");
   };
 
   return (
@@ -114,7 +120,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
             onChange={handleChange}
           />
           <Collapse in={alertOpen}>
-            {/* <Alert
+            <Alert
               action={
                 <IconButton
                   aria-label='close'
@@ -128,7 +134,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
               }
               sx={{ mb: 2 }}>
               已送出
-            </Alert> */}
+            </Alert>
           </Collapse>
           <Box>
             <Rating
@@ -143,11 +149,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
             />
           </Box>
 
-          <Button
-            bgc='#426765'
-            color='#eae5be'
-            boxShadow='none'
-            onClick={sendComment}>
+          <Button bgc='#426765' color='#eae5be' onClick={sendComment}>
             送出評論
           </Button>
         </Display>
@@ -185,9 +187,7 @@ function CheckCommentFromMember({ groupId }) {
       return total + e;
     }, 0);
 
-    let averageScore = totalScore / comment.length;
-
-    setTotalScore(averageScore.toFixed(1));
+    setTotalScore(totalScore / comment.length);
   }, [comment]);
 
   return (
@@ -216,7 +216,7 @@ function CheckCommentFromMember({ groupId }) {
           <Font onClick={() => setCommentIsOpen(false)}>X</Font>
           <Font>你的評論</Font>
           <Font>總分</Font>
-          <Font fontSize='50px'>{totalScore}</Font>
+          <Font>{totalScore}</Font>
           <div className='setScroll'>
             {comment &&
               comment.map((item) => (
@@ -231,12 +231,7 @@ function CheckCommentFromMember({ groupId }) {
                   }}>
                   <Font>{item.name}</Font>
                   <Font>{item.note}</Font>
-                  <Display>
-                    <Font fontSize='30px' color='#426765'>
-                      {item.score}
-                    </Font>
-                    <Font fontSize='15px'>分</Font>
-                  </Display>
+                  <Font>{item.score}</Font>
                 </Box>
               ))}
           </div>
@@ -272,16 +267,6 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
     await deleteDoc(
       doc(db, "CreateCampingGroup", groupId, "member", member[index].member_id)
     ).then(async () => {
-      //更新團的current_number-1
-      const docRefChangeCurrentNumber = await doc(
-        db,
-        "CreateCampingGroup",
-        groupId
-      );
-      updateDoc(docRefChangeCurrentNumber, {
-        current_number: increment(-1),
-      });
-
       let afterDeleteMemberArr = [];
       const commentRef = collection(
         db,
@@ -296,7 +281,7 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
       });
       setMember(afterDeleteMemberArr);
     });
-    const docRefJoinGroup = await doc(db, "joinGroup", member[index].member_id);
+    const docRefJoinGroup = await doc(db, "joinGroup", userId);
     updateDoc(docRefJoinGroup, {
       group: arrayRemove(groupId),
     });
@@ -388,28 +373,50 @@ export default function Profile({ userName, userId }) {
     }
     const groups = [];
     participateGroupArr.map(async (item) => {
-      // const q = query(
-      //   collection(db, "CreateCampingGroup"),
-      //   where("group_id", "==", item)
-      // );
-      // const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      //   querySnapshot.forEach((doc) => {
-      //     console.log(doc.data());
-      //     groups.push(doc.data());
-      //   });
-      //   console.log(groups);
-      //   setYourParticipateGroup(groups);
-      // });
-      const docRef = await doc(db, "CreateCampingGroup", item);
-      const groupData = await getDoc(docRef);
-      if (groupData.exists()) {
-        renderArr.push(groupData.data());
-        setYourParticipateGroup(renderArr);
-      } else {
-        console.log("No such document!");
-      }
+      const q = query(
+        collection(db, "CreateCampingGroup"),
+        where("group_id", "==", item)
+      );
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        querySnapshot.forEach(async (item) => {
+          console.log(item.data());
+          if (
+            new Date().getTime() <
+            new Date(
+              new Date(item.data().end_date.seconds * 1000)
+                .toLocaleString()
+                .split(" ")[0]
+            ).getTime()
+          ) {
+            await updateDoc(
+              doc(db, "CreateCampingGroup", item.data().group_id),
+              {
+                status: "進行中",
+              }
+            );
+          } else {
+            await updateDoc(
+              doc(db, "CreateCampingGroup", item.data().group_id),
+              {
+                status: "已結束",
+              }
+            );
+          }
+          groups.push(item.data());
+        });
+        console.log(groups);
+        setYourParticipateGroup(groups);
+      });
+      // const docRef = await doc(db, "CreateCampingGroup", item);
+      // const groupData = await getDoc(docRef);
+      // if (groupData.exists()) {
+      //   renderArr.push(groupData.data());
+      //   setYourParticipateGroup(renderArr);
+      // } else {
+      //   console.log("No such document!");
+      // }
     });
-  }, [renderParticipateArr]);
+  }, []);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -425,38 +432,39 @@ export default function Profile({ userName, userId }) {
   };
 
   const memberWithdrawGroup = async (id, userId) => {
-    //移除member自己的加入清單
     await updateDoc(doc(db, "joinGroup", userId), {
       group: arrayRemove(id),
     });
-    //整團現有人數-1
-    const docRefChangeCurrentNumber = await doc(db, "CreateCampingGroup", id);
-    updateDoc(docRefChangeCurrentNumber, {
-      current_number: increment(-1),
-    });
-    await deleteDoc(doc(db, "CreateCampingGroup", id, "member",userId));
-    setRenderParticipateArr(true);
 
-    //帳篷現有人數-1,人名移除
-    const docRefChangeTentMember = await collection(
-      db,
-      "CreateCampingGroup",
-      id,
-      "tent"
-    );
-    let removeOfTentID = "";
-    const tent = query(
-      docRefChangeTentMember,
-      where("member", "array-contains", userName)
-    );
-    const querySnapshot = await getDocs(tent);
-    querySnapshot.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
-      removeOfTentID = doc.id;
-    });
-    await updateDoc(doc(db, "CreateCampingGroup", id, "tent", removeOfTentID), {
-      current_number: increment(-1),
-      member: arrayRemove(userName),
+    let participateGroupArr = [];
+    const q = query(doc(db, "joinGroup", params.id));
+    const docSnap = await getDoc(q);
+    if (docSnap.exists()) {
+      participateGroupArr = docSnap.data().group;
+    } else {
+      console.log("No such document!");
+    }
+    participateGroupArr.map(async (item) => {
+      console.log(item);
+      let renderArr = [];
+      const docRef = doc(db, "CreateCampingGroup", item);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+        renderArr.push(docSnap.data());
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+      console.log(renderArr);
+      setYourParticipateGroup(renderArr);
+
+      //   const unsub = onSnapshot(doc(db, "CreateCampingGroup", item), (doc) => {
+      //     console.log("Current data: ", doc.data());
+      //     renderArr.push(doc.data());
+      //     console.log(renderArr);
+      //   });
+      //   setYourParticipateGroup(renderArr);
     });
   };
 
@@ -474,10 +482,6 @@ export default function Profile({ userName, userId }) {
       setYourCreateGroup(groups);
     });
   }, []);
-
-  // const unsub = onSnapshot(doc(db, "cities", "SF"), (doc) => {
-  //   console.log("Current data: ", doc.data());
-  // });
 
   return (
     <div>
@@ -518,34 +522,31 @@ export default function Profile({ userName, userId }) {
                   margin: 3,
                 }}>
                 <Display justifyContent='space-around'>
-                  <Display direction='column' alignItems='start'>
-                    {new Date().getTime() <
-                    new Date(
-                      new Date(item.end_date.seconds * 1000)
-                        .toLocaleString()
-                        .split(" ")[0]
-                    ).getTime()
-                      ? "進行中"
-                      : "已結束"}
-                    <Img src={item.picture} width='300px'></Img>
-                    <Font>{item.group_title}</Font>
-                    <Font>
-                      {
-                        new Date(item.start_date.seconds * 1000)
-                          .toLocaleString()
-                          .split(" ")[0]
-                      }
-                      ~
-                      {
-                        new Date(item.end_date.seconds * 1000)
-                          .toLocaleString()
-                          .split(" ")[0]
-                      }
-                    </Font>
-                    <Font>{item.city}</Font>
-                  </Display>
+                  <LinkRoute to={`/joinGroup/${item.group_id}`}>
+                    <Display direction='column' alignItems='start'>
+                      {item.status}
+                      <Img src={item.picture} width='300px'></Img>
+                      <Font>{item.group_title}</Font>
+                      <Font>
+                        {
+                          new Date(item.start_date.seconds * 1000)
+                            .toLocaleString()
+                            .split(" ")[0]
+                        }
+                        ~
+                        {
+                          new Date(item.end_date.seconds * 1000)
+                            .toLocaleString()
+                            .split(" ")[0]
+                        }
+                      </Font>
+                      <Font>{item.city}</Font>
+                    </Display>
+                  </LinkRoute>
                   <Display direction='column' alignItems='end'>
-                    <CheckCommentFromMember groupId={item.group_id} />
+                    {item.status == "已結束" && (
+                      <CheckCommentFromMember groupId={item.group_id} />
+                    )}
                     <CheckOfGroupMember
                       setRenderParticipateArr={setRenderParticipateArr}
                       groupId={item.group_id}
@@ -577,42 +578,41 @@ export default function Profile({ userName, userId }) {
                     margin: 3,
                   }}>
                   <Display justifyContent='space-around'>
-                    <Display direction='column' alignItems='start'>
-                      {new Date().getTime() <
-                      new Date(
-                        new Date(item.end_date.seconds * 1000)
-                          .toLocaleString()
-                          .split(" ")[0]
-                      ).getTime()
-                        ? "進行中"
-                        : "已結束"}
-                      <Img src={item.picture} width='300px'></Img>
-                      <Font>{item.group_title}</Font>
-                      <Font>
-                        {item.start_date.seconds &&
-                          new Date(item.start_date.seconds * 1000)
-                            .toLocaleString()
-                            .split(" ")[0]}
-                        ~
-                        {item.end_date.seconds &&
-                          new Date(item.end_date.seconds * 1000)
-                            .toLocaleString()
-                            .split(" ")[0]}
-                      </Font>
-                      <Font>{item.city}</Font>
-                    </Display>
+                    <LinkRoute to={`/joinGroup/${item.group_id}`}>
+                      <Display direction='column' alignItems='start'>
+                        {item.status}
+                        <Img src={item.picture} width='300px'></Img>
+                        <Font>{item.group_title}</Font>
+                        <Font>
+                          {item.start_date.seconds &&
+                            new Date(item.start_date.seconds * 1000)
+                              .toLocaleString()
+                              .split(" ")[0]}
+                          ~
+                          {item.end_date.seconds &&
+                            new Date(item.end_date.seconds * 1000)
+                              .toLocaleString()
+                              .split(" ")[0]}
+                        </Font>
+                        <Font>{item.city}</Font>
+                      </Display>
+                    </LinkRoute>
+
                     <Display direction='column' alignItems='end'>
                       <Button
+                        width='200px'
                         onClick={() => {
                           memberWithdrawGroup(item.group_id, userId);
                         }}>
                         我要退團
                       </Button>
-                      <SentCommentToHeader
-                        groupId={item.group_id}
-                        userName={userName}
-                        userId={userId}
-                      />
+                      {item.status == "已結束" && (
+                        <SentCommentToHeader
+                          groupId={item.group_id}
+                          userName={userName}
+                          userId={userId}
+                        />
+                      )}
                     </Display>
                   </Display>
                 </Box>

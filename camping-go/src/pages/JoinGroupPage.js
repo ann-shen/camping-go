@@ -13,6 +13,7 @@ import {
   arrayUnion,
   arrayRemove,
   increment,
+  where,
 } from "firebase/firestore";
 import { useState, useEffect, useRef, useContext } from "react";
 import { useParams } from "react-router-dom";
@@ -72,6 +73,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     create_time: serverTimestamp(),
   });
   const [addNewTentSection, setAddNewTentSection] = useState(false);
+  const [IsMemberInTheTent, setRenderParticipateArr] = useState(false);
   const [currentTentId, setCurrentTentId] = useState("");
   const [alreadyTentId, setAlreadyTentId] = useState("");
   const ContextByUserId = useContext(UserContext);
@@ -240,20 +242,23 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     });
   }, []);
 
-  // useEffect(()=>{
-  //   const eventListenerpage = query(
-  //     collection(db, "CreateCampingGroup", params.id, "supplies")
-  //   );
-  //   onSnapshot(eventListenerpage, (snapshot) => {
-  //     let suppliesArr = [];
-  //     snapshot.docChanges().forEach(async (change) => {
-  //         suppliesArr.push(change.doc.data());
-  //     });
-  //     console.log(suppliesArr);
-  //     setAllSupplies(suppliesArr);
-  //   });
-
-  // },[])
+  useEffect(async () => {
+    const docRefTentMember = await collection(
+      db,
+      "CreateCampingGroup",
+      params.id,
+      "tent"
+    );
+    const tent = query(
+      docRefTentMember,
+      where("member", "array-contains", userName)
+    );
+    const querySnapshot = await getDocs(tent);
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id, " => ", doc.data());
+      setRenderParticipateArr(true);
+    });
+  }, []);
 
   const takeAway = async (id) => {
     console.log(id);
@@ -261,7 +266,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
 
     await updateDoc(doc(db, "CreateCampingGroup", params.id, "supplies", id), {
       bring_person: userName,
-    }).then(async()=>{
+    }).then(async () => {
       let takeAwayArr = [];
       const takeAwayRef = collection(
         db,
@@ -275,7 +280,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
         takeAwayArr.push(doc.data());
       });
       setAllSupplies(takeAwayArr);
-    })
+    });
   };
 
   const addNewTent = async () => {
@@ -467,15 +472,17 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                 </Box>
               ))}
               <SourseContainer id='source-container' ref={dragSource}>
-                <PersonWrap
-                  id='drag-source'
-                  draggable='true'
-                  onDragStart={dragStart}>
-                  <AssignmentIndIcon
-                    sx={{ pointerEvents: "none", cursor: "not-allowed" }}
-                    color='primary'
-                    fontSize='large'></AssignmentIndIcon>
-                </PersonWrap>
+                {!IsMemberInTheTent && (
+                  <PersonWrap
+                    id='drag-source'
+                    draggable='true'
+                    onDragStart={dragStart}>
+                    <AssignmentIndIcon
+                      sx={{ pointerEvents: "none", cursor: "not-allowed" }}
+                      color='primary'
+                      fontSize='large'></AssignmentIndIcon>
+                  </PersonWrap>
+                )}
               </SourseContainer>
               <Button
                 width='80px'
@@ -485,7 +492,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                 fontSize='30px'
                 bgc='#426765'
                 color='#CFC781'
-                boxShadow="none"
+                boxShadow='none'
                 onClick={handleAddTentSection}>
                 +
               </Button>

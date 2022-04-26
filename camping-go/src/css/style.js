@@ -73,4 +73,5 @@ export const Button = styled.button`
     "inset 0.2rem 0.2rem 1rem #FFFEF4, inset -0.2rem -0.2rem 1rem #DCD8B3, 0.2rem 0.2rem 0.3rem #D7D2AE, -0.2rem -0.2rem 0.5rem #ffffff"};
   padding: 5px;
   letter-spacing: 2px;
+  z-index: 10;
 `;

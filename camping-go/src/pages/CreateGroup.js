@@ -101,6 +101,64 @@ function MaterialUIPickers({ setTime }) {
   );
 }
 
+function Multiple({ setUpLoadFile }) {
+  const [file, setFile] = useState([]);
+
+  function uploadSingleFile(e) {
+    setFile([...file, URL.createObjectURL(e.target.files[0])]);
+    console.log("file", file);
+  }
+
+  function upload(e) {
+    e.preventDefault();
+    console.log(file);
+    setUpLoadFile((prevState) => ({
+      ...prevState,
+      detail_picture: file,
+    }));
+  }
+
+  function deleteFile(e) {
+    const s = file.filter((item, index) => index !== e);
+    setFile(s);
+    console.log(s);
+  }
+
+  return (
+    <form>
+      <div className='form-group preview'>
+        <div>加入細節照片</div>
+        {file.length > 0 &&
+          file.map((item, index) => {
+            return (
+              <div key={item}>
+                <img src={item} alt='' />
+                <button type='button' onClick={() => deleteFile(index)}>
+                  delete
+                </button>
+              </div>
+            );
+          })}
+      </div>
+
+      <div className='form-group'>
+        <input
+          type='file'
+          disabled={file.length === 5}
+          className='form-control'
+          onChange={uploadSingleFile}
+        />
+      </div>
+      <button
+        type='button'
+        className='btn btn-primary btn-block'
+        onClick={upload}>
+        Upload
+      </button>
+    </form>
+  );
+}
+
 function CreateGroup({
   userId,
   setUserName,
@@ -130,7 +188,7 @@ function CreateGroup({
   const [groupInfo, setGroupInfo] = useState({
     header_id: userId,
     header_name: "",
-    status: "進行中",
+    status: "",
     privacy: "",
     password: "",
     group_title: "",
@@ -164,22 +222,13 @@ function CreateGroup({
   const [time, setTime] = useState("");
   const [clickConfirm, setClickConfirm] = useState(false);
   // const [tentMember, setTentMember] = useState([]);
-  const [upload, setUpLoadFile] = useState({ file: "", url: "" });
+  const [upload, setUpLoadFile] = useState({
+    file: "",
+    url: "",
+    detail_picture: [],
+  });
 
   const navigate = useNavigate();
-
-  // useEffect(async () => {
-  //   if (userId) {
-  //     const docRef = doc(db, "joinGroup", userId);
-  //     const docSnap = await getDoc(docRef);
-  //     if (docSnap.exists()) {
-  //       // console.log(docSnap.data().info.user_name);
-  //       setUserName(docSnap.data().info.user_name);
-  //     } else {
-  //       console.log("No such document!");
-  //     }
-  //   }
-  // }, [userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -276,6 +325,7 @@ function CreateGroup({
         position: state.address,
         city: state.city,
         picture: upload.url,
+        detail_picture: upload.detail_picture,
       });
     }
   }, [upload.url]);
@@ -321,9 +371,6 @@ function CreateGroup({
     console.log(e.target.files[0]);
   };
 
-
-  // console.log(arr);
-
   return (
     <Wrap>
       <Label>名稱</Label>
@@ -334,12 +381,10 @@ function CreateGroup({
       <br />
       <Label>封面照片</Label>
       <input type='file' accept='image/*' onChange={handleFiles}></input>
+      <Multiple setUpLoadFile={setUpLoadFile} />
       {/* <Upload /> */}
       <Label>公開狀態</Label>
-      <Select
-        name='privacy'
-        onChange={handleChange}
-        value={groupInfo.privacy}>
+      <Select name='privacy' onChange={handleChange} value={groupInfo.privacy}>
         <option value='公開'>公開</option>
         <option value='私人'>私人</option>
       </Select>
@@ -347,12 +392,10 @@ function CreateGroup({
       <br />
       <Label>最多幾人</Label>
       <br />
-
       <Input
         name='max_member_number'
         value={groupInfo.max_member_number}
         onChange={handleChange}></Input>
-
       <Label>密碼</Label>
       <Input
         name='password'
