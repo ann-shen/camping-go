@@ -17,7 +17,7 @@ const Input = styled.input`
   margin: 20px;
 `;
 
-function FormPropsTextFields({ tentInfo, setTentInfo, setSeat }) {
+function FormPropsTextFields({ tentInfo, setTentInfo, setSeat,seat}) {
   return (
     <div>
       <Box
@@ -42,6 +42,8 @@ function FormPropsTextFields({ tentInfo, setTentInfo, setSeat }) {
               setTentInfo((prevState) => ({
                 ...prevState,
                 max_number: Number(e.target.value),
+                current_number: 0,
+                seat: Number(e.target.value) - 0,
               }));
               setSeat(e.target.value);
             }}
@@ -76,8 +78,8 @@ function FormPropsTextFieldsStorage({ tentInfo, setTentInfo, seat }) {
               console.log(e.target.value);
               setTentInfo((prevState) => ({
                 ...prevState,
-                current_number: Number(e.target.value),
-                seat: seat - Number(e.target.value),
+                current_number: 0,
+                seat: seat - 0,
               }));
             }}
           />
@@ -87,27 +89,27 @@ function FormPropsTextFieldsStorage({ tentInfo, setTentInfo, seat }) {
   );
 }
 
-function Member({ setAllMemberArr, allMemberArr }) {
-  const [memberName, setMemberName] = useState("");
+// function Member({ setAllMemberArr, allMemberArr }) {
+//   const [memberName, setMemberName] = useState("");
 
-  const addTentMember = () => {
-    setAllMemberArr((prev) => [...prev, memberName]);
-    setMemberName("");
-  };
+//   const addTentMember = () => {
+//     setAllMemberArr((prev) => [...prev, memberName]);
+//     setMemberName("");
+//   };
 
-  return (
-    <div>
-      <Input
-        value={memberName}
-        onChange={(e) => {
-          setMemberName(e.target.value);
-        }}
-      />
-      <button onClick={addTentMember}>加入</button>
-      <div>{allMemberArr && allMemberArr.map((item,index) => <div key={index}>{item}</div>)}</div>
-    </div>
-  );
-}
+//   return (
+//     <div>
+//       <Input
+//         value={memberName}
+//         onChange={(e) => {
+//           setMemberName(e.target.value);
+//         }}
+//       />
+//       <button onClick={addTentMember}>加入</button>
+//       <div>{allMemberArr && allMemberArr.map((item,index) => <div key={index}>{item}</div>)}</div>
+//     </div>
+//   );
+// }
 
 function Tent({ tentInfo, setTentInfo, setAllMemberArr, allMemberArr}) {
   const [seat, setSeat] = useState(0);
@@ -122,16 +124,17 @@ function Tent({ tentInfo, setTentInfo, setAllMemberArr, allMemberArr}) {
         setTentInfo={setTentInfo}
         tentInfo={tentInfo}
         setSeat={setSeat}
+        seat={seat}
       />
       <Label>已有</Label>
-      <FormPropsTextFieldsStorage
+      {/* <FormPropsTextFieldsStorage
         setTentInfo={setTentInfo}
         tentInfo={tentInfo}
         seat={seat}
-      />
+      /> */}
       <br />
-      <Label>入住團友</Label>
-      <Member setAllMemberArr={setAllMemberArr} allMemberArr={allMemberArr} />
+      {/* <Label>入住團友</Label> */}
+      {/* <Member setAllMemberArr={setAllMemberArr} allMemberArr={allMemberArr} /> */}
     </div>
   );
 }
