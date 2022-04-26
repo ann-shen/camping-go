@@ -28,6 +28,7 @@ import Rating from "@mui/material/Rating";
 import Header from "../component/Header";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import ProfilePicture from "../component/ProfilePicture"
 
 Modal.setAppElement("#root");
 
@@ -486,6 +487,8 @@ export default function Profile({ userName, userId }) {
   return (
     <div>
       <Header ContextByUserId={ContextByUserId} />
+      <h1>{userName}</h1>
+      <ProfilePicture/>
       <Box sx={{ bgcolor: "background.paper", width: "100%" }}>
         <AppBar position='static' sx={{ bgcolor: "#426765" }}>
           <Tabs
