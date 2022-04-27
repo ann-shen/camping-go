@@ -10,16 +10,16 @@ import {
 import { Font, Img, Display, Button } from "../css/style";
 import { Box } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { useState, useEffect,useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { db } from "../utils/firebase";
 import Header from "../component/Header";
 import { UserContext } from "../utils/userContext";
-
 
 function PersonalOfHeader() {
   const [yourCreateGroup, setYourCreateGroup] = useState([]);
   const [groupID, setGroupID] = useState([]);
   const [totalScoreStatus, setTotalScoreStatus] = useState(false);
+  const [comment, setComment] = useState([]);
   const ContextByUserId = useContext(UserContext);
 
   let params = useParams();
@@ -37,6 +37,7 @@ function PersonalOfHeader() {
     setYourCreateGroup(CreateGroupArr);
   }, []);
 
+  //你所創建的團ID
   useEffect(async () => {
     let groupArr = [];
     yourCreateGroup.map((item) => {
@@ -49,22 +50,49 @@ function PersonalOfHeader() {
   useEffect(() => {
     groupID.map(async (item, index) => {
       let scoreArr = [];
-      const commentRef = collection(db, "feedback", item, "comment");
+      let commentArr = [];
+
+      const commentRef = collection(db, "CreateCampingGroup", item, "feedback");
+      // const commentRef = collection(db, "feedback", item, "comment");
+
       const querySnapshot = await getDocs(commentRef);
       querySnapshot.forEach((doc) => {
-        scoreArr.push(doc.data().score);
+        scoreArr.push(Number(doc.data().score));
+        commentArr.push(doc.data().note);
       });
       let totalScore = scoreArr.reduce(function (total, e) {
         return total + e;
       }, 0);
       // yourCreateGroup[index].score = totalScore / scoreArr.length;
+      console.log(totalScore);
       updateDoc(doc(db, "CreateCampingGroup", item), {
         score: totalScore / scoreArr.length,
+        comment: commentArr,
       });
     });
 
     setTotalScoreStatus(true);
   }, [groupID]);
+
+  console.log(yourCreateGroup);
+
+  const checkComment = async (groupId) => {
+    console.log("123");
+    let commentArr = [];
+    const commentRef = collection(
+      db,
+      "CreateCampingGroup",
+      // -------- fix me lost groupid --------
+      groupId,
+      "feedback"
+    );
+    const querySnapshot = await getDocs(commentRef);
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id, " => ", doc.data());
+      commentArr.push(doc.data());
+    });
+    setComment(commentArr);
+  };
 
   return (
     <div>
@@ -92,7 +120,12 @@ function PersonalOfHeader() {
                 ).getTime()
                   ? "進行中"
                   : "已結束"}
-                <Img src={item.picture} width='300px'></Img>
+                <Img
+                  src={item.picture}
+                  width='300px'
+                  onClick={(id) => {
+                    checkComment(item.group_id);
+                  }}></Img>
                 <Font>{item.group_title}</Font>
                 <Font>
                   {
@@ -116,9 +149,19 @@ function PersonalOfHeader() {
                 </Font>
                 分
               </Display>
+              <Display>
+                {item.comment.map(item=>(
+                  <Font>{item}</Font>
+                ))}
+              </Display>
             </Display>
           </Box>
         ))}
+      {/* <Display direction='cloumn'>
+        {comment.map((item) => (
+          <Font key={item.user_id}>{item.note}</Font>
+        ))}
+      </Display> */}
     </div>
   );
 }

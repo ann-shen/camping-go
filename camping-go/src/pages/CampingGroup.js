@@ -193,7 +193,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
   }, [currentMemberAmount]);
 
   const joinThisGroup = async (index, password, header_name) => {
-    if (header_name == "sf") {
+    if (header_name == userName) {
       alert("你是此團團長，不能加入唷！顆顆");
       return;
     }
@@ -237,9 +237,8 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       );
       let memberArrLength = [];
       querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
         console.log(doc.id, " => ", doc.data());
-        memberArrLength.push(doc.data());
+        // memberArrLength.push(doc.data());
       });
       console.log(memberArrLength.length);
       await updateDoc(docRef, {

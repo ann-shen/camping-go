@@ -1,91 +1,109 @@
-import React from "react";
-import profilePicture from "../css/profilePicture.css";
-import UploadIcon from "@mui/icons-material/Upload";
+import styled from "styled-components";
+import { useState, useEffect, useContext } from "react";
+import { Font, Display, Img, Button } from "../css/style";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db } from "../utils/firebase";
+import { doc, updateDoc } from "firebase/firestore";
 
-const ImgUpload = ({ onChange, src }) => (
-  <label htmlFor='photo-upload' className='custom-file-upload fas'>
-    <div className='img-wrap img-upload'>
-      <img htmlFor='photo-upload' src={src} />
-    </div>
-    <input id='photo-upload' type='file' onChange={onChange} />
-  </label>
-);
+const ImgWrap = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+`;
 
-const Profile = ({ onSubmit, src, name, status }) => (
-  <form onSubmit={onSubmit}>
-    <label className='custom-file-upload fas'>
-      <div className='img-wrap'>
-        <img htmlFor='photo-upload' src={src} />
-      </div>
-    </label>
-    <div className='name'>{name}</div>
-    <div className='status'>{status}</div>
-    <button type='submit' className='edit'>
-      Edit Profile{" "}
-    </button>
-  </form>
-);
+const Label = styled.label`
+  width: 100px;
+  height: 30px;
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+`;
 
-const Edit = ({ onSubmit, children }) => (
-  <div className='card'>
-    <form onSubmit={onSubmit}>
-      {children}
-      <button type='submit' className='save'>
-        Save{" "}
-      </button>
-    </form>
-  </div>
-);
+const Input = styled.input`
+  position: absolute;
+  top: 50;
+  left: 0;
+  display: none;
+  color: rgba(0, 0, 0, 0);
+`;
 
-class CardProfile extends React.Component {
-  state = {
-    file: "",
-    imagePreviewUrl: <UploadIcon />,
-    name: "",
-    status: "",
-    active: "edit",
-  };
+const InfoWrap = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 0px;
+`;
 
-  photoUpload = (e) => {
-    e.preventDefault();
-    const reader = new FileReader();
-    const file = e.target.files[0];
-    reader.onloadend = () => {
-      this.setState({
-        file: file,
-        imagePreviewUrl: reader.result,
+export const ImageUpload = ({ userId }) => {
+  const [selectedFile, setSelectedFile] = useState();
+  const [preview, setPreview] = useState("");
+
+  // create a preview as a side effect, whenever selected file is changed
+  useEffect(() => {
+    console.log(preview);
+    if (!selectedFile) {
+      setPreview(
+        "https://firebasestorage.googleapis.com/v0/b/camping-go-14942.appspot.com/o/person%2Bprofile%2Buser%2Bicon-1320184051308863170.png?alt=media&token=91bccd8a-3fea-4515-8211-c10dfffb1285"
+      );
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(selectedFile);
+    setPreview(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [selectedFile]);
+
+  const onSelectFile = (e) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      setSelectedFile(undefined);
+      return;
+    }
+
+    setSelectedFile(e.target.files[0]);
+
+    const storage = getStorage();
+    const imageRef = ref(storage, e.target.files[0].name);
+    uploadBytes(imageRef, e.target.files[0])
+      .then(() => {
+        getDownloadURL(imageRef)
+          .then((url) => {
+            console.log(url);
+
+            //=======fix me ========//
+
+            updateDoc(doc(db, "joinGroup", userId), {
+              profile_img: url,
+            });
+          })
+          .catch((error) => {
+            console.log(error.message, "error getting the img url");
+          });
+      })
+      .catch((error) => {
+        console.log(error.message);
       });
-    };
-    reader.readAsDataURL(file);
   };
 
-  handleSubmit = (e) => {
-    e.preventDefault();
-    let activeP = this.state.active === "edit" ? "profile" : "edit";
-    this.setState({
-      active: activeP,
-    });
-  };
-
-  render() {
-    const { imagePreviewUrl, name, status, active } = this.state;
-    return (
-      <div>
-        {active === "edit" ? (
-          <Edit onSubmit={this.handleSubmit}>
-            <ImgUpload onChange={this.photoUpload} src={imagePreviewUrl} />
-          </Edit>
-        ) : (
-          <Profile
-            onSubmit={this.handleSubmit}
-            src={imagePreviewUrl}
-            name={name}
-            status={status}
-          />
+  return (
+    <InfoWrap>
+      <Display direction='column'>
+        {preview && (
+          <ImgWrap>
+            <Img src={preview} width='auto' height='115%' />
+          </ImgWrap>
         )}
-      </div>
-    );
-  }
-}
-
-export default CardProfile;
+        <Label>
+          chose
+          <Input type='file' onChange={onSelectFile} />
+        </Label>
+      </Display>
+    </InfoWrap>
+  );
+};
