@@ -161,7 +161,6 @@ function Multiple({ setUpLoadFile }) {
 
 function CreateGroup({
   userId,
-  setUserName,
   userName,
   allMemberArr,
   setAllMemberArr,
@@ -381,7 +380,7 @@ function CreateGroup({
       <br />
       <Label>封面照片</Label>
       <input type='file' accept='image/*' onChange={handleFiles}></input>
-      <Multiple setUpLoadFile={setUpLoadFile} />
+      <Multiple  />
       {/* <Upload /> */}
       <Label>公開狀態</Label>
       <Select name='privacy' onChange={handleChange} value={groupInfo.privacy}>

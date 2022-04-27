@@ -17,6 +17,7 @@ import {
   onSnapshot,
   updateDoc,
   arrayRemove,
+  setDoc,
 } from "firebase/firestore";
 import { Font, Img, Display, Button } from "../css/style";
 import Modal from "react-modal";
@@ -28,6 +29,7 @@ import Rating from "@mui/material/Rating";
 import Header from "../component/Header";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { ImageUpload } from "../component/ProfilePicture";
 
 Modal.setAppElement("#root");
 
@@ -78,13 +80,26 @@ function SentCommentToHeader({ groupId, userName, userId }) {
   const sendComment = async () => {
     console.log(groupId);
     setAlertOpen(true);
-    const docRef = collection(db, "feedback", groupId, "comment");
-    await addDoc(docRef, {
+    const feedbackInCreateRef = doc(
+      db,
+      "CreateCampingGroup",
+      groupId,
+      "feedback",
+      userId
+    );
+    await setDoc(feedbackInCreateRef, {
       name: userName,
       note: value,
       score: startValue,
-      user_iD: userId,
+      user_id: userId,
     });
+    // const docRef = collection(db, "feedback", groupId, "comment");
+    // await addDoc(docRef, {
+    //   name: userName,
+    //   note: value,
+    //   score: startValue,
+    //   user_iD: userId,
+    // });
   };
 
   return (
@@ -167,7 +182,13 @@ function CheckCommentFromMember({ groupId }) {
     console.log(groupId);
     let commentArr = [];
     setCommentIsOpen(true);
-    const commentRef = collection(db, "feedback", groupId, "comment");
+    // const commentRef = collection(db, "feedback", groupId, "comment");
+    const commentRef = collection(
+      db,
+      "CreateCampingGroup",
+      groupId,
+      "feedback"
+    );
     const querySnapshot = await getDocs(commentRef);
     querySnapshot.forEach((doc) => {
       // doc.data() is never undefined for query doc snapshots
@@ -181,7 +202,7 @@ function CheckCommentFromMember({ groupId }) {
     let scoreArr = [];
     comment.map((item) => {
       console.log(item.score);
-      scoreArr.push(item.score);
+      scoreArr.push(Number(item.score));
     });
     let totalScore = scoreArr.reduce(function (total, e) {
       return total + e;
@@ -428,6 +449,9 @@ export default function Profile({ userName, userId }) {
 
   const deleteThisGroup = async (id) => {
     console.log(id);
+    await deleteDoc(collection(db, "CreateCampingGroup", id, "member"));
+    await deleteDoc(collection(db, "CreateCampingGroup", id, "supplies"));
+    await deleteDoc(collection(db, "CreateCampingGroup", id, "tent"));
     await deleteDoc(doc(db, "CreateCampingGroup", id));
   };
 
@@ -486,6 +510,8 @@ export default function Profile({ userName, userId }) {
   return (
     <div>
       <Header ContextByUserId={ContextByUserId} />
+      <h1>{userName}</h1>
+      <ImageUpload userId={userId} />
       <Box sx={{ bgcolor: "background.paper", width: "100%" }}>
         <AppBar position='static' sx={{ bgcolor: "#426765" }}>
           <Tabs

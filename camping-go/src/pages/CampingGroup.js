@@ -24,7 +24,7 @@ import landingpage from "../image/landingpage.jpeg";
 import Header from "../component/Header";
 import Modal from "react-modal";
 import { UserContext } from "../utils/userContext";
-
+import PaginationBar from "../component/Pagination";
 Modal.setAppElement("#root");
 
 const LinkPrivate = styled(Link)`
@@ -136,6 +136,11 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
   const [groupPassword, setGroupPassword] = useState("");
   const [currentMemberAmount, setCurrentMemberAmount] = useState("");
   const ContextByUserId = useContext(UserContext);
+  const [pagination, setPaagination] = useState({
+    loading: false,
+    currentPage: 1,
+    posts_per_page: 3,
+  });
   const navigate = useNavigate();
 
   //render all camping group
@@ -148,7 +153,23 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       arr.push(doc.data());
     });
     sethomePageCampGroup(arr);
+    setPaagination((prevState) => ({
+      ...prevState,
+      loading: false,
+    }));
   }, []);
+
+  const indexOfLastPost = pagination.currentPage * pagination.posts_per_page;
+  const indexOfFirstPost = indexOfLastPost - pagination.posts_per_page;
+  const currentPosts = homePageCampGroup.slice(
+    indexOfFirstPost,
+    indexOfLastPost
+  );
+  const paginate = (pageNumber) =>
+    setPaagination((prevState) => ({
+      ...prevState,
+      currentPage: pageNumber,
+    }));
 
   //particular city
   useEffect(async () => {
@@ -172,7 +193,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
   }, [currentMemberAmount]);
 
   const joinThisGroup = async (index, password, header_name) => {
-    if (header_name == "sf") {
+    if (header_name == userName) {
       alert("你是此團團長，不能加入唷！顆顆");
       return;
     }
@@ -216,9 +237,8 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       );
       let memberArrLength = [];
       querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
         console.log(doc.id, " => ", doc.data());
-        memberArrLength.push(doc.data());
+        // memberArrLength.push(doc.data());
       });
       console.log(memberArrLength.length);
       await updateDoc(docRef, {
@@ -260,7 +280,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
         <Img src={landingpage} width='100%'></Img>
       </Box>
       <GroupWrap>
-        {homePageCampGroup.map((item, index) => (
+        {currentPosts.map((item, index) => (
           <Box
             sx={{
               width: 1000,
@@ -353,6 +373,11 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
           </Box>
         ))}
       </GroupWrap>
+      <PaginationBar
+        pagination={pagination}
+        totalPosts={homePageCampGroup.length}
+        paginate={paginate}
+      />
       <Button
         width='80px'
         height='80px'
