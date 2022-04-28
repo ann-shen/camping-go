@@ -19,6 +19,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 99;
 }
 
 .overlay-after {
@@ -54,12 +55,10 @@
   transition-timing-function: ease-in-out;
 }
 
-/* .setScroll{
-  overflow: scroll;
-} */
+
 
 .content-after {
-  width: 70%;
+  width: 50%;
   height: 55%;
   background-color: #FFFEF4;
   border: 6px solid #CFC781 ;

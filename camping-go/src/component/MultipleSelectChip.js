@@ -11,7 +11,6 @@ import { useEffect } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../utils/firebase";
 
-
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -47,28 +46,40 @@ function getStyles(name, personName, theme) {
   };
 }
 
-export default function MultipleSelectChip({ userId }) {
+export default function MultipleSelectChip({ userId, path, groupId }) {
   const theme = useTheme();
   const [personName, setPersonName] = React.useState([]);
-  console.log(personName);
+  const [personNameByCreate, setPersonNameByCreate] = React.useState([]);
+ console.log(groupId);
 
   useEffect(async () => {
-    await updateDoc(doc(db, "joinGroup", userId), {
-      selectTag: personName,
-    });
+    if (path == "/createGroup") {
+      console.log("ttttt");
+      await updateDoc(doc(db, "CreateCampingGroup", groupId), {
+        selectTag: personName,
+      });
+    } else {
+      await updateDoc(doc(db, "joinGroup", userId), {
+        selectTag: personName,
+      });
+    }
   }, [personName]);
 
   const handleChange = (event) => {
     const value = event.target.value;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
+    // if (path == "/createGroup") {
+    //   console.log("go");
+    //   setPersonNameByCreate(
+    //     typeof value === "string" ? value.split(",") : value
+    //   );
+    // } else {
+    setPersonName(typeof value === "string" ? value.split(",") : value);
+    // }
   };
 
   return (
     <div>
-      <FormControl sx={{ ml: 3, mt:2, width: "500px" }}>
+      <FormControl sx={{ ml: 3, mt: 2, width: "500px" }}>
         <InputLabel id='demo-multiple-chip-label'>喜愛</InputLabel>
         <Select
           labelId='demo-multiple-chip-label'

@@ -32,6 +32,7 @@ import styled from "styled-components";
 import { ProfilePicture } from "../component/ProfilePicture";
 import location from "../image/location.png";
 import MultipleSelectChip from "../component/MultipleSelectChip";
+import { borderBottom } from "@mui/system";
 Modal.setAppElement("#root");
 
 const LinkRoute = styled(Link)`
@@ -39,6 +40,46 @@ const LinkRoute = styled(Link)`
   margin: 5px 5px;
   font-size: 14px;
   color: gray;
+`;
+
+const CheckCommentWrap = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  position: relative;
+  padding: 40px 10px;
+  margin-right: 40px;
+  overflow: scroll;
+
+  /* ::-webkit-scrollbar {
+    background-color: red;
+    border-radius: 10px;
+  } */
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    border-radius: 3px;
+    border-left: 6px solid #e6ecf8;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #eae5be;
+  }
+`;
+
+const CommentTitleWrap = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+`;
+
+const DeleteModalButton = styled.button`
+  width: 20px;
+  position: absolute;
+  top: 30px;
+  left: 30px;
 `;
 
 function TabPanel(props) {
@@ -94,13 +135,6 @@ function SentCommentToHeader({ groupId, userName, userId }) {
       score: startValue,
       user_id: userId,
     });
-    // const docRef = collection(db, "feedback", groupId, "comment");
-    // await addDoc(docRef, {
-    //   name: userName,
-    //   note: value,
-    //   score: startValue,
-    //   user_iD: userId,
-    // });
   };
 
   return (
@@ -234,30 +268,27 @@ function CheckCommentFromMember({ groupId }) {
           beforeClose: "content-before",
         }}
         closeTimeoutMS={500}>
-        <Wrap direction='column' width='100%' boxShadow='none'>
-          <Font onClick={() => setCommentIsOpen(false)}>X</Font>
-          <Display>
-            <Wrap
-              width='100%'
-              m=' 20px 150px 20px 0px'
-              boxShadow='none'
-              justifyContent='center'>
-              <Font fontSize='30px'>你的評論</Font>
-            </Wrap>
-            <Font>總分</Font>
-            <Font>{totalScore}</Font>
-          </Display>
+        <CheckCommentWrap>
+          <DeleteModalButton onClick={() => setCommentIsOpen(false)}>
+            X
+          </DeleteModalButton>
+          <CommentTitleWrap>
+            <Font fontSize='30px'>你的評論</Font>
+            <Display>
+              <Font>總分</Font>
+              <Font>{totalScore}</Font>
+            </Display>
+          </CommentTitleWrap>
 
-          <div className='setScroll'>
+          <div>
             {comment &&
               comment.map((item) => (
                 <Box
                   sx={{
-                    width: "600px",
+                    width: "500px",
                     height: "auto",
-                    boxShadow: 3,
-                    borderRadius: 6,
-                    padding: 1,
+                    borderBottom: " 1.4px solid #EAE5BE",
+                    padding: 3,
                     margin: 1,
                   }}>
                   <Font>{item.name}</Font>
@@ -266,7 +297,7 @@ function CheckCommentFromMember({ groupId }) {
                 </Box>
               ))}
           </div>
-        </Wrap>
+        </CheckCommentWrap>
       </Modal>
     </div>
   );
