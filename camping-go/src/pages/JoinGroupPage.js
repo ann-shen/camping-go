@@ -349,8 +349,8 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                   {homePageCampGroup &&
                     new Date(homePageCampGroup.start_date.seconds * 1000)
                       .toLocaleString()
-                      .split(" ")[0]}{" "}
-                  ~{" "}
+                      .split(" ")[0]}
+                  ~
                   {homePageCampGroup &&
                     new Date(homePageCampGroup.end_date.seconds * 1000)
                       .toLocaleString()
