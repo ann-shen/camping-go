@@ -1,5 +1,5 @@
 import { db } from "../utils/firebase";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import {
   doc,
   onSnapshot,
@@ -44,9 +44,9 @@ const TargetContainer = {
 
 const SourseContainer = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
-  width: 50px;
+  width: 300px;
   height: 80px;
   margin: 10px;
 `;
@@ -60,6 +60,39 @@ const PersonWrap = styled.div`
   background-color: white;
   border: 2px solid #797659;
   border-radius: 5px;
+`;
+
+const pulse = keyframes`
+  from {
+      transform: scale(0.5);
+      opacity: 1;
+    }
+    to {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+`;
+
+const AnimationIndicators = styled.span`
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin: 10px;
+  background: #ffda72;
+  &:before {
+    background: #ffda72;
+    content: "";
+    display: block;
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    width:50px;
+    height: 50px;
+    border-radius: 50%;
+    animation: ${pulse} 1.5s infinite ease-in;
+  }
 `;
 
 function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
@@ -349,8 +382,8 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                   {homePageCampGroup &&
                     new Date(homePageCampGroup.start_date.seconds * 1000)
                       .toLocaleString()
-                      .split(" ")[0]}{" "}
-                  ~{" "}
+                      .split(" ")[0]}
+                  ~
                   {homePageCampGroup &&
                     new Date(homePageCampGroup.end_date.seconds * 1000)
                       .toLocaleString()
@@ -483,6 +516,10 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                       fontSize='large'></AssignmentIndIcon>
                   </PersonWrap>
                 )}
+                <Display >
+                  <Font fontSize='14px'>拖移小人偶至指定帳篷</Font>
+                  <AnimationIndicators />
+                </Display>
               </SourseContainer>
               <Button
                 width='80px'

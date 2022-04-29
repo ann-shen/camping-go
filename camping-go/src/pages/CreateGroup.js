@@ -20,6 +20,9 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import GoogleMapBasic from "../component/GoogleMapBasic";
+import MultipleSelectChip from "../component/MultipleSelectChip";
+
+
 
 const Wrap = styled.div`
   display: flex;
@@ -159,12 +162,7 @@ function Multiple({ setUpLoadFile }) {
   );
 }
 
-function CreateGroup({
-  userId,
-  userName,
-  allMemberArr,
-  setAllMemberArr,
-}) {
+function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [state, setState] = useState({
@@ -228,6 +226,9 @@ function CreateGroup({
   });
 
   const navigate = useNavigate();
+  let path = window.location.pathname;
+  console.log(path);
+ 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -380,7 +381,7 @@ function CreateGroup({
       <br />
       <Label>封面照片</Label>
       <input type='file' accept='image/*' onChange={handleFiles}></input>
-      <Multiple  />
+      <Multiple />
       {/* <Upload /> */}
       <Label>公開狀態</Label>
       <Select name='privacy' onChange={handleChange} value={groupInfo.privacy}>
@@ -437,6 +438,7 @@ function CreateGroup({
           <br />
           <Label>公告</Label>
           <br />
+          <MultipleSelectChip path={path} groupId={groupId} />
           <Input
             maxlength='150'
             name='announcement'

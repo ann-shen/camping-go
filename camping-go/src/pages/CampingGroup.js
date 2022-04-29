@@ -25,6 +25,7 @@ import Header from "../component/Header";
 import Modal from "react-modal";
 import { UserContext } from "../utils/userContext";
 import PaginationBar from "../component/Pagination";
+import ReviewCard from "../component/ReviewCard";
 Modal.setAppElement("#root");
 
 const LinkPrivate = styled(Link)`
@@ -45,11 +46,6 @@ const GroupWrap = styled.div`
   display: flex;
   /* flex-direction: column; */
   margin: 100px;
-`;
-
-const Group = styled.div`
-  width: 200px;
-  margin-left: 100px;
 `;
 
 const Label = styled.label`
@@ -238,23 +234,13 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       let memberArrLength = [];
       querySnapshot.forEach((doc) => {
         console.log(doc.id, " => ", doc.data());
-        // memberArrLength.push(doc.data());
+        memberArrLength.push(doc.data());
       });
       console.log(memberArrLength.length);
       await updateDoc(docRef, {
         current_number: memberArrLength.length,
       });
-
-      // setCurrentMemberAmount(memberArrLength.length);
     });
-    // .then(async() => {
-    //   if(currentMembeAmount !== "" ){
-    //     console.log(currentMembeAmount);
-    //     await updateDoc(docRef, {
-    //       current_number: currentMembeAmount,
-    //     });
-    //   }
-    // });
 
     const docRefJoinGroup = await doc(db, "joinGroup", userId);
     console.log(homePageCampGroup[index].group_id);
@@ -263,7 +249,6 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     });
   };
 
-  // console.log(homePageCampGroup[0].id);
   return (
     <div>
       <Header ContextByUserId={ContextByUserId} />
@@ -279,100 +264,15 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
         }}>
         <Img src={landingpage} width='100%'></Img>
       </Box>
-      <GroupWrap>
-        {currentPosts.map((item, index) => (
-          <Box
-            sx={{
-              width: 1000,
-              height: "auto",
-
-              boxShadow:
-                "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-              "&:hover": {
-                border: 1,
-                opacity: [0.9, 0.8, 0.7],
-              },
-              borderRadius: 6,
-              padding: 3,
-              margin: 3,
-            }}
-            key={index}>
-            <Grid item xs={4} md={8}>
-              {item.privacy == "私人" && <Tag>私人</Tag>}
-
-              <ImgWrap>
-                <Img src={item.picture} width='120%' alt='圖片' />
-              </ImgWrap>
-              <Display direction='column' alignItems='start' mb='30px'>
-                <span>團長{item.header_name}</span>
-                <Font
-                  fontSize='24px'
-                  color='#797659'
-                  marginLeft='0px'
-                  margin='8px'>
-                  {item.group_title}
-                </Font>
-                <div>
-                  <Label ml='8px'>
-                    {
-                      new Date(item.start_date.seconds * 1000)
-                        .toLocaleString()
-                        .split(" ")[0]
-                    }
-                    ~
-                  </Label>
-                  <Label>
-                    {
-                      new Date(item.end_date.seconds * 1000)
-                        .toLocaleString()
-                        .split(" ")[0]
-                    }
-                  </Label>
-                </div>
-              </Display>
-              <div>
-                <Display justifyContent='space-between'>
-                  <Display>
-                    <Img src={location} width='26px'></Img>
-                    <Font fontSize='16px' marginLeft='10px'>
-                      {item.city}
-                    </Font>
-                  </Display>
-                  <div>
-                    <Display>
-                      <Font fontSize='35px'>
-                        {item.current_number}/{item.max_member_number}人
-                      </Font>
-                    </Display>
-                  </div>
-                </Display>
-              </div>
-              <IsModal
-                modalIsOpen={modalIsOpen}
-                setIsOpen={setIsOpen}
-                groupId={groupId}
-                groupPassword={groupPassword}
-              />
-              <Button
-                group_id={item.group_id}
-                variant='outlined'
-                onClick={(e) => {
-                  joinThisGroup(index, item.password, item.header_name);
-                }}>
-                {item.privacy == "公開" && item.header_name !== userName && (
-                  <LinkPrivate to={`joinGroup/${item.group_id}`}>
-                    我要加入
-                  </LinkPrivate>
-                )}
-                {item.privacy == "私人" && item.header_name !== userName && (
-                  <LinkOpen>我要加入</LinkOpen>
-                )}
-                {item.header_name == userName && <LinkOpen>我要加入</LinkOpen>}
-              </Button>
-            </Grid>
-          </Box>
-        ))}
-      </GroupWrap>
+      <ReviewCard
+        currentPosts={currentPosts}
+        joinThisGroup={joinThisGroup}
+        groupId={groupId}
+        userName={userName}
+        setIsOpen={setIsOpen}
+        modalIsOpen={modalIsOpen}
+        groupPassword={groupPassword}
+      />
       <PaginationBar
         pagination={pagination}
         totalPosts={homePageCampGroup.length}
