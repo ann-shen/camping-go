@@ -60,18 +60,20 @@ export const ProfilePicture = ({ userId }) => {
   const [preview, setPreview] = useState("");
 
   // create a preview as a side effect, whenever selected file is changed
-  useEffect(() => {
-    console.log(preview);
+  useEffect(async() => {
+    console.log(userId);
+    await updateDoc(doc(db, "joinGroup", userId), {
+      profile_img: `https://joeschmoe.io/api/v1/${userId}`,
+    });
+
     if (!selectedFile) {
       setPreview(
         "https://firebasestorage.googleapis.com/v0/b/camping-go-14942.appspot.com/o/person%2Bprofile%2Buser%2Bicon-1320184051308863170.png?alt=media&token=91bccd8a-3fea-4515-8211-c10dfffb1285"
       );
       return;
     }
-
     const objectUrl = URL.createObjectURL(selectedFile);
     setPreview(objectUrl);
-
     return () => URL.revokeObjectURL(objectUrl);
   }, [selectedFile]);
 
@@ -109,14 +111,21 @@ export const ProfilePicture = ({ userId }) => {
         <ProfileWrap>
           {preview && (
             <ImgWrap>
-              <Img src={preview} width='auto' height='115%' />
+              <Img
+                src={`https://joeschmoe.io/api/v1/${userId}`}
+                width='auto'
+                height='115%'
+              />
             </ImgWrap>
           )}
           <Label>
-
             <FileUploadRoundedIcon
-            
-              sx={{ pointerEvents: "none", cursor: "not-allowed" ,stroke: "#ffffff", strokeWidth: 1}}
+              sx={{
+                pointerEvents: "none",
+                cursor: "not-allowed",
+                stroke: "#ffffff",
+                strokeWidth: 1,
+              }}
             />
             <Input type='file' onChange={onSelectFile} />
           </Label>

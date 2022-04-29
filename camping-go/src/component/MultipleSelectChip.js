@@ -49,7 +49,14 @@ export default function MultipleSelectChip({ userId, path, groupId }) {
   const theme = useTheme();
   const [personName, setPersonName] = useState([]);
   // const [chosenTag, setChosenTag] = useState([]);
-
+  
+  useEffect(async () => {
+    if (path == "/createGroup") {
+      await updateDoc(doc(db, "CreateCampingGroup", groupId), {
+        select_tag: personName,
+      });
+    }
+  }, [personName]);
 
   useEffect(async () => {
     const docRef = doc(db, "joinGroup", userId);
@@ -62,13 +69,6 @@ export default function MultipleSelectChip({ userId, path, groupId }) {
     }
   }, []);
 
-  useEffect(async () => {
-    if (path == "/createGroup") {
-      await updateDoc(doc(db, "CreateCampingGroup", groupId), {
-        select_tag: personName,
-      });
-    }
-  }, [personName]);
 
 
   const handleChange = async (event) => {

@@ -278,7 +278,6 @@ function CheckCommentFromMember({ groupId }) {
     });
   }, [totalScore]);
 
-
   return (
     <div className='App'>
       <Button
@@ -485,7 +484,7 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
   );
 }
 
-export default function Profile({ userName, userId }) {
+export default function Profile({ userName, userId, getLogout }) {
   let params = useParams();
   const theme = useTheme();
   const [value, setValue] = useState(0);
@@ -596,11 +595,14 @@ export default function Profile({ userName, userId }) {
       <Header ContextByUserId={ContextByUserId} />
 
       <Wrap
-        width='100%'
+        maxWidth='1440px'
+        width='75%'
         m='20px 40px 0px 12%'
         alignItems='center'
+        justifyContent='space-between'
         boxShadow='none'>
-        <ProfilePicture userId={userId} />
+        <Display>
+          <ProfilePicture userId={userId} />
         <Wrap
           width='500px'
           direction='column'
@@ -618,6 +620,10 @@ export default function Profile({ userName, userId }) {
             <MultipleSelectChip userId={userId} />
           </Display>
         </Wrap>
+        </Display>
+        <Button width='100px' onClick={getLogout}>
+          登出
+        </Button>
       </Wrap>
 
       <Box

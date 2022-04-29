@@ -78,7 +78,13 @@ function App() {
               }></Route>
             <Route
               path='profile/:id'
-              element={<Profile userName={userName} userId={userId} />}></Route>
+              element={
+                <Profile
+                  userName={userName}
+                  userId={userId}
+                  getLogout={getLogout}
+                />
+              }></Route>
             <Route
               path='login'
               element={
@@ -94,7 +100,7 @@ function App() {
               path='personal_header/:id'
               element={<PersonalOfHeader />}></Route>
           </Routes>
-          <button onClick={getLogout}>登出</button>
+          
         </BrowserRouter>
       </UserContext.Provider>
       {/* <MaterialUIPickers></MaterialUIPickers> */}
