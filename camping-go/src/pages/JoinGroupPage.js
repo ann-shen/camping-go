@@ -110,22 +110,27 @@ const groupTitle = styled.div`
 `;
 
 const HeaderName = styled.div`
-  width: auto;
-  height: 25px;
+  width: 130px;
+  height: 30px;
   border-radius: 10px;
-  padding-top: 3px;
-  background-color: #CFC781;
+  padding-top: 7px;
+  background-color: #426765;
   color: white;
 `;
 
 const ImagesWrap = styled.div`
   width: 500px;
-  height: auto;
+  height: 300px;
   border-radius: 20px;
+  margin: 40px 0px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const GroupImg = styled.img`
-  width: 100%;
+  width: 105%;
 `;
 
 function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
@@ -332,7 +337,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   async function getinfo(id) {
     const docRef = doc(db, "joinGroup", id);
     const docSnap = await getDoc(docRef);
-    console.log(docSnap.data());
     return docSnap.data();
   }
 
@@ -440,13 +444,13 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             paddingBottom: "50px",
           }}>
           <groupTitle>
-            <HeaderName>{homePageCampGroup.header_name}</HeaderName>
-            <Display>
+            <HeaderName> 團長：{homePageCampGroup.header_name}</HeaderName>
+            <Display alignItems='center' m='20px 0px '>
               <Img src={location} width='20px'></Img>
               {homePageCampGroup.city && (
                 <Font marginLeft='8px'>{homePageCampGroup.city} | </Font>
               )}
-              <Label>
+              <Label mt='0px'>
                 {homePageCampGroup &&
                   new Date(homePageCampGroup.start_date.seconds * 1000)
                     .toLocaleString()
@@ -460,10 +464,10 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             </Display>
           </groupTitle>
           <Display justifyContent='space-between'>
-            <Font fontSize='40px' marginLeft='25px'>
+            <Font fontSize='35px' letterSpacing='3px'>
               {homePageCampGroup.group_title}
             </Font>
-            <Font fontSize='30px' marginLeft='25px'>
+            <Font fontSize='30px' letterSpacing='3px'>
               {homePageCampGroup.current_number}/
               {homePageCampGroup.max_member_number}人
             </Font>
@@ -472,73 +476,99 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             <GroupImg src={homePageCampGroup.picture} alt='' />
           </ImagesWrap>
           <Display>
-            <Font>露營團基本資訊</Font>
+            <Font letterSpacing='3px' fontSize='20px'>
+              露營團基本資訊
+            </Font>
           </Display>
           <Display>
             <Box
               sx={{
-                width: "400px",
-                height: "auto",
-                // boxShadow:
-                //   "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-                borderRadius: 10,
-                paddingTop: 8,
-                margin: "auto",
-                marginBottom: "100px",
-                paddingBottom: "50px",
+                width: "50%",
+                height: "200px",
+                borderRadius: 15,
+                padding: 5,
+                marginTop: 3,
                 justifyContent: "start",
+                backgroundColor: "#426765",
               }}>
               <Cloumn>
-                <Font fontSize='16px' margin='10px'>
+                <Font fontSize='20px' m='10px 0px' color='#F3EA98'>
                   詳細地址
                 </Font>
-                <Font fontSize='16px'>{homePageCampGroup.position}</Font>
+                <Font fontSize='20px' m='0px 0px 25px 0px' color='#F3EA98'>
+                  {homePageCampGroup.position}
+                </Font>
               </Cloumn>
               <Display>
                 <Cloumn>
-                  <Font fontSize='16px' margin='10px'>
+                  <Font fontSize='20px' m='10px 0px' color='#F3EA98'>
                     營區網站
                   </Font>
-                  <Font fontSize='16px'>{homePageCampGroup.site}</Font>
+                  <Font fontSize='20px' color='#F3EA98'>
+                    {homePageCampGroup.site}
+                  </Font>
                 </Cloumn>
               </Display>
             </Box>
 
             <Box
               sx={{
-                width: "300px",
-                height: "auto",
-                // boxShadow:
-                //   "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+                width: "30%",
+                height: "200px",
+                boxShadow:
+                  "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
                 borderRadius: 10,
-                paddingTop: 8,
-                margin: "auto",
-                marginBottom: "100px",
-                paddingBottom: "50px",
+                padding: 5,
+                marginTop: 3,
+                marginLeft: 5,
                 justifyContent: "start",
               }}>
               <Cloumn>
-                <Font fontSize='16px' margin='10px'>
+                <Font fontSize='20px' m='10px'>
                   集合時間
                 </Font>
-                <Font fontSize='16px'>
+                <Font fontSize='20px'>
                   {homePageCampGroup &&
-                    new Date(
-                      homePageCampGroup.meeting_time.seconds * 1000
-                    ).toLocaleString()}
+                    new Date(homePageCampGroup.meeting_time.seconds * 1000)
+                      .toLocaleString()
+                      .split(" ")[0]}
+                </Font>
+                <Font fontSize='35px'>
+                  {homePageCampGroup &&
+                    new Date(homePageCampGroup.meeting_time.seconds * 1000)
+                      .toLocaleString()
+                      .split(" ")[1]
+                      .split(":")[0]}
+                  :
+                  {homePageCampGroup &&
+                    new Date(homePageCampGroup.meeting_time.seconds * 1000)
+                      .toLocaleString()
+                      .split(" ")[1]
+                      .split(":")[1]}
                 </Font>
               </Cloumn>
             </Box>
           </Display>
 
-          <Box>
+          <Box
+            sx={{
+              width: "95%",
+              height: "auto",
+              boxShadow:
+                "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+              borderRadius: 10,
+              padding: 2,
+              marginTop: 8,
+              justifyContent: "start",
+            }}>
             <Cloumn>
-              <Font fontSize='16px' margin='10px'>
+              <Font fontSize='16px'>
                 公告
               </Font>
               <Font fontSize='16px'>{homePageCampGroup.announcement}</Font>
             </Cloumn>
           </Box>
+
           <Cloumn>
             <Font>加入帳篷</Font>
             <Font>

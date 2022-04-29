@@ -5,7 +5,6 @@ export const Label = styled.label`
   font-size: ${(props) => props.fontSize || "20px"};
   margin-left: ${(props) => props.ml || "5px"};
   margin-top: ${(props) => props.mt || "10px"};
-
   color: ${(props) => props.color || "#797659"};
 `;
 export const Input = styled.input`
@@ -25,6 +24,7 @@ export const Font = styled.p`
   margin: ${(props) => props.m || "0px"};
   margin-left: ${(props) => props.marginLeft || "0px"};
   color: ${(props) => props.color || "#797659"};
+  letter-spacing: ${(props) => props.letterSpacing || "0px"};
 `;
 
 export const Display = styled.div`
@@ -33,6 +33,7 @@ export const Display = styled.div`
   justify-content: ${(props) => props.justifyContent || "none"};
   margin-left: ${(props) => props.ml || "0px"};
   margin-bottom: ${(props) => props.mb || "0px"};
+  margin: ${(props) => props.m || "0px"};
   align-items: ${(props) => props.alignItems || "center"};
   border-bottom: ${(props) => props.borderBottom || "none"};
   padding-bottom: ${(props) => props.paddingBottom || "0px"};
@@ -63,8 +64,8 @@ export const Img = styled.img`
 `;
 
 export const ImgWrap = styled.div`
-align-items: center;
-justify-content: center;
+  align-items: center;
+  justify-content: center;
   margin: ${(props) => props.m || "0px"};
   margin-bottom: ${(props) => props.mb || "0px"};
   width: ${(props) => props.width || "300px"};
@@ -72,8 +73,6 @@ justify-content: center;
   border-radius: 20px;
   overflow: hidden;
 `;
-
-
 
 export const Button = styled.button`
   &:hover {
@@ -117,6 +116,7 @@ export const Tag = styled.div`
 `;
 
 export const Cloumn = styled.div`
-display:flex;
-flex-direction:column;
-align-items:start;`
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+`;
