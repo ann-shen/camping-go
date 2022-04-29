@@ -18,6 +18,7 @@ import {
   updateDoc,
   arrayRemove,
   setDoc,
+  increment,
 } from "firebase/firestore";
 import { Font, Img, Display, Button, Wrap, Tag, ImgWrap } from "../css/style";
 import Modal from "react-modal";
@@ -69,7 +70,7 @@ const CheckCommentWrap = styled.div`
 `;
 
 const SendCommentWrap = styled.div`
- width: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: start;
@@ -77,7 +78,7 @@ const SendCommentWrap = styled.div`
   position: relative;
   padding: 40px 10px;
   margin-right: 40px;
-`
+`;
 
 const CommentTitleWrap = styled.div`
   width: 100%;
@@ -189,18 +190,22 @@ function SentCommentToHeader({ groupId, userName, userId }) {
             variant='filled'
             onChange={handleChange}
           />
-            <Rating
-              name='size-large'
-              defaultValue={2}
-              size='large'
-              value={startValue}
-              sx={{margin:"30px"}}
-              onChange={(event, newValue) => {
-                console.log(newValue);
-                setStartValue(newValue);
-              }}
-            />
-          <Button bgc='#426765' color='#eae5be' width="150px" onClick={sendComment}>
+          <Rating
+            name='size-large'
+            defaultValue={2}
+            size='large'
+            value={startValue}
+            sx={{ margin: "30px" }}
+            onChange={(event, newValue) => {
+              console.log(newValue);
+              setStartValue(newValue);
+            }}
+          />
+          <Button
+            bgc='#426765'
+            color='#eae5be'
+            width='150px'
+            onClick={sendComment}>
             送出評論
           </Button>
         </SendCommentWrap>
@@ -237,7 +242,6 @@ function CheckCommentFromMember({ groupId }) {
     console.log(groupId);
     let commentArr = [];
     setCommentIsOpen(true);
-    // const commentRef = collection(db, "feedback", groupId, "comment");
     const commentRef = collection(
       db,
       "CreateCampingGroup",
@@ -246,25 +250,34 @@ function CheckCommentFromMember({ groupId }) {
     );
     const querySnapshot = await getDocs(commentRef);
     querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      // console.log(doc.id, " => ", doc.data());
       commentArr.push(doc.data());
     });
     setComment(commentArr);
   };
 
   useEffect(() => {
-    let scoreArr = [];
-    comment.map((item) => {
-      console.log(item.score);
-      scoreArr.push(Number(item.score));
-    });
-    let totalScore = scoreArr.reduce(function (total, e) {
-      return total + e;
-    }, 0);
-
-    setTotalScore(totalScore / comment.length);
+    if (comment.length !== 0) {
+      console.log("hi");
+      let scoreArr = [];
+      comment.map((item) => {
+        console.log(item.score);
+        scoreArr.push(Number(item.score));
+      });
+      let totalScore = scoreArr.reduce(function (total, e) {
+        return total + e;
+      }, 0);
+      setTotalScore(totalScore / comment.length);
+    } else {
+      return;
+    }
   }, [comment]);
+
+  useEffect(() => {
+    updateDoc(doc(db, "CreateCampingGroup", groupId), {
+      score: totalScore / comment.length,
+    });
+  }, [totalScore]);
+
 
   return (
     <div className='App'>
@@ -295,8 +308,14 @@ function CheckCommentFromMember({ groupId }) {
           <CommentTitleWrap>
             <Font fontSize='30px'>你的評論</Font>
             <Display>
-              <Font>總分</Font>
-              <Font>{totalScore}</Font>
+              {totalScore ? (
+                <div>
+                  <Font>總分</Font>
+                  <Font>{totalScore}</Font>
+                </div>
+              ) : (
+                <Font>尚未有回饋唷！</Font>
+              )}
             </Display>
           </CommentTitleWrap>
 
@@ -502,7 +521,6 @@ export default function Profile({ userName, userId }) {
     } else {
       console.log("No such document!");
     }
-
     //拿這些groupID去跟createCampingGroup比對 抓相對應的資料
     const groups = [];
     participateGroupArr.map(async (item) => {
@@ -512,37 +530,10 @@ export default function Profile({ userName, userId }) {
       );
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         querySnapshot.forEach((item) => {
-          console.log(item.data());
-          if (
-            new Date().getTime() <
-            new Date(
-              new Date(item.data().end_date.seconds * 1000)
-                .toLocaleString()
-                .split(" ")[0]
-            ).getTime()
-          ) {
-            updateDoc(doc(db, "CreateCampingGroup", item.data().group_id), {
-              status: "進行中",
-            });
-          } else {
-            updateDoc(doc(db, "CreateCampingGroup", item.data().group_id), {
-              status: "已結束",
-            });
-          }
           groups.push(item.data());
         });
-        console.log(groups);
         setYourParticipateGroup(groups);
       });
-      // let renderArr = [];
-      // const docRef = await doc(db, "CreateCampingGroup", item);
-      // const groupData = await getDoc(docRef);
-      // if (groupData.exists()) {
-      //   renderArr.push(groupData.data());
-      //   setYourParticipateGroup(renderArr);
-      // } else {
-      //   console.log("No such document!");
-      // }
     });
   }, [withDrawGrop]);
 
@@ -553,19 +544,37 @@ export default function Profile({ userName, userId }) {
     );
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const groups = [];
-      querySnapshot.forEach((doc) => {
-        groups.push(doc.data());
+      querySnapshot.forEach((item) => {
+        groups.push(item.data());
+        if (
+          new Date().getTime() <
+          new Date(
+            new Date(item.data().end_date.seconds * 1000)
+              .toLocaleString()
+              .split(" ")[0]
+          ).getTime()
+        ) {
+          updateDoc(doc(db, "CreateCampingGroup", item.id), {
+            status: "進行中",
+          });
+        } else {
+          updateDoc(doc(db, "CreateCampingGroup", item.id), {
+            status: "已結束",
+          });
+        }
       });
       setYourCreateGroup(groups);
     });
   }, []);
 
-  console.log(yourParticipateGroup);
-
   const memberWithdrawGroup = async (id, userId) => {
     await updateDoc(doc(db, "joinGroup", userId), {
       group: arrayRemove(id),
     });
+    await updateDoc(doc(db, "CreateCampingGroup", id), {
+      current_number: increment(-1),
+    });
+    await deleteDoc(doc(db, "CreateCampingGroup", id, "member", userId));
     setWithDrawGrop(true);
   };
 
@@ -680,7 +689,7 @@ export default function Profile({ userName, userId }) {
                           alignItems='start'
                           ml='30px'>
                           <Tag bgc='#CFC781' color='white'>
-                            {item.status}{" "}
+                            {item.status}
                           </Tag>
                           <Font fontSize='30px' m='10px 0px 10px 0px'>
                             {item.group_title}
@@ -708,8 +717,12 @@ export default function Profile({ userName, userId }) {
                         </Display>
                       </Display>
                       <Display alignItems='center'>
-                        <Font fontSize='40px'>{item.score}</Font>
-                        <Font fontSize='20px'>分</Font>
+                        {/* {item.score && (
+                          <Display>
+                            <Font fontSize='40px'>{item.score}</Font>
+                            <Font fontSize='20px'>分</Font>
+                          </Display>
+                        )} */}
                       </Display>
                     </Display>
                   </LinkRoute>
@@ -798,8 +811,12 @@ export default function Profile({ userName, userId }) {
                           </Display>
                         </Display>
                         <Display alignItems='center'>
-                          <Font fontSize='40px'>{item.score}</Font>
-                          <Font fontSize='20px'>分</Font>
+                          {/* {item.score && (
+                            <Display>
+                              <Font fontSize='40px'>{item.score}</Font>
+                              {item.score && <Font fontSize='20px'>分</Font>}
+                            </Display>
+                          )} */}
                         </Display>
                       </Display>
                     </LinkRoute>
@@ -821,7 +838,7 @@ export default function Profile({ userName, userId }) {
                         bgc='#FFFEF4'
                         width='200px'
                         onClick={(id) => {
-                          deleteThisGroup(item.group_id);
+                          memberWithdrawGroup(item.group_id, userId);
                         }}>
                         我要退團
                       </Button>

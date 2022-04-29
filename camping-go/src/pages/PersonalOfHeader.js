@@ -53,7 +53,6 @@ function PersonalOfHeader() {
       let commentArr = [];
 
       const commentRef = collection(db, "CreateCampingGroup", item, "feedback");
-      // const commentRef = collection(db, "feedback", item, "comment");
 
       const querySnapshot = await getDocs(commentRef);
       querySnapshot.forEach((doc) => {
@@ -142,17 +141,24 @@ function PersonalOfHeader() {
                 </Font>
                 <Font>{item.city}</Font>
               </Display>
+              {item.score !== "NaN" && (
+                <Display>
+                  平均分數
+                  <Font fontSize='30px' margin='10px' marginLeft='10px'>
+                    {item.score}
+                  </Font>
+                  分
+                </Display>
+              )}
+
               <Display>
-                平均分數
-                <Font fontSize='30px' margin='10px' marginLeft='10px'>
-                  {item.score}
-                </Font>
-                分
-              </Display>
-              <Display>
-                {item.comment.map(item=>(
-                  <Font>{item}</Font>
-                ))}
+                {item.map && (
+                  <div>
+                    {item.comment.map((item) => (
+                      <Font>{item}</Font>
+                    ))}
+                  </div>
+                )}
               </Display>
             </Display>
           </Box>
