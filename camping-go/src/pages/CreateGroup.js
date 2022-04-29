@@ -170,7 +170,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     city: "",
     area: "",
     state: "",
-    zoom: 15,
+    zoom: 5,
     height: 400,
     mapPosition: {
       lat: 0,
@@ -381,7 +381,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       <br />
       <Label>封面照片</Label>
       <input type='file' accept='image/*' onChange={handleFiles}></input>
-      <Multiple />
+      <Multiple setUpLoadFile={setUpLoadFile}/>
       {/* <Upload /> */}
       <Label>公開狀態</Label>
       <Select name='privacy' onChange={handleChange} value={groupInfo.privacy}>

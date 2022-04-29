@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import OutlinedInput from "@mui/material/OutlinedInput";
@@ -7,8 +6,8 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Chip from "@mui/material/Chip";
-import { useEffect } from "react";
-import { doc, updateDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../utils/firebase";
 
 const ITEM_HEIGHT = 48;
@@ -48,39 +47,45 @@ function getStyles(name, personName, theme) {
 
 export default function MultipleSelectChip({ userId, path, groupId }) {
   const theme = useTheme();
-  const [personName, setPersonName] = React.useState([]);
-  const [personNameByCreate, setPersonNameByCreate] = React.useState([]);
- console.log(groupId);
+  const [personName, setPersonName] = useState([]);
+  // const [chosenTag, setChosenTag] = useState([]);
+
+
+  useEffect(async () => {
+    const docRef = doc(db, "joinGroup", userId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      // setChosenTag(docSnap.data().select_tag);
+      setPersonName(docSnap.data().select_tag);
+    } else {
+      console.log("No such document!");
+    }
+  }, []);
 
   useEffect(async () => {
     if (path == "/createGroup") {
-      console.log("ttttt");
       await updateDoc(doc(db, "CreateCampingGroup", groupId), {
-        selectTag: personName,
-      });
-    } else {
-      await updateDoc(doc(db, "joinGroup", userId), {
-        selectTag: personName,
+        select_tag: personName,
       });
     }
   }, [personName]);
 
-  const handleChange = (event) => {
+
+  const handleChange = async (event) => {
     const value = event.target.value;
-    // if (path == "/createGroup") {
-    //   console.log("go");
-    //   setPersonNameByCreate(
-    //     typeof value === "string" ? value.split(",") : value
-    //   );
-    // } else {
-    setPersonName(typeof value === "string" ? value.split(",") : value);
-    // }
+    setPersonName(value, value.toString().split(",")[value.length - 1]);
+    // typeof value === "string" ? value.split(",") : value;
+
+    await updateDoc(doc(db, "joinGroup", userId), {
+      select_tag: arrayUnion(value.toString().split(",")[value.length - 1]),
+    });
   };
 
   return (
     <div>
       <FormControl sx={{ ml: 3, mt: 2, width: "500px" }}>
         <InputLabel id='demo-multiple-chip-label'>喜愛</InputLabel>
+
         <Select
           labelId='demo-multiple-chip-label'
           id='demo-multiple-chip'
