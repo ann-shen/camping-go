@@ -115,3 +115,8 @@ export const Tag = styled.div`
   font-size: ${(props) => props.fontSize || "15px"};
   color: ${(props) => props.color || "#426765"};
 `;
+
+export const Cloumn = styled.div`
+display:flex;
+flex-direction:column;
+align-items:start;`

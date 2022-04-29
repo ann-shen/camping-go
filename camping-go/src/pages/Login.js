@@ -103,11 +103,7 @@ function Loogin({ setUserId, setUserName, userName }) {
             email: user.email,
             user_name: userName,
           },
-          favorite: [
-            {
-              group_id: "",
-            },
-          ],
+          select_tag:[],
           group: [
             {
               group_id: "",
