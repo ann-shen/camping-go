@@ -49,25 +49,23 @@ function PersonalOfHeader() {
 
   useEffect(() => {
     groupID.map(async (item, index) => {
-      let scoreArr = [];
-      let commentArr = [];
-
-      const commentRef = collection(db, "CreateCampingGroup", item, "feedback");
-
-      const querySnapshot = await getDocs(commentRef);
-      querySnapshot.forEach((doc) => {
-        scoreArr.push(Number(doc.data().score));
-        commentArr.push(doc.data().note);
-      });
-      let totalScore = scoreArr.reduce(function (total, e) {
-        return total + e;
-      }, 0);
-      // yourCreateGroup[index].score = totalScore / scoreArr.length;
-      console.log(totalScore);
-      updateDoc(doc(db, "CreateCampingGroup", item), {
-        score: totalScore / scoreArr.length,
-        comment: commentArr,
-      });
+      // let scoreArr = [];
+      // let commentArr = [];
+      // const commentRef = collection(db, "CreateCampingGroup", item, "feedback");
+      // const querySnapshot = await getDocs(commentRef);
+      // querySnapshot.forEach((doc) => {
+      //   scoreArr.push(Number(doc.data().score));
+      //   commentArr.push(doc.data().note);
+      // });
+      // let totalScore = scoreArr.reduce(function (total, e) {
+      //   return total + e;
+      // }, 0);
+      // // yourCreateGroup[index].score = totalScore / scoreArr.length;
+      // console.log(totalScore);
+      // updateDoc(doc(db, "CreateCampingGroup", item), {
+      //   score: totalScore / scoreArr.length,
+      //   comment: commentArr,
+      // });
     });
 
     setTotalScoreStatus(true);
@@ -163,11 +161,11 @@ function PersonalOfHeader() {
             </Display>
           </Box>
         ))}
-      {/* <Display direction='cloumn'>
+      <Display direction='cloumn'>
         {comment.map((item) => (
           <Font key={item.user_id}>{item.note}</Font>
         ))}
-      </Display> */}
+      </Display>
     </div>
   );
 }
