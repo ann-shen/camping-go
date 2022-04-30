@@ -31,9 +31,9 @@ export const Display = styled.div`
   display: flex;
   flex-direction: ${(props) => props.direction || "flex"};
   justify-content: ${(props) => props.justifyContent || "none"};
+  margin: ${(props) => props.m || "0px"};
   margin-left: ${(props) => props.ml || "0px"};
   margin-bottom: ${(props) => props.mb || "0px"};
-  margin: ${(props) => props.m || "0px"};
   align-items: ${(props) => props.alignItems || "center"};
   border-bottom: ${(props) => props.borderBottom || "none"};
   padding-bottom: ${(props) => props.paddingBottom || "0px"};
@@ -68,7 +68,7 @@ export const ImgWrap = styled.div`
   justify-content: center;
   margin: ${(props) => props.m || "0px"};
   margin-bottom: ${(props) => props.mb || "0px"};
-  width: ${(props) => props.width || "300px"};
+  width: ${(props) => props.width || "350px"};
   height: ${(props) => props.height || "200px"};
   border-radius: 20px;
   overflow: hidden;
