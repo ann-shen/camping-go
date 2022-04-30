@@ -13,6 +13,7 @@ import Member from "./component/Member";
 import Profile from "./pages/Profile";
 import CityCamping from "./pages/CityCamping";
 import { UserContext } from "./utils/userContext";
+import FindGroup from "./pages/FindGroup";
 
 function App() {
   const [userName, setUserName] = useState("");
@@ -99,8 +100,10 @@ function App() {
             <Route
               path='personal_header/:id'
               element={<PersonalOfHeader />}></Route>
+            <Route
+              path='find_group'
+              element={<FindGroup userId={userId} />}></Route>
           </Routes>
-          
         </BrowserRouter>
       </UserContext.Provider>
       {/* <MaterialUIPickers></MaterialUIPickers> */}

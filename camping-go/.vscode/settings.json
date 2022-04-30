@@ -1,0 +1,35 @@
+{
+  "editor.tabSize": 2,
+  "editor.wordWrap": "on",
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "workbench.settings.openDefaultSettings": true,
+  "files.autoSave": "afterDelay",
+  "liveServer.settings.CustomBrowser": "chrome",
+  "liveServer.settings.donotShowInfoMsg": true,
+  "liveServer.settings.https": {
+    "enable": true, //set it true to enable the feature.
+    "cert": "/Users/chenyazhu/example.com+1.pem", //full path
+    "key": "/Users/chenyazhu/example.com+1-key.pem", //full path
+    "passphrase": "12345"
+  },
+  "liveServer.settings.host": "localhost",
+  "bracketPairColorizer.depreciation-notice": false,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  // 啟用 emmet  
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "liveServer.settings.file": "localhost",
+  "editor.accessibilitySupport": "on",
+  "prettier.jsxBracketSameLine": true,
+  "prettier.jsxSingleQuote": true,
+  "audioCues.lineHasError": "off",
+  "window.zoomLevel": 1,
+}
