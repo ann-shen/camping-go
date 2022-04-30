@@ -104,7 +104,7 @@ const AnimationIndicators = styled.span`
     animation: ${pulse} 1.5s infinite ease-in;
   }
 `;
-const groupTitle = styled.div`
+const GroupTitle = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -134,21 +134,22 @@ const GroupImg = styled.img`
   width: 105%;
 `;
 
-function MemberSection({ allMember }) {
-  return (
-    <div>
-      {allMember.map((item) => (
-        <div>{item.info.user_name}</div>
-      ))}
-    </div>
-  );
-}
+const ProfileImgWrap = styled.div`
+  width: 60px;
+  height: auto;
+  overflow: hidden;
+  border-radius: 50%;
+`;
+const ProfileImg = styled.img`
+  width: 60px;
+  height: 60px;
+`;
 
 function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   const [homePageCampGroup, setHomePageCampGroup] = useState("");
   const [allTentArr, setAllTentArr] = useState([]);
   const [allSupplies, setAllSupplies] = useState([]);
-  const [allMember, setAllMember] = useState([]);
+  const [thisGroupMember, setThisGroupMember] = useState([]);
 
   const [tentInfo, setTentInfo] = useState({
     current_number: 0,
@@ -345,31 +346,49 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   }, []);
 
   //getMember
-  async function getinfo(id) {
-    const docRef = doc(db, "joinGroup", id);
-    const docSnap = await getDoc(docRef);
-    return docSnap.data();
-  }
+  // async function getinfo(id) {
+  //   const docRef = doc(db, "joinGroup", id);
+  //   const docSnap = await getDoc(docRef);
+  //   return docSnap.data();
+  // }
+
+  // useEffect(async () => {
+  //   const memberShot = await getDocs(
+  //     collection(db, "CreateCampingGroup", params.id, "member")
+  //   );
+  //   let memberIdArr = [];
+  //   memberShot.forEach((doc) => {
+  //     memberIdArr.push(doc.data().member_id);
+  //   });
+  //   let memberInfoArr = [];
+  //   memberIdArr.map((item) => {
+  //     getinfo(item)
+  //       .then((res) => {
+  //         console.log(res);
+  //         memberInfoArr.push(res);
+  //       })
+  //       .then(() => {
+  //         setAllMember(memberInfoArr);
+  //       });
+  //   });
+  // }, [allTentArr]);
 
   useEffect(async () => {
-    const memberShot = await getDocs(
-      collection(db, "CreateCampingGroup", params.id, "member")
+    const q = query(
+      collection(db, "joinGroup"),
+      where("group", "array-contains", "xyzHE3Fuv8CS6oRVirez")
     );
-    let memberIdArr = [];
-    memberShot.forEach((doc) => {
-      memberIdArr.push(doc.data().member_id);
+    const querySnapshot = await getDocs(q);
+    let thisGroupMemberArr = [];
+    querySnapshot.forEach((doc) => {
+      // console.log(doc.data().info)
+      thisGroupMemberArr.push(doc.data());
     });
-    let memberInfoArr = [];
-    memberIdArr.map((item) => {
-      getinfo(item)
-        .then((res) => {
-          memberInfoArr.push(res);
-        })
-        .then(() => {
-          setAllMember(memberInfoArr);
-        });
-    });
+    // console.log(thisGroupMemberArr);
+    setThisGroupMember(thisGroupMemberArr);
   }, []);
+
+  console.log(thisGroupMember);
 
   const takeAway = async (id) => {
     console.log(id);
@@ -420,7 +439,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
       setAllTentArr(tentsArr);
     });
     setAllMemberArr("");
-    // console.log(allMemberArr);
   };
 
   //------------------------FIX ME ------------------------//
@@ -435,14 +453,18 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     <div>
       <div>
         <Header ContextByUserId={ContextByUserId} />
-        <div>
-          {/* {allMember.map((i) => (
-            <div>
-              {i.info.user_name}
-            </div>
-          ))} */}
-          <MemberSection allMember={allMember} />
-        </div>
+        {thisGroupMember.map((item) => (
+          <Cloumn>
+            <ProfileImgWrap>
+              <ProfileImg src={item.profile_img} />
+            </ProfileImgWrap>
+            {item.info.user_name}
+            {item.select_tag.map((obj) => (
+              <div>{obj}</div>
+            )).slice(0,3)}
+          </Cloumn>
+        ))}
+
         <Box
           sx={{
             width: "75%",
@@ -452,9 +474,9 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             borderRadius: 10,
             paddingTop: 8,
             margin: "auto",
-            marginBottom:10,
+            marginBottom: 10,
           }}>
-          <groupTitle>
+          <GroupTitle>
             <HeaderName> 團長：{homePageCampGroup.header_name}</HeaderName>
             <Display alignItems='center' m='20px 0px '>
               <Img src={location} width='20px'></Img>
@@ -473,7 +495,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                     .split(" ")[0]}
               </Label>
             </Display>
-          </groupTitle>
+          </GroupTitle>
           <Display justifyContent='space-between'>
             <Font fontSize='35px' letterSpacing='3px'>
               {homePageCampGroup.group_title}

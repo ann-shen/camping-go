@@ -48,7 +48,20 @@ const Tag = styled.div`
   padding-top: 2px;
   border-radius: 10px;
   background-color: #426765;
+  border: 1.5px solid #cfc781;
   color: white;
+`;
+
+const SelectTag = styled.div`
+  width: auto;
+  height: 25px;
+  padding: 2px 7px 0px 7px;
+  border-radius: 10px;
+  margin: 0px 4px;
+  border: 1.5px solid #cfc781;
+
+  background-color: #ebebeb;
+  color: #797659;
 `;
 
 const GroupWrap = styled.div`
@@ -176,16 +189,18 @@ export default function ReviewCard({
     let cloneExpandedArr = [...expandedArr];
     cloneExpandedArr[index] = !cloneExpandedArr[index];
     let prev = cloneExpandedArr.slice(0, index).fill(false);
-    let after = cloneExpandedArr.slice(index+1, cloneExpandedArr.length).fill(false);
-    console.log(prev, after)
-    setExpandedArr([...prev,cloneExpandedArr[index],...after]);
+    let after = cloneExpandedArr
+      .slice(index + 1, cloneExpandedArr.length)
+      .fill(false);
+    console.log(prev, after);
+    setExpandedArr([...prev, cloneExpandedArr[index], ...after]);
   };
   useEffect(() => {
     console.log(expandedArr);
   }, [expandedArr]);
 
   return (
-    <GroupWrap > 
+    <GroupWrap>
       {currentPosts.map((item, index) => (
         <Card
           sx={{
@@ -215,7 +230,6 @@ export default function ReviewCard({
             sx={{
               textAlign: "start",
               height: "160px",
-
             }}>
             <Span>團長</Span>
             <Span>{item.header_name}</Span>
@@ -275,12 +289,15 @@ export default function ReviewCard({
             groupPassword={groupPassword}
           />
           <CardActions disableSpacing>
-            <IconButton aria-label='add to favorites'>
+            {item.select_tag
+              .map((obj) => <SelectTag>{obj}</SelectTag>)
+              .slice(0, 3)}
+            {/* <IconButton aria-label='add to favorites'>
               <FavoriteIcon />
             </IconButton>
             <IconButton aria-label='share'>
               <ShareIcon />
-            </IconButton>
+            </IconButton> */}
             <ExpandMore
               sx={{ zIndex: "10" }}
               name='gogo'

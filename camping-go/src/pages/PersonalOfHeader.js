@@ -7,7 +7,7 @@ import {
   updateDoc,
   doc,
 } from "firebase/firestore";
-import { Font, Img, Display, Button } from "../css/style";
+import { Font, Img, Display, Button, ImgWrap } from "../css/style";
 import { Box } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
@@ -37,42 +37,6 @@ function PersonalOfHeader() {
     setYourCreateGroup(CreateGroupArr);
   }, []);
 
-  //你所創建的團ID
-  useEffect(async () => {
-    let groupArr = [];
-    yourCreateGroup.map((item) => {
-      // console.log(item.group_id);
-      groupArr.push(item.group_id);
-    });
-    setGroupID(groupArr);
-  }, [yourCreateGroup]);
-
-  useEffect(() => {
-    groupID.map(async (item, index) => {
-      // let scoreArr = [];
-      // let commentArr = [];
-      // const commentRef = collection(db, "CreateCampingGroup", item, "feedback");
-      // const querySnapshot = await getDocs(commentRef);
-      // querySnapshot.forEach((doc) => {
-      //   scoreArr.push(Number(doc.data().score));
-      //   commentArr.push(doc.data().note);
-      // });
-      // let totalScore = scoreArr.reduce(function (total, e) {
-      //   return total + e;
-      // }, 0);
-      // // yourCreateGroup[index].score = totalScore / scoreArr.length;
-      // console.log(totalScore);
-      // updateDoc(doc(db, "CreateCampingGroup", item), {
-      //   score: totalScore / scoreArr.length,
-      //   comment: commentArr,
-      // });
-    });
-
-    setTotalScoreStatus(true);
-  }, [groupID]);
-
-  console.log(yourCreateGroup);
-
   const checkComment = async (groupId) => {
     console.log("123");
     let commentArr = [];
@@ -94,7 +58,7 @@ function PersonalOfHeader() {
   return (
     <div>
       <Header ContextByUserId={ContextByUserId} />
-      {totalScoreStatus &&
+      {groupID &&
         yourCreateGroup.map((item, index) => (
           <Box
             key={index}
@@ -117,12 +81,15 @@ function PersonalOfHeader() {
                 ).getTime()
                   ? "進行中"
                   : "已結束"}
-                <Img
-                  src={item.picture}
-                  width='300px'
-                  onClick={(id) => {
-                    checkComment(item.group_id);
-                  }}></Img>
+                <ImgWrap>
+                  <Img
+                    src={item.picture}
+                    width='100%'
+                    onClick={(id) => {
+                      checkComment(item.group_id);
+                    }}></Img>
+                </ImgWrap>
+
                 <Font>{item.group_title}</Font>
                 <Font>
                   {
@@ -139,16 +106,15 @@ function PersonalOfHeader() {
                 </Font>
                 <Font>{item.city}</Font>
               </Display>
-              {item.score !== "NaN" && (
+              {item.total_score && (
                 <Display>
                   平均分數
                   <Font fontSize='30px' margin='10px' marginLeft='10px'>
-                    {item.score}
+                    {item.total_score}
                   </Font>
                   分
                 </Display>
               )}
-
               <Display>
                 {item.map && (
                   <div>

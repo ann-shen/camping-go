@@ -233,7 +233,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       );
       let memberArrLength = [];
       querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
+        // console.log(doc.id, " => ", doc.data());
         memberArrLength.push(doc.data());
       });
       console.log(memberArrLength.length);

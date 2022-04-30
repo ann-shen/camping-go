@@ -153,6 +153,28 @@ function SentCommentToHeader({ groupId, userName, userId }) {
       note: value,
       score: startValue,
       user_id: userId,
+    }).then(async () => {
+      let scoreArr = [];
+      let commentArr = [];
+      const commentRef = collection(
+        db,
+        "CreateCampingGroup",
+        groupId,
+        "feedback"
+      );
+      const querySnapshot = await getDocs(commentRef);
+      querySnapshot.forEach((doc) => {
+        scoreArr.push(Number(doc.data().score));
+        commentArr.push(doc.data().note);
+      });
+      let totalScore = scoreArr.reduce(function (total, e) {
+        return total + e;
+      }, 0);
+      console.log(totalScore);
+      updateDoc(doc(db, "CreateCampingGroup", groupId), {
+        total_score: totalScore / scoreArr.length,
+        comment: commentArr,
+      });
     });
   };
 
@@ -263,20 +285,20 @@ function CheckCommentFromMember({ groupId }) {
         console.log(item.score);
         scoreArr.push(Number(item.score));
       });
-      let totalScore = scoreArr.reduce(function (total, e) {
+      let totalScoreNumber = scoreArr.reduce(function (total, e) {
         return total + e;
       }, 0);
-      setTotalScore(totalScore / comment.length);
+      setTotalScore(totalScoreNumber / comment.length);
     } else {
       return;
     }
   }, [comment]);
 
-  useEffect(() => {
-    updateDoc(doc(db, "CreateCampingGroup", groupId), {
-      score: totalScore / comment.length,
-    });
-  }, [totalScore]);
+  // useEffect(() => {
+  //   updateDoc(doc(db, "CreateCampingGroup", groupId), {
+  //     total_score: totalScore,
+  //   });
+  // }, [totalScore]);
 
   return (
     <div className='App'>
@@ -603,23 +625,23 @@ export default function Profile({ userName, userId, getLogout }) {
         boxShadow='none'>
         <Display>
           <ProfilePicture userId={userId} />
-        <Wrap
-          width='500px'
-          direction='column'
-          alignItems='start'
-          m='0px 0px 0px 20px'
-          boxShadow='none'>
-          <Font
-            fontSize='40px'
-            margin='0px 0px 10px 20px'
-            marginLeft='20px'
-            color='#426765'>
-            {userName}
-          </Font>
-          <Display>
-            <MultipleSelectChip userId={userId} />
-          </Display>
-        </Wrap>
+          <Wrap
+            width='500px'
+            direction='column'
+            alignItems='start'
+            m='0px 0px 0px 20px'
+            boxShadow='none'>
+            <Font
+              fontSize='40px'
+              margin='0px 0px 10px 20px'
+              marginLeft='20px'
+              color='#426765'>
+              {userName}
+            </Font>
+            <Display>
+              <MultipleSelectChip userId={userId} />
+            </Display>
+          </Wrap>
         </Display>
         <Button width='100px' onClick={getLogout}>
           登出
@@ -688,7 +710,7 @@ export default function Profile({ userName, userId, getLogout }) {
                     <Display direction='column' alignItems='start'>
                       <Display alignItems='start'>
                         <ImgWrap>
-                          <Img src={item.picture} width='130%' m='0px'></Img>
+                          <Img src={item.picture} width='100%' m='0px'></Img>
                         </ImgWrap>
                         <Display
                           direction='column'
@@ -782,7 +804,7 @@ export default function Profile({ userName, userId, getLogout }) {
                       <Display direction='column' alignItems='start'>
                         <Display alignItems='start'>
                           <ImgWrap>
-                            <Img src={item.picture} width='130%' m='0px'></Img>
+                            <Img src={item.picture} width='100%' m='0px'></Img>
                           </ImgWrap>
                           <Display
                             direction='column'
