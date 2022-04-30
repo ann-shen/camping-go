@@ -27,6 +27,7 @@ import {
   Display,
   Button,
   Cloumn,
+  Wrap,
 } from "../css/style";
 import Tent from "../component/Tent";
 import Header from "../component/Header";
@@ -110,23 +111,38 @@ const groupTitle = styled.div`
 `;
 
 const HeaderName = styled.div`
-  width: auto;
-  height: 25px;
+  width: 130px;
+  height: 30px;
   border-radius: 10px;
-  padding-top: 3px;
-  background-color: #CFC781;
+  padding-top: 7px;
+  background-color: #426765;
   color: white;
 `;
 
 const ImagesWrap = styled.div`
   width: 500px;
-  height: auto;
+  height: 300px;
   border-radius: 20px;
+  margin: 40px 0px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const GroupImg = styled.img`
-  width: 100%;
+  width: 105%;
 `;
+
+function MemberSection({ allMember }) {
+  return (
+    <div>
+      {allMember.map((item) => (
+        <div>{item.info.user_name}</div>
+      ))}
+    </div>
+  );
+}
 
 function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   const [homePageCampGroup, setHomePageCampGroup] = useState("");
@@ -332,7 +348,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   async function getinfo(id) {
     const docRef = doc(db, "joinGroup", id);
     const docSnap = await getDoc(docRef);
-    console.log(docSnap.data());
     return docSnap.data();
   }
 
@@ -420,13 +435,14 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     <div>
       <div>
         <Header ContextByUserId={ContextByUserId} />
-        {/* <div>
-          {allMember.map((i) => (
+        <div>
+          {/* {allMember.map((i) => (
             <div>
               {i.info.user_name}
             </div>
-          ))}
-        </div> */}
+          ))} */}
+          <MemberSection allMember={allMember} />
+        </div>
         <Box
           sx={{
             width: "75%",
@@ -436,17 +452,16 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             borderRadius: 10,
             paddingTop: 8,
             margin: "auto",
-            marginBottom: "100px",
-            paddingBottom: "50px",
+            marginBottom:10,
           }}>
           <groupTitle>
-            <HeaderName>{homePageCampGroup.header_name}</HeaderName>
-            <Display>
+            <HeaderName> 團長：{homePageCampGroup.header_name}</HeaderName>
+            <Display alignItems='center' m='20px 0px '>
               <Img src={location} width='20px'></Img>
               {homePageCampGroup.city && (
                 <Font marginLeft='8px'>{homePageCampGroup.city} | </Font>
               )}
-              <Label>
+              <Label mt='0px'>
                 {homePageCampGroup &&
                   new Date(homePageCampGroup.start_date.seconds * 1000)
                     .toLocaleString()
@@ -460,10 +475,10 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             </Display>
           </groupTitle>
           <Display justifyContent='space-between'>
-            <Font fontSize='40px' marginLeft='25px'>
+            <Font fontSize='35px' letterSpacing='3px'>
               {homePageCampGroup.group_title}
             </Font>
-            <Font fontSize='30px' marginLeft='25px'>
+            <Font fontSize='30px' letterSpacing='3px'>
               {homePageCampGroup.current_number}/
               {homePageCampGroup.max_member_number}人
             </Font>
@@ -472,260 +487,313 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             <GroupImg src={homePageCampGroup.picture} alt='' />
           </ImagesWrap>
           <Display>
-            <Font>露營團基本資訊</Font>
+            <Font letterSpacing='3px' fontSize='20px'>
+              露營團基本資訊
+            </Font>
           </Display>
           <Display>
             <Box
               sx={{
-                width: "400px",
-                height: "auto",
-                // boxShadow:
-                //   "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-                borderRadius: 10,
-                paddingTop: 8,
-                margin: "auto",
-                marginBottom: "100px",
-                paddingBottom: "50px",
+                width: "50%",
+                height: "200px",
+                borderRadius: 15,
+                padding: 5,
+                marginTop: 3,
                 justifyContent: "start",
+                backgroundColor: "#426765",
               }}>
               <Cloumn>
-                <Font fontSize='16px' margin='10px'>
+                <Font fontSize='20px' m='10px 0px' color='#F3EA98'>
                   詳細地址
                 </Font>
-                <Font fontSize='16px'>{homePageCampGroup.position}</Font>
+                <Font fontSize='20px' m='0px 0px 25px 0px' color='#F3EA98'>
+                  {homePageCampGroup.position}
+                </Font>
               </Cloumn>
               <Display>
                 <Cloumn>
-                  <Font fontSize='16px' margin='10px'>
+                  <Font fontSize='20px' m='10px 0px' color='#F3EA98'>
                     營區網站
                   </Font>
-                  <Font fontSize='16px'>{homePageCampGroup.site}</Font>
+                  <Font fontSize='20px' color='#F3EA98'>
+                    {homePageCampGroup.site}
+                  </Font>
                 </Cloumn>
               </Display>
             </Box>
 
             <Box
               sx={{
-                width: "300px",
-                height: "auto",
-                // boxShadow:
-                //   "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+                width: "30%",
+                height: "200px",
+                boxShadow:
+                  "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
                 borderRadius: 10,
-                paddingTop: 8,
-                margin: "auto",
-                marginBottom: "100px",
-                paddingBottom: "50px",
+                padding: 5,
+                marginTop: 3,
+                marginLeft: 5,
                 justifyContent: "start",
               }}>
               <Cloumn>
-                <Font fontSize='16px' margin='10px'>
+                <Font fontSize='20px' m='10px'>
                   集合時間
                 </Font>
-                <Font fontSize='16px'>
+                <Font fontSize='20px'>
                   {homePageCampGroup &&
-                    new Date(
-                      homePageCampGroup.meeting_time.seconds * 1000
-                    ).toLocaleString()}
+                    new Date(homePageCampGroup.meeting_time.seconds * 1000)
+                      .toLocaleString()
+                      .split(" ")[0]}
+                </Font>
+                <Font fontSize='35px'>
+                  {homePageCampGroup &&
+                    new Date(homePageCampGroup.meeting_time.seconds * 1000)
+                      .toLocaleString()
+                      .split(" ")[1]
+                      .split(":")[0]}
+                  :
+                  {homePageCampGroup &&
+                    new Date(homePageCampGroup.meeting_time.seconds * 1000)
+                      .toLocaleString()
+                      .split(" ")[1]
+                      .split(":")[1]}
                 </Font>
               </Cloumn>
             </Box>
           </Display>
 
-          <Box>
+          <Box
+            sx={{
+              width: "95%",
+              height: "auto",
+              boxShadow:
+                "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+              borderRadius: 10,
+              padding: 2,
+              marginTop: 8,
+              marginBottom: 8,
+              justifyContent: "start",
+            }}>
             <Cloumn>
-              <Font fontSize='16px' margin='10px'>
-                公告
-              </Font>
+              <Font fontSize='16px'>公告</Font>
               <Font fontSize='16px'>{homePageCampGroup.announcement}</Font>
             </Cloumn>
           </Box>
           <Cloumn>
-            <Font>加入帳篷</Font>
-            <Font>
+            <Font fontSize='30px'>加入帳篷</Font>
+            <Font fontSize='16px'>
               請選擇想加入的帳篷！如有自備帳篷請按加號，並輸入預計可容納人數。
             </Font>
           </Cloumn>
-        </Box>
-
-        <Display>
-          {allTentArr.map((item, index) => (
-            <Box
-              sx={{
-                width: "75%",
-                height: "auto",
-                boxShadow:
-                  "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-                borderRadius: 10,
-                paddingTop: 8,
-                margin: "auto",
-                marginBottom: "100px",
-                paddingBottom: "50px",
-              }}>
-              <Font>{index + 1}</Font>
-              <Display key={index} direction='column'>
-                <Img src={tent}></Img>
-                <Label fontSize='35px'>
-                  {item.current_number}/{item.max_number}
-                </Label>
-                <Font fontSize='16px'>
-                  還有
-                  {Number(item.max_number) - Number(item.current_number)}
-                  個位置
-                </Font>
-                <Display>
-                  {item.member &&
-                    item.member.map((seat, index) => (
-                      <Display direction='column' justifyContent='center'>
-                        <Font margin='10px' marginLeft='10px'>
-                          {seat !== userName && <div>{seat}</div>}
-                          {seat === userName && <div>{seat}</div>}
-                        </Font>
-                        {seat !== userName && (
-                          <AccountCircleIcon
-                            key={index}
-                            color='primary'
-                            fontSize='large'></AccountCircleIcon>
-                        )}
-                        {seat === userName && (
-                          <PersonWrap
+          <Display justifyContent='center'>
+            {allTentArr.map((item, index) => (
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "350px",
+                  boxShadow:
+                    "0.3rem 0.3rem 0.8rem #E0DCBA , -0.5rem -0.5rem 0.6rem #ffffff",
+                  borderRadius: 10,
+                  paddingTop: 5,
+                  paddingBottom: 5,
+                  margin: 2,
+                  backgroundColor: "#EAE5BE",
+                }}>
+                <Font>{index + 1}</Font>
+                <Display key={index} direction='column'>
+                  <Img src={tent}></Img>
+                  <Label fontSize='35px'>
+                    {item.current_number}/{item.max_number}
+                  </Label>
+                  <Font fontSize='16px'>
+                    還有
+                    {Number(item.max_number) - Number(item.current_number)}
+                    個位置
+                  </Font>
+                  <Display>
+                    {item.member &&
+                      item.member.map((seat, index) => (
+                        <Display direction='column' justifyContent='center'>
+                          <Font margin='10px' marginLeft='10px'>
+                            {seat !== userName && <div>{seat}</div>}
+                            {seat === userName && <div>{seat}</div>}
+                          </Font>
+                          {seat !== userName && (
+                            <AccountCircleIcon
+                              key={index}
+                              color='primary'
+                              fontSize='large'></AccountCircleIcon>
+                          )}
+                          {seat === userName && (
+                            <PersonWrap
+                              data-key={item.tent_id}
+                              id='drag-source'
+                              draggable='true'
+                              onDragStart={dragStart}>
+                              <AssignmentIndIcon
+                                sx={{
+                                  pointerEvents: "none",
+                                  cursor: "not-allowed",
+                                }}
+                                fontSize='large'></AssignmentIndIcon>
+                            </PersonWrap>
+                          )}
+                        </Display>
+                      ))}
+                  </Display>
+                  <Display>
+                    {Array(
+                      Number(item.max_number) - Number(item.current_number)
+                    )
+                      .fill(null)
+                      .map(() => (
+                        <label key={uuidv4()}>
+                          <div
                             data-key={item.tent_id}
-                            id='drag-source'
-                            draggable='true'
-                            onDragStart={dragStart}>
-                            <AssignmentIndIcon
-                              sx={{
-                                pointerEvents: "none",
-                                cursor: "not-allowed",
-                              }}
-                              fontSize='large'></AssignmentIndIcon>
-                          </PersonWrap>
-                        )}
-                      </Display>
-                    ))}
+                            style={TargetContainer}
+                            ref={dropTarget}
+                            onDrop={drop}
+                            onDragEnter={onDragEnter}
+                            onDragOver={onDragOver}
+                            onDragLeave={onDragLeave}></div>
+                        </label>
+                      ))}
+                  </Display>
                 </Display>
-                <Display>
-                  {Array(Number(item.max_number) - Number(item.current_number))
-                    .fill(null)
-                    .map(() => (
-                      <label key={uuidv4()}>
-                        <div
-                          data-key={item.tent_id}
-                          style={TargetContainer}
-                          ref={dropTarget}
-                          onDrop={drop}
-                          onDragEnter={onDragEnter}
-                          onDragOver={onDragOver}
-                          onDragLeave={onDragLeave}></div>
-                      </label>
-                    ))}
-                </Display>
-              </Display>
-            </Box>
-          ))}
-        </Display>
-
-        <SourseContainer id='source-container' ref={dragSource}>
-          {!IsMemberInTheTent && (
-            <PersonWrap
-              id='drag-source'
-              draggable='true'
-              onDragStart={dragStart}>
-              <AssignmentIndIcon
-                sx={{ pointerEvents: "none", cursor: "not-allowed" }}
-                color='primary'
-                fontSize='large'></AssignmentIndIcon>
-            </PersonWrap>
-          )}
-          <Display>
-            <Font fontSize='14px'>拖移小人偶至指定帳篷</Font>
-            <AnimationIndicators />
+              </Box>
+            ))}
           </Display>
-        </SourseContainer>
-        <Button
-          width='80px'
-          height='80px'
-          borderRadius='50%'
-          ml='90%'
-          fontSize='30px'
-          bgc='#426765'
-          color='#CFC781'
-          boxShadow='none'
-          onClick={handleAddTentSection}>
-          +
-        </Button>
-        <br />
-        {addNewTentSection && (
           <Box
             sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              // m: 10,
-              mt: 2,
-              ml: 35,
-              "& > :not(style)": {
-                m: 1,
-                width: "80%",
-                height: "auto",
-              },
+              width: "auto",
+              height: "auto",
+              boxShadow:
+                "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+              borderRadius: 10,
+              padding: 2,
+              marginTop: 8,
+              marginBottom: 8,
             }}>
-            <Paper elevation={3} sx={{ p: 10 }}>
-              <Tent
-                setTentInfo={setTentInfo}
-                tentInfo={tentInfo}
-                setAllMemberArr={setAllMemberArr}
-                allMemberArr={allMemberArr}
-              />
-              <AddButton onClick={addNewTent}>新增</AddButton>
-              {/* {tentArr.map((_, index) => (
+            <SourseContainer id='source-container' ref={dragSource}>
+              {!IsMemberInTheTent && (
+                <PersonWrap
+                  id='drag-source'
+                  draggable='true'
+                  onDragStart={dragStart}>
+                  <AssignmentIndIcon
+                    sx={{ pointerEvents: "none", cursor: "not-allowed" }}
+                    color='primary'
+                    fontSize='large'></AssignmentIndIcon>
+                </PersonWrap>
+              )}
+              <Display>
+                <Font fontSize='14px'>拖移小人偶至指定帳篷</Font>
+                <AnimationIndicators />
+              </Display>
+            </SourseContainer>
+          </Box>
+          <Button
+            width='80px'
+            height='80px'
+            borderRadius='50%'
+            fontSize='30px'
+            bgc='#426765'
+            color='#CFC781'
+            boxShadow='none'
+            ml='90%'
+            onClick={handleAddTentSection}>
+            +
+          </Button>
+          {addNewTentSection && (
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                // m: 10,
+                mt: 2,
+                ml: 35,
+                "& > :not(style)": {
+                  m: 1,
+                  width: "80%",
+                  height: "auto",
+                },
+              }}>
+              <Paper elevation={3} sx={{ p: 10 }}>
+                <Tent
+                  setTentInfo={setTentInfo}
+                  tentInfo={tentInfo}
+                  setAllMemberArr={setAllMemberArr}
+                  allMemberArr={allMemberArr}
+                />
+                <AddButton onClick={addNewTent}>新增</AddButton>
+                {/* {tentArr.map((_, index) => (
             <div key={index}>
               <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
             </div>
           ))} */}
-            </Paper>
-          </Box>
-        )}
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            // m: 10,
-            mt: 2,
-            ml: 35,
-            "& > :not(style)": {
-              m: 1,
-              width: "80%",
-              height: "auto",
-            },
-          }}>
-          <Box>
-            <Paper elevation={3} sx={{ p: 10 }}>
-              <Label fontSize='30px'>需要大家幫忙帶的用品</Label>
-              <br />
-              <br />
-              {allSupplies.map((item, index) => (
-                <div key={index}>
-                  <Label>{item.supplies}</Label>
-                  <Label fontSize='16px' ml='30px'>
-                    {item.note}
-                  </Label>
-                  <Label ml='30px'>{item.bring_person}</Label>
-                  {/* onClick=
+              </Paper>
+            </Box>
+          )}
+          <Display>
+            <Box
+              sx={{
+                width: "100%",
+                height: "200px",
+                borderRadius: 15,
+                padding: 5,
+                marginTop: 3,
+                justifyContent: "start",
+                backgroundColor: "#426765",
+              }}>
+              <Box>
+                <Font fontSize='30px' m='10px 0px' color='#F3EA98'>
+                  需要大家幫忙帶的用品
+                </Font>
+                <br />
+                <br />
+                {allSupplies.map((item, index) => (
+                  <div key={index}>
+                    <Label fontSize='16px' color='#F3EA98'>
+                      {item.supplies}
+                    </Label>
+                    <Label fontSize='16px' ml='30px' color='#F3EA98'>
+                      {item.note}
+                    </Label>
+                    <Label ml='30px' color='#F3EA98'>
+                      {item.bring_person}
+                    </Label>
+                    {/* onClick=
               {(index) => {
                 takeAway(index);
               }} */}
-                  <Button
-                    width='150px'
-                    fontSize='16px'
-                    ml='40px'
-                    onClick={() => {
-                      takeAway(item.supplies_id);
-                    }}>
-                    我可以幫忙帶
-                  </Button>
-                </div>
-              ))}
-            </Paper>
-          </Box>
+                    <Button
+                      width='150px'
+                      fontSize='16px'
+                      ml='40px'
+                      onClick={() => {
+                        takeAway(item.supplies_id);
+                      }}>
+                      我可以幫忙帶
+                    </Button>
+                  </div>
+                ))}
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                width: "50%",
+                height: "200px",
+                boxShadow:
+                  "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+                borderRadius: 10,
+                padding: 5,
+                marginTop: 3,
+                marginLeft: -13,
+                justifyContent: "start",
+                zIndex: -1,
+              }}>
+              <Cloumn></Cloumn>
+            </Box>
+          </Display>
         </Box>
       </div>
     </div>
