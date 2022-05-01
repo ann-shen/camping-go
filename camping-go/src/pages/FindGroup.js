@@ -1,7 +1,15 @@
 import { db } from "../utils/firebase";
 import styled, { keyframes } from "styled-components";
-import { doc, collection, getDocs, getDoc } from "firebase/firestore";
-import { useState, useEffect } from "react";
+import {
+  doc,
+  collection,
+  getDocs,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+  setDoc,
+} from "firebase/firestore";
+import { useState, useEffect, } from "react";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
@@ -16,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
 import { TextField, Alert, AlertTitle, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
+
 
 const Span = styled.span`
   font-size: 16px;
@@ -86,14 +95,34 @@ const LinkOpen = styled.a`
   color: gray;
 `;
 
-function FindGroup({ userId, joinThisGroup, userName, Expanded }) {
+function Expanded({ expanded, findIndex, allGroupInfo }) {
+  // console.log(targetIndex);
+  // console.log(currentPosts[targetIndex]);
+  return (
+    <Collapse in={expanded} timeout='auto' unmountOnExit>
+      <CardContent>
+        <>
+          <Typography paragraph>注意事項:</Typography>
+          <Typography paragraph>
+            {findIndex ? (
+              <p>{allGroupInfo[findIndex].announcement}</p>
+            ) : (
+              <p>{allGroupInfo[findIndex].announcement}</p>
+            )}
+          </Typography>
+        </>
+      </CardContent>
+    </Collapse>
+  );
+}
+
+function FindGroup({ userId, userName, setGroupId }) {
   const [userTag, setUserTag] = useState([]);
   const [allGroupInfo, setAllGroupInfo] = useState([]);
   const [allGroupSelectArr, setAllGroupSelectArr] = useState([]);
   const [findIndex, setFindIndex] = useState("");
-  const [IsExpended,setIsExpended]=useState(false)
-
-  console.log(userId);
+  const [IsExpended, setIsExpended] = useState(false);
+  const [groupPassword, setGroupPassword] = useState("");
 
   useEffect(async () => {
     const docRef = await getDoc(doc(db, "joinGroup", userId));
@@ -110,14 +139,21 @@ function FindGroup({ userId, joinThisGroup, userName, Expanded }) {
     let allSelectArr = [];
     let allInfoArr = [];
     docRef.forEach((doc) => {
-      allSelectArr.push(doc.data().select_tag);
+      // allSelectArr.push(doc.data().select_tag);
       allInfoArr.push(doc.data());
     });
+
+    const filterHeaderGroup = allInfoArr.filter((e, index) => {
+      return e.header_id !== userId;
+    });
+    // console.log(filterHeaderGroup);
+
+    filterHeaderGroup.map((item) => {
+      allSelectArr.push(item.select_tag);
+    });
     setAllGroupSelectArr(allSelectArr);
-    setAllGroupInfo(allInfoArr);
-
+    setAllGroupInfo(filterHeaderGroup);
   }, []);
-
 
   useEffect(() => {
     let mathArr = [];
@@ -135,7 +171,66 @@ function FindGroup({ userId, joinThisGroup, userName, Expanded }) {
     });
   }, [allGroupSelectArr, allGroupInfo]);
 
-  console.log(findIndex);
+  const joinThisGroup = async (index, password, header_name) => {
+    console.log(allGroupInfo);
+    console.log(index);
+    setGroupId(allGroupInfo[index].group_id.toString());
+    setGroupPassword(password);
+    const docRef = await doc(
+      db,
+      "CreateCampingGroup",
+      allGroupInfo[index].group_id.toString()
+    );
+
+    const docRefMember = await doc(
+      db,
+      "CreateCampingGroup",
+      allGroupInfo[index].group_id.toString(),
+      "member",
+      userId
+    );
+
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      if (docSnap.data().privacy == "私人") {
+        // setIsOpen(true);
+      }
+    } else {
+      // doc.data() will be undefined in this case
+      console.log("No such document!");
+    }
+    setDoc(docRefMember, {
+      role: "member",
+      member_name: userName,
+      member_id: userId,
+    }).then(async () => {
+      const querySnapshot = await getDocs(
+        collection(
+          db,
+          "CreateCampingGroup",
+          allGroupInfo[index].group_id.toString(),
+          "member"
+        )
+      );
+      let memberArrLength = [];
+      querySnapshot.forEach((doc) => {
+        // console.log(doc.id, " => ", doc.data());
+        memberArrLength.push(doc.data());
+      });
+      console.log(memberArrLength.length);
+      await updateDoc(docRef, {
+        current_number: memberArrLength.length,
+      });
+    });
+
+    const docRefJoinGroup = await doc(db, "joinGroup", userId);
+    console.log(allGroupInfo[index].group_id);
+    updateDoc(docRefJoinGroup, {
+      group: arrayUnion(allGroupInfo[index].group_id),
+    });
+  };
+
+  // console.log(findIndex);
 
   return (
     <div>
@@ -247,8 +342,9 @@ function FindGroup({ userId, joinThisGroup, userName, Expanded }) {
                 sx={{ zIndex: "10" }}
                 name='gogo'
                 expand={IsExpended}
-                onClick={()=>{setIsExpended(!IsExpended)}
-                }
+                onClick={() => {
+                  setIsExpended(!IsExpended);
+                }}
                 aria-expanded={IsExpended}
                 aria-label='show more'>
                 <ExpandMoreIcon
@@ -256,7 +352,11 @@ function FindGroup({ userId, joinThisGroup, userName, Expanded }) {
                 />
               </ExpandMore>
             </CardActions>
-            <Expanded expanded={IsExpended} />
+            <Expanded
+              expanded={IsExpended}
+              allGroupInfo={allGroupInfo}
+              findIndex={findIndex}
+            />
           </Card>
         </GroupWrap>
       )}

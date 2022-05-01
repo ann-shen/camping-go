@@ -191,22 +191,23 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
   }, [currentMemberAmount]);
 
   const joinThisGroup = async (index, password, header_name) => {
+    console.log(index);
     if (header_name == userName) {
       alert("你是此團團長，不能加入唷！顆顆");
       return;
     }
-    setGroupId(homePageCampGroup[index].group_id.toString());
+    setGroupId(currentPosts[index].group_id.toString());
     setGroupPassword(password);
     const docRef = await doc(
       db,
       "CreateCampingGroup",
-      homePageCampGroup[index].group_id.toString()
+      currentPosts[index].group_id.toString()
     );
 
     const docRefMember = await doc(
       db,
       "CreateCampingGroup",
-      homePageCampGroup[index].group_id.toString(),
+      currentPosts[index].group_id.toString(),
       "member",
       userId
     );
@@ -229,7 +230,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
         collection(
           db,
           "CreateCampingGroup",
-          homePageCampGroup[index].group_id.toString(),
+          currentPosts[index].group_id.toString(),
           "member"
         )
       );
@@ -245,9 +246,9 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     });
 
     const docRefJoinGroup = await doc(db, "joinGroup", userId);
-    console.log(homePageCampGroup[index].group_id);
+    console.log(currentPosts[index].group_id);
     updateDoc(docRefJoinGroup, {
-      group: arrayUnion(homePageCampGroup[index].group_id),
+      group: arrayUnion(currentPosts[index].group_id),
     });
   };
 
@@ -276,6 +277,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
         modalIsOpen={modalIsOpen}
         groupPassword={groupPassword}
         userId={userId}
+        setGroupId={setGroupId}
       />
       <PaginationBar
         pagination={pagination}

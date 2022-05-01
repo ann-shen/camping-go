@@ -162,7 +162,7 @@ const AllMemberWrap = styled.div`
   justify-content: start;
   align-items: center;
   padding: 10px;
-  margin-top:50px;
+  margin-top: 50px;
 `;
 
 function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
@@ -397,12 +397,20 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
       collection(db, "joinGroup"),
       where("group", "array-contains", params.id)
     );
-    const querySnapshot = await getDocs(q);
     let thisGroupMemberArr = [];
-    querySnapshot.forEach((doc) => {
-      // console.log(doc.data().info)
-      thisGroupMemberArr.push(doc.data());
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        thisGroupMemberArr.push(doc.data());
+      });
+      console.log(thisGroupMemberArr);
     });
+
+    // const querySnapshot = await getDocs(q);
+    // let thisGroupMemberArr = [];
+    // querySnapshot.forEach((doc) => {
+    //   // console.log(doc.data().info)
+    //   thisGroupMemberArr.push(doc.data());
+    // });
     // console.log(thisGroupMemberArr);
     setThisGroupMember(thisGroupMemberArr);
   }, []);
@@ -467,7 +475,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   };
 
   //------------------------FIX ME ------------------------//
-
   return (
     <div>
       <div>
@@ -485,7 +492,19 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             marginBottom: 10,
           }}>
           <GroupTitle>
-            <HeaderName> 團長：{homePageCampGroup.header_name}</HeaderName>
+            <Display>
+              <HeaderName> 團長：{homePageCampGroup.header_name}</HeaderName>
+              <Display>
+                {homePageCampGroup.select_tag
+                  ? homePageCampGroup.select_tag.map((item) => (
+                      <>
+                        <Tag m='3px'>{item}</Tag>
+                      </>
+                    ))
+                  : ""}
+              </Display>
+            </Display>
+
             <Display alignItems='center' m='20px 0px '>
               <Img src={location} width='20px'></Img>
               {homePageCampGroup.city && (
@@ -791,10 +810,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                     <Label ml='30px' color='#F3EA98'>
                       {item.bring_person}
                     </Label>
-                    {/* onClick=
-              {(index) => {
-                takeAway(index);
-              }} */}
                     <Button
                       width='150px'
                       fontSize='16px'
@@ -829,7 +844,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                   <ProfileImg src={item.profile_img} />
                 </ProfileImgWrap>
                 <Font>{item.info.user_name}</Font>
-                <Display m="3px">
+                <Display m='3px'>
                   {item.select_tag
                     .map((obj) => (
                       <Tag width='auto' m='3px'>

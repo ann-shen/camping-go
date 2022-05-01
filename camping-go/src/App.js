@@ -95,14 +95,20 @@ function App() {
                   userName={userName}
                 />
               }></Route>
-            <Route path='/:city' element={<CityCamping />}></Route>
+            <Route
+              path='/:city'
+              element={
+                <CityCamping userName={userName} groupId={groupId} />
+              }></Route>
             <Route path='googlemap_basic' element={<GoogleMapBasic />}></Route>
             <Route
               path='personal_header/:id'
               element={<PersonalOfHeader />}></Route>
             <Route
               path='find_group'
-              element={<FindGroup userId={userId} />}></Route>
+              element={
+                <FindGroup userId={userId} />
+              }></Route>
           </Routes>
         </BrowserRouter>
       </UserContext.Provider>
