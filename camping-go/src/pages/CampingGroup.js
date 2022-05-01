@@ -267,6 +267,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
         <Img src={landingpage} width='100%'></Img>
       </Box>
       <ReviewCard
+        homePageCampGroup={homePageCampGroup}
         currentPosts={currentPosts}
         joinThisGroup={joinThisGroup}
         groupId={groupId}

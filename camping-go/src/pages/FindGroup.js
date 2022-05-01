@@ -91,13 +91,15 @@ function FindGroup({ userId, joinThisGroup, userName, Expanded }) {
   const [allGroupInfo, setAllGroupInfo] = useState([]);
   const [allGroupSelectArr, setAllGroupSelectArr] = useState([]);
   const [findIndex, setFindIndex] = useState("");
+  const [IsExpended,setIsExpended]=useState(false)
 
-  // console.log(userId);
+  console.log(userId);
 
   useEffect(async () => {
     const docRef = await getDoc(doc(db, "joinGroup", userId));
     if (docRef.exists()) {
       setUserTag(docRef.data().select_tag);
+      console.log(docRef.data().select_tag);
     } else {
       console.log("nono~");
     }
@@ -113,7 +115,9 @@ function FindGroup({ userId, joinThisGroup, userName, Expanded }) {
     });
     setAllGroupSelectArr(allSelectArr);
     setAllGroupInfo(allInfoArr);
+
   }, []);
+
 
   useEffect(() => {
     let mathArr = [];
@@ -208,12 +212,11 @@ function FindGroup({ userId, joinThisGroup, userName, Expanded }) {
                 variant='outlined'
                 onClick={(e) => {
                   joinThisGroup(
-                    0,
+                    findIndex,
                     allGroupInfo[findIndex].password,
                     allGroupInfo[findIndex].header_name
                   );
-                }}
-              >
+                }}>
                 {allGroupInfo[findIndex].privacy == "公開" &&
                   allGroupInfo[findIndex].header_name !== userName && (
                     <LinkPrivate
@@ -243,18 +246,17 @@ function FindGroup({ userId, joinThisGroup, userName, Expanded }) {
               <ExpandMore
                 sx={{ zIndex: "10" }}
                 name='gogo'
-                expand={false}
-                // onClick={(e) => {
-                //   handleExpandClick(index, e);
-                // }}
-                aria-expanded={false}
+                expand={IsExpended}
+                onClick={()=>{setIsExpended(!IsExpended)}
+                }
+                aria-expanded={IsExpended}
                 aria-label='show more'>
                 <ExpandMoreIcon
                   sx={{ pointerEvents: "none", cursor: "not-allowed" }}
                 />
               </ExpandMore>
             </CardActions>
-            {/* <Expanded expanded={false} /> */}
+            <Expanded expanded={IsExpended} />
           </Card>
         </GroupWrap>
       )}

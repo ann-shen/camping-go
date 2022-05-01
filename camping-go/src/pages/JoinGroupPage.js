@@ -170,7 +170,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   const [allTentArr, setAllTentArr] = useState([]);
   const [allSupplies, setAllSupplies] = useState([]);
   const [thisGroupMember, setThisGroupMember] = useState([]);
-
   const [tentInfo, setTentInfo] = useState({
     current_number: 0,
     max_number: 0,
@@ -396,7 +395,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   useEffect(async () => {
     const q = query(
       collection(db, "joinGroup"),
-      where("group", "array-contains", "xyzHE3Fuv8CS6oRVirez")
+      where("group", "array-contains", params.id)
     );
     const querySnapshot = await getDocs(q);
     let thisGroupMemberArr = [];

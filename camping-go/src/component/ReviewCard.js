@@ -151,6 +151,7 @@ function Recommend({
   joinThisGroup,
   userName,
   Expanded,
+  userId,
 }) {
   // const navigate = useNavigate();
   return (
@@ -174,6 +175,7 @@ function Recommend({
             joinThisGroup={joinThisGroup}
             userName={userName}
             Expanded={Expanded}
+            userId={userId}
           />
         </Display>
       </Modal>
@@ -181,24 +183,24 @@ function Recommend({
   );
 }
 
-function Expanded({ expanded }) {
+function Expanded({ expanded, currentPosts, targetIndex }) {
+  console.log(targetIndex);
+  console.log(currentPosts[targetIndex]);
   return (
     <Collapse in={expanded} timeout='auto' unmountOnExit>
       <CardContent>
-        <Typography paragraph>注意事項:</Typography>
-        <Typography paragraph>提供帳篷租借</Typography>
-
-        <Typography paragraph>
-          Add rice and stir very gently to distribute. Top with artichokes and
-          peppers, and cook without stirring, until most of the liquid is
-          absorbed, 15 to 18 minutes. Reduce heat to medium-low, add reserved
-          shrimp and mussels, tucking them down into the rice, and cook again
-          without stirring, until mussels have opened and rice is just tender, 5
-          to 7 minutes more. (Discard any mussels that don&apos;t open.)
-        </Typography>
-        <Typography>
-          Set aside off of the heat to let rest for 10 minutes, and then serve.
-        </Typography>
+        {targetIndex !== "" && (
+          <>
+            <Typography paragraph>注意事項:</Typography>
+            <Typography paragraph>
+              {targetIndex ? (
+                <p>{currentPosts[targetIndex].announcement}</p>
+              ) : (
+                <p>{currentPosts[targetIndex].announcement}</p>
+              )}
+            </Typography>
+          </>
+        )}
       </CardContent>
     </Collapse>
   );
@@ -218,26 +220,26 @@ export default function ReviewCard({
     Array(currentPosts.length).fill(false)
   );
   const [recommendIsOpen, setRecommendIsOpen] = useState(false);
+  const [targetIndex, setTargetIndex] = useState("");
+
   // console.log(currentPosts);
   // console.log(Array(currentPosts.length).fill(false));
 
   const handleExpandClick = (index, e) => {
-    console.log(index);
+    // console.log(index);
+    setTargetIndex(index);
     let cloneExpandedArr = [...expandedArr];
     cloneExpandedArr[index] = !cloneExpandedArr[index];
     let prev = cloneExpandedArr.slice(0, index).fill(false);
     let after = cloneExpandedArr
       .slice(index + 1, cloneExpandedArr.length)
       .fill(false);
-    console.log(prev, after);
     setExpandedArr([...prev, cloneExpandedArr[index], ...after]);
   };
 
-  useEffect(() => {
-    console.log(expandedArr);
-  }, [expandedArr]);
-
-  
+  // useEffect(() => {
+  //   console.log(expandedArr);
+  // }, [expandedArr]);
 
   return (
     <>
@@ -348,12 +350,16 @@ export default function ReviewCard({
                 />
               </ExpandMore>
             </CardActions>
-            <Expanded expanded={expandedArr[index]} />
+            <Expanded
+              expanded={expandedArr[index]}
+              currentPosts={currentPosts}
+              targetIndex={targetIndex}
+            />
           </Card>
         ))}
       </GroupWrap>
       <Button
-      width="150px"
+        width='150px'
         onClick={() => {
           setRecommendIsOpen(true);
         }}>
@@ -365,6 +371,7 @@ export default function ReviewCard({
         joinThisGroup={joinThisGroup}
         userName={userName}
         Expanded={Expanded}
+        userId={userId}
       />
     </>
   );
