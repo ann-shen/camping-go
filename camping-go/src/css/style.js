@@ -110,7 +110,6 @@ export const Tag = styled.div`
   margin: ${(props) => props.m || "0px"};
   background-color: ${(props) => props.bgc || ""};
   border: ${(props) => props.border || "2px solid #CFC781"};
-  margin: ${(props) => props.m || "0px"};
   font-size: ${(props) => props.fontSize || "15px"};
   color: ${(props) => props.color || "#426765"};
 `;

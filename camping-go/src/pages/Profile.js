@@ -20,7 +20,7 @@ import {
   setDoc,
   increment,
 } from "firebase/firestore";
-import { Font, Img, Display, Button, Wrap, Tag, ImgWrap } from "../css/style";
+import { Font, Img, Display, Button, Wrap, Tag, ImgWrap,Cloumn } from "../css/style";
 import Modal from "react-modal";
 import "../css/modal.css";
 import { TextField, Alert, Collapse, IconButton } from "@mui/material";
@@ -384,8 +384,13 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
     setMember(memberArr);
   };
 
-  const removeMember = async (index) => {
+  const removeMember = async (index,role) => {
     console.log(groupId);
+    if(role){
+      alert("無法移除團長")
+      return
+    }
+
     await deleteDoc(
       doc(db, "CreateCampingGroup", groupId, "member", member[index].member_id)
     ).then(async () => {
@@ -449,14 +454,18 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
                 margin: 1,
                 display: "flex",
               }}>
-              <Font>{item.member_name}</Font>
+              <Display>
+                {item.role == "header" && <Tag width="35px">團長</Tag>}
+                <Font>{item.member_name}</Font>
+              </Display>
+
               <Button
                 width='150px'
                 mt='10px'
                 ml='20px'
                 boxShadow='none'
                 onClick={() => {
-                  removeMember(index);
+                  removeMember(index, item.role);
                 }}>
                 移除成員
               </Button>

@@ -26,6 +26,8 @@ import Modal from "react-modal";
 import { UserContext } from "../utils/userContext";
 import PaginationBar from "../component/Pagination";
 import ReviewCard from "../component/ReviewCard";
+import FindGroup from "./FindGroup"
+
 Modal.setAppElement("#root");
 
 const LinkPrivate = styled(Link)`
@@ -272,6 +274,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
         setIsOpen={setIsOpen}
         modalIsOpen={modalIsOpen}
         groupPassword={groupPassword}
+        userId={userId}
       />
       <PaginationBar
         pagination={pagination}
