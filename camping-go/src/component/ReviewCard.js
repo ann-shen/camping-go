@@ -5,19 +5,17 @@ import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import Collapse from "@mui/material/Collapse";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Font, Display, Img, Button } from "../css/style";
 import { ExpandMore } from "./ReviewCard_Component/ExpanMore";
 import location from "../image/location.png";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
-import { Box, Grid, TextField, Alert, AlertTitle, Stack } from "@mui/material";
+import { TextField, Alert, AlertTitle, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
+import FindGroup from "../pages/FindGroup";
 
 const Span = styled.span`
   font-size: 16px;
@@ -146,6 +144,43 @@ function IsModal({ modalIsOpen, setIsOpen, groupId, groupPassword }) {
   );
 }
 
+function Recommend({
+  recommendIsOpen,
+  setRecommendIsOpen,
+  groupId,
+  joinThisGroup,
+  userName,
+  Expanded,
+}) {
+  // const navigate = useNavigate();
+  return (
+    <div className='App'>
+      <Modal
+        isOpen={recommendIsOpen}
+        onRequestClose={() => setRecommendIsOpen(false)}
+        overlayClassName={{
+          base: "overlay-base",
+          afterOpen: "overlay-after",
+          beforeClose: "overlay-before",
+        }}
+        className={{
+          base: "content-base",
+          afterOpen: "content-after",
+          beforeClose: "content-before",
+        }}
+        closeTimeoutMS={500}>
+        <Display direction='column'>
+          <FindGroup
+            joinThisGroup={joinThisGroup}
+            userName={userName}
+            Expanded={Expanded}
+          />
+        </Display>
+      </Modal>
+    </div>
+  );
+}
+
 function Expanded({ expanded }) {
   return (
     <Collapse in={expanded} timeout='auto' unmountOnExit>
@@ -177,12 +212,14 @@ export default function ReviewCard({
   setIsOpen,
   modalIsOpen,
   groupPassword,
+  userId,
 }) {
   const [expandedArr, setExpandedArr] = useState(
     Array(currentPosts.length).fill(false)
   );
-  console.log(currentPosts);
-  console.log(Array(currentPosts.length).fill(false));
+  const [recommendIsOpen, setRecommendIsOpen] = useState(false);
+  // console.log(currentPosts);
+  // console.log(Array(currentPosts.length).fill(false));
 
   const handleExpandClick = (index, e) => {
     console.log(index);
@@ -195,126 +232,140 @@ export default function ReviewCard({
     console.log(prev, after);
     setExpandedArr([...prev, cloneExpandedArr[index], ...after]);
   };
+
   useEffect(() => {
     console.log(expandedArr);
   }, [expandedArr]);
 
-  return (
-    <GroupWrap>
-      {currentPosts.map((item, index) => (
-        <Card
-          sx={{
-            width: "24%",
-            height: "auto",
-            boxShadow:
-              "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-            borderRadius: 7.5,
-            padding: 1,
-            margin: 5,
-            backgroundColor: "#F4F4EE",
-          }}>
-          <ImgWrap>
-            <CardMedia
-              sx={{
-                width: "100%",
-                height: "230px",
-              }}
-              component='img'
-              height='194'
-              image={item.picture}
-              alt='Paella dish'
-            />
-            {item.privacy == "私人" && <Tag>私</Tag>}
-          </ImgWrap>
-          <CardContent
-            sx={{
-              textAlign: "start",
-              height: "160px",
-            }}>
-            <Span>團長</Span>
-            <Span>{item.header_name}</Span>
-            <Font fontSize='25px' m='6px 0px 6px 0px'>
-              {item.group_title}
-            </Font>
-            <Font fontSize='16px' m='0px 0px 16px 0px'>
-              {
-                new Date(item.start_date.seconds * 1000)
-                  .toLocaleString()
-                  .split(" ")[0]
-              }
-              ~
-              {
-                new Date(item.end_date.seconds * 1000)
-                  .toLocaleString()
-                  .split(" ")[0]
-              }
-            </Font>
-            <Display justifyContent='space-between'>
-              <Display>
-                <Img src={location} width='26px'></Img> <Span>{item.city}</Span>
-              </Display>
-              <Display>
-                <Font>
-                  {item.current_number}/{item.max_member_number}
-                </Font>
-                <Span>人</Span>
-              </Display>
-            </Display>
-          </CardContent>
+  
 
-          <ButtonWrap>
-            <Button
-              width='90%'
-              margin='auto'
-              group_id={item.group_id}
-              variant='outlined'
-              onClick={(e) => {
-                joinThisGroup(index, item.password, item.header_name);
-              }}>
-              {item.privacy == "公開" && item.header_name !== userName && (
-                <LinkPrivate to={`joinGroup/${item.group_id}`}>
-                  我要加入
-                </LinkPrivate>
-              )}
-              {item.privacy == "私人" && item.header_name !== userName && (
-                <LinkOpen>我要加入</LinkOpen>
-              )}
-              {item.header_name == userName && <LinkOpen>我要加入</LinkOpen>}
-            </Button>
-          </ButtonWrap>
-          <IsModal
-            modalIsOpen={modalIsOpen}
-            setIsOpen={setIsOpen}
-            groupId={groupId}
-            groupPassword={groupPassword}
-          />
-          <CardActions disableSpacing>
-            {item.select_tag
-              .map((obj) => <SelectTag>{obj}</SelectTag>)
-              .slice(0, 3)}
-            {/* <IconButton aria-label='add to favorites'>
-              <FavoriteIcon />
-            </IconButton>
-            <IconButton aria-label='share'>
-              <ShareIcon />
-            </IconButton> */}
-            <ExpandMore
-              sx={{ zIndex: "10" }}
-              name='gogo'
-              expand={expandedArr[index]}
-              onClick={(e) => {
-                handleExpandClick(index, e);
-              }}
-              aria-expanded={expandedArr[index]}
-              aria-label='show more'>
-              <ExpandMoreIcon
-                sx={{ pointerEvents: "none", cursor: "not-allowed" }}
+  return (
+    <>
+      <GroupWrap>
+        {currentPosts.map((item, index) => (
+          <Card
+            sx={{
+              width: "24%",
+              height: "auto",
+              boxShadow:
+                "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+              borderRadius: 7.5,
+              padding: 1,
+              margin: 5,
+              backgroundColor: "#F4F4EE",
+            }}>
+            <ImgWrap>
+              <CardMedia
+                sx={{
+                  width: "100%",
+                  height: "230px",
+                }}
+                component='img'
+                height='194'
+                image={item.picture}
+                alt='Paella dish'
               />
-            </ExpandMore>
-          </CardActions>
-          <Expanded expanded={expandedArr[index]} />
-        </Card>
-      ))}
-    </GroupWrap>
+              {item.privacy == "私人" && <Tag>私</Tag>}
+            </ImgWrap>
+            <CardContent
+              sx={{
+                textAlign: "start",
+                height: "160px",
+              }}>
+              <Span>團長</Span>
+              <Span>{item.header_name}</Span>
+              <Font fontSize='25px' m='6px 0px 6px 0px'>
+                {item.group_title}
+              </Font>
+              <Font fontSize='16px' m='0px 0px 16px 0px'>
+                {
+                  new Date(item.start_date.seconds * 1000)
+                    .toLocaleString()
+                    .split(" ")[0]
+                }
+                ~
+                {
+                  new Date(item.end_date.seconds * 1000)
+                    .toLocaleString()
+                    .split(" ")[0]
+                }
+              </Font>
+              <Display justifyContent='space-between'>
+                <Display>
+                  <Img src={location} width='26px'></Img>{" "}
+                  <Span>{item.city}</Span>
+                </Display>
+                <Display>
+                  <Font>
+                    {item.current_number}/{item.max_member_number}
+                  </Font>
+                  <Span>人</Span>
+                </Display>
+              </Display>
+            </CardContent>
+
+            <ButtonWrap>
+              <Button
+                width='90%'
+                margin='auto'
+                group_id={item.group_id}
+                variant='outlined'
+                onClick={(e) => {
+                  joinThisGroup(index, item.password, item.header_name);
+                }}>
+                {item.privacy == "公開" && item.header_name !== userName && (
+                  <LinkPrivate to={`joinGroup/${item.group_id}`}>
+                    我要加入
+                  </LinkPrivate>
+                )}
+                {item.privacy == "私人" && item.header_name !== userName && (
+                  <LinkOpen>我要加入</LinkOpen>
+                )}
+                {item.header_name == userName && <LinkOpen>我要加入</LinkOpen>}
+              </Button>
+            </ButtonWrap>
+            <IsModal
+              modalIsOpen={modalIsOpen}
+              setIsOpen={setIsOpen}
+              groupId={groupId}
+              groupPassword={groupPassword}
+            />
+            <CardActions disableSpacing>
+              {item.select_tag
+                .map((obj) => <SelectTag>{obj}</SelectTag>)
+                .slice(0, 3)}
+              <ExpandMore
+                sx={{ zIndex: "10" }}
+                name='gogo'
+                expand={expandedArr[index]}
+                onClick={(e) => {
+                  handleExpandClick(index, e);
+                }}
+                aria-expanded={expandedArr[index]}
+                aria-label='show more'>
+                <ExpandMoreIcon
+                  sx={{ pointerEvents: "none", cursor: "not-allowed" }}
+                />
+              </ExpandMore>
+            </CardActions>
+            <Expanded expanded={expandedArr[index]} />
+          </Card>
+        ))}
+      </GroupWrap>
+      <Button
+      width="150px"
+        onClick={() => {
+          setRecommendIsOpen(true);
+        }}>
+        最佳推薦
+      </Button>
+      <Recommend
+        recommendIsOpen={recommendIsOpen}
+        setRecommendIsOpen={setRecommendIsOpen}
+        joinThisGroup={joinThisGroup}
+        userName={userName}
+        Expanded={Expanded}
+      />
+    </>
   );
 }

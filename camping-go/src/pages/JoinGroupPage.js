@@ -28,6 +28,7 @@ import {
   Button,
   Cloumn,
   Wrap,
+  Tag,
 } from "../css/style";
 import Tent from "../component/Tent";
 import Header from "../component/Header";
@@ -139,10 +140,29 @@ const ProfileImgWrap = styled.div`
   height: auto;
   overflow: hidden;
   border-radius: 50%;
+  border: 2px solid #eae5be;
 `;
 const ProfileImg = styled.img`
   width: 60px;
   height: 60px;
+`;
+
+const MemberWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  flex-direction: column;
+  margin: 20px;
+`;
+
+const AllMemberWrap = styled.div`
+  width: 90%;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 10px;
+  margin-top:50px;
 `;
 
 function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
@@ -453,17 +473,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     <div>
       <div>
         <Header ContextByUserId={ContextByUserId} />
-        {thisGroupMember.map((item) => (
-          <Cloumn>
-            <ProfileImgWrap>
-              <ProfileImg src={item.profile_img} />
-            </ProfileImgWrap>
-            {item.info.user_name}
-            {item.select_tag.map((obj) => (
-              <div>{obj}</div>
-            )).slice(0,3)}
-          </Cloumn>
-        ))}
 
         <Box
           sx={{
@@ -812,10 +821,27 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                 marginLeft: -13,
                 justifyContent: "start",
                 zIndex: -1,
-              }}>
-              <Cloumn></Cloumn>
-            </Box>
+              }}></Box>
           </Display>
+          <AllMemberWrap>
+            {thisGroupMember.map((item) => (
+              <MemberWrap>
+                <ProfileImgWrap>
+                  <ProfileImg src={item.profile_img} />
+                </ProfileImgWrap>
+                <Font>{item.info.user_name}</Font>
+                <Display m="3px">
+                  {item.select_tag
+                    .map((obj) => (
+                      <Tag width='auto' m='3px'>
+                        {obj}
+                      </Tag>
+                    ))
+                    .slice(0, 3)}
+                </Display>
+              </MemberWrap>
+            ))}
+          </AllMemberWrap>
         </Box>
       </div>
     </div>
