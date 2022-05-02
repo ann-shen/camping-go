@@ -176,6 +176,10 @@ function SentCommentToHeader({ groupId, userName, userId }) {
         comment: commentArr,
       });
     });
+
+    setTimeout(()=>{
+      setAlertOpen(false);
+    },1000)
   };
 
   return (
@@ -223,15 +227,6 @@ function SentCommentToHeader({ groupId, userName, userId }) {
               setStartValue(newValue);
             }}
           />
-          <Button
-            bgc='#426765'
-            color='#eae5be'
-            width='150px'
-            onClick={sendComment}>
-            送出評論
-          </Button>
-        </SendCommentWrap>
-        {/* <Display direction='column'>
           <Collapse in={alertOpen}>
             <Alert
               action={
@@ -249,7 +244,15 @@ function SentCommentToHeader({ groupId, userName, userId }) {
               已送出
             </Alert>
           </Collapse>
-        </Display> */}
+          <Button
+            bgc='#426765'
+            color='#eae5be'
+            width='150px'
+            onClick={sendComment}>
+            送出評論
+          </Button>
+        </SendCommentWrap>
+
       </Modal>
     </div>
   );

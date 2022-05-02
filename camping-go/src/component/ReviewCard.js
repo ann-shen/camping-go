@@ -1,5 +1,5 @@
 // import { styled } from "@mui/material/styles";
-import styled from "styled-components";
+import styled,{keyframes} from "styled-components";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
@@ -86,6 +86,41 @@ const LinkOpen = styled.a`
   color: gray;
 `;
 
+const fadeIn = keyframes`
+from {
+  opacity: 0.1;
+  transform: scale(1);
+}
+to {
+  opacity: 1;
+  transform: scale(1.2);
+}
+`;
+
+const FindGroupButton = styled.button`
+  width: 150px;
+  height: 60px;
+  border: none;
+  background-color: #fffef4;
+  letter-spacing: 3px;
+  /* border: 2px solid #cfc781; */
+  font-size: 18px;
+  padding: 10px;
+  margin: 40px 10px;
+  box-shadow: 0.2rem 0.2rem 0.7rem #eae5be, -0.2rem -0.2rem 0.2rem #fffef4;
+  border-radius: 30px;
+  color: #cfc781;
+  animation: ${fadeIn} 2.5s infinite linear;
+  cursor: pointer;
+  &:hover {
+    color: #cfc781;
+    border: 3px solid #cfc781;
+    background-color: #426765;
+    box-shadow: none;
+    animation: ${fadeIn} 0.5s ease-in-out;
+  }
+`;
+
 function IsModal({ modalIsOpen, setIsOpen, groupId, groupPassword }) {
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState(false);
@@ -151,6 +186,8 @@ function Recommend({
   joinThisGroup,
   userName,
   Expanded,
+  userId,
+  setGroupId,
 }) {
   // const navigate = useNavigate();
   return (
@@ -174,6 +211,8 @@ function Recommend({
             joinThisGroup={joinThisGroup}
             userName={userName}
             Expanded={Expanded}
+            userId={userId}
+            setGroupId={setGroupId}
           />
         </Display>
       </Modal>
@@ -181,24 +220,24 @@ function Recommend({
   );
 }
 
-function Expanded({ expanded }) {
+function Expanded({ expanded, currentPosts, targetIndex }) {
+  // console.log(targetIndex);
+  // console.log(currentPosts[targetIndex]);
   return (
     <Collapse in={expanded} timeout='auto' unmountOnExit>
       <CardContent>
-        <Typography paragraph>注意事項:</Typography>
-        <Typography paragraph>提供帳篷租借</Typography>
-
-        <Typography paragraph>
-          Add rice and stir very gently to distribute. Top with artichokes and
-          peppers, and cook without stirring, until most of the liquid is
-          absorbed, 15 to 18 minutes. Reduce heat to medium-low, add reserved
-          shrimp and mussels, tucking them down into the rice, and cook again
-          without stirring, until mussels have opened and rice is just tender, 5
-          to 7 minutes more. (Discard any mussels that don&apos;t open.)
-        </Typography>
-        <Typography>
-          Set aside off of the heat to let rest for 10 minutes, and then serve.
-        </Typography>
+        {targetIndex !== "" && (
+          <>
+            <Typography paragraph>注意事項:</Typography>
+            <Typography paragraph>
+              {targetIndex ? (
+                <p>{currentPosts[targetIndex].announcement}</p>
+              ) : (
+                <p>{currentPosts[targetIndex].announcement}</p>
+              )}
+            </Typography>
+          </>
+        )}
       </CardContent>
     </Collapse>
   );
@@ -213,31 +252,32 @@ export default function ReviewCard({
   modalIsOpen,
   groupPassword,
   userId,
+  setGroupId,
 }) {
   const [expandedArr, setExpandedArr] = useState(
     Array(currentPosts.length).fill(false)
   );
   const [recommendIsOpen, setRecommendIsOpen] = useState(false);
+  const [targetIndex, setTargetIndex] = useState("");
+
   // console.log(currentPosts);
   // console.log(Array(currentPosts.length).fill(false));
 
   const handleExpandClick = (index, e) => {
-    console.log(index);
+    // console.log(index);
+    setTargetIndex(index);
     let cloneExpandedArr = [...expandedArr];
     cloneExpandedArr[index] = !cloneExpandedArr[index];
     let prev = cloneExpandedArr.slice(0, index).fill(false);
     let after = cloneExpandedArr
       .slice(index + 1, cloneExpandedArr.length)
       .fill(false);
-    console.log(prev, after);
     setExpandedArr([...prev, cloneExpandedArr[index], ...after]);
   };
 
-  useEffect(() => {
-    console.log(expandedArr);
-  }, [expandedArr]);
-
-  
+  // useEffect(() => {
+  //   console.log(expandedArr);
+  // }, [expandedArr]);
 
   return (
     <>
@@ -348,23 +388,28 @@ export default function ReviewCard({
                 />
               </ExpandMore>
             </CardActions>
-            <Expanded expanded={expandedArr[index]} />
+            <Expanded
+              expanded={expandedArr[index]}
+              currentPosts={currentPosts}
+              targetIndex={targetIndex}
+            />
           </Card>
         ))}
       </GroupWrap>
-      <Button
-      width="150px"
+      <Font>找不到喜愛的？一鍵找尋你的最佳推薦露營團</Font>
+      <FindGroupButton
         onClick={() => {
           setRecommendIsOpen(true);
         }}>
         最佳推薦
-      </Button>
+      </FindGroupButton>
       <Recommend
         recommendIsOpen={recommendIsOpen}
         setRecommendIsOpen={setRecommendIsOpen}
         joinThisGroup={joinThisGroup}
         userName={userName}
-        Expanded={Expanded}
+        userId={userId}
+        setGroupId={setGroupId}
       />
     </>
   );
