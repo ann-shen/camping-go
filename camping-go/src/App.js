@@ -15,6 +15,7 @@ import CityCamping from "./pages/CityCamping";
 import { UserContext } from "./utils/userContext";
 import FindGroup from "./pages/FindGroup";
 
+
 function App() {
   const [userName, setUserName] = useState("");
   const [groupId, setGroupId] = useState("");
@@ -35,12 +36,8 @@ function App() {
     });
   }, []);
 
-  function getLogout() {
-    signOut(auth)
-      .then(() => {})
-      .catch((error) => {});
-    // setToken("");
-  }
+  
+
   return (
     <div className='App'>
       <UserContext.Provider value={userId}>
@@ -83,7 +80,6 @@ function App() {
                 <Profile
                   userName={userName}
                   userId={userId}
-                  getLogout={getLogout}
                 />
               }></Route>
             <Route

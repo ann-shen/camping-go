@@ -247,7 +247,6 @@ function FindGroup({ userId, userName, setGroupId }) {
               padding: 1,
               margin: 5,
               backgroundColor: "#F4F4EE",
-              transition: "1s",
             }}>
             <ImgWrap>
               <CardMedia

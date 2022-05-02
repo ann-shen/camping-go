@@ -293,7 +293,6 @@ export default function ReviewCard({
               padding: 1,
               margin: 5,
               backgroundColor: "#F4F4EE",
-              animation: `${fadeIn} 0.5s ease-in-out`,
             }}>
             <ImgWrap>
               <CardMedia

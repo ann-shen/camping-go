@@ -182,6 +182,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   const [currentTentId, setCurrentTentId] = useState("");
   const [alreadyTentId, setAlreadyTentId] = useState("");
   const ContextByUserId = useContext(UserContext);
+  
 
   //------------------------DND ------------------------//
 
@@ -397,21 +398,20 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
       collection(db, "joinGroup"),
       where("group", "array-contains", params.id)
     );
-    let thisGroupMemberArr = [];
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        thisGroupMemberArr.push(doc.data());
-      });
-      console.log(thisGroupMemberArr);
-    });
-
-    // const querySnapshot = await getDocs(q);
-    // let thisGroupMemberArr = [];
-    // querySnapshot.forEach((doc) => {
-    //   // console.log(doc.data().info)
-    //   thisGroupMemberArr.push(doc.data());
+    // const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    //   querySnapshot.forEach((doc) => {
+    //     thisGroupMemberArr.push(doc.data());
+    //   });
+    //   console.log(thisGroupMemberArr);
     // });
-    // console.log(thisGroupMemberArr);
+
+    const querySnapshot = await getDocs(q);
+    let thisGroupMemberArr = [];
+    querySnapshot.forEach((doc) => {
+      console.log(doc.data().info)
+      thisGroupMemberArr.push(doc.data());
+    });
+    console.log(thisGroupMemberArr);
     setThisGroupMember(thisGroupMemberArr);
   }, []);
 
@@ -740,6 +740,32 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
               </Display>
             </SourseContainer>
           </Box>
+          {addNewTentSection && (
+            <Box
+              sx={{
+                width: "auto",
+                height: "auto",
+                boxShadow:
+                  "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+                borderRadius: 10,
+                padding: 2,
+                marginTop: 8,
+                marginBottom: 8,
+              }}>
+              <Tent
+                setTentInfo={setTentInfo}
+                tentInfo={tentInfo}
+                setAllMemberArr={setAllMemberArr}
+                allMemberArr={allMemberArr}
+              />
+              <AddButton onClick={addNewTent}>新增</AddButton>
+              {/* {tentArr.map((_, index) => (
+            <div key={index}>
+              <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
+            </div>
+          ))} */}
+            </Box>
+          )}
           <Button
             width='80px'
             height='80px'
@@ -752,36 +778,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             onClick={handleAddTentSection}>
             +
           </Button>
-          {addNewTentSection && (
-            <Box
-              sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                // m: 10,
-                mt: 2,
-                ml: 35,
-                "& > :not(style)": {
-                  m: 1,
-                  width: "80%",
-                  height: "auto",
-                },
-              }}>
-              <Paper elevation={3} sx={{ p: 10 }}>
-                <Tent
-                  setTentInfo={setTentInfo}
-                  tentInfo={tentInfo}
-                  setAllMemberArr={setAllMemberArr}
-                  allMemberArr={allMemberArr}
-                />
-                <AddButton onClick={addNewTent}>新增</AddButton>
-                {/* {tentArr.map((_, index) => (
-            <div key={index}>
-              <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
-            </div>
-          ))} */}
-              </Paper>
-            </Box>
-          )}
+
           <Display>
             <Box
               sx={{

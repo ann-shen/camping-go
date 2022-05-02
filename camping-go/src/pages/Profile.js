@@ -6,21 +6,29 @@ import { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../utils/firebase";
 import {
-  getDoc,
   getDocs,
   collection,
   query,
   where,
   doc,
-  addDoc,
   deleteDoc,
   onSnapshot,
   updateDoc,
   arrayRemove,
   setDoc,
   increment,
+  getDoc,
 } from "firebase/firestore";
-import { Font, Img, Display, Button, Wrap, Tag, ImgWrap,Cloumn } from "../css/style";
+import {
+  Font,
+  Img,
+  Display,
+  Button,
+  Wrap,
+  Tag,
+  ImgWrap,
+  Cloumn,
+} from "../css/style";
 import Modal from "react-modal";
 import "../css/modal.css";
 import { TextField, Alert, Collapse, IconButton } from "@mui/material";
@@ -33,7 +41,9 @@ import styled from "styled-components";
 import { ProfilePicture } from "../component/ProfilePicture";
 import location from "../image/location.png";
 import MultipleSelectChip from "../component/MultipleSelectChip";
-import { borderBottom } from "@mui/system";
+import { signOut, getAuth } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+
 Modal.setAppElement("#root");
 
 const LinkRoute = styled(Link)`
@@ -129,7 +139,7 @@ function a11yProps(index) {
 
 function SentCommentToHeader({ groupId, userName, userId }) {
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [alertOpen, setAlertOpen] = useState(true);
+  const [alertOpen, setAlertOpen] = useState(false);
   const [value, setValue] = useState("Controlled");
   const [startValue, setStartValue] = React.useState(2);
 
@@ -177,9 +187,9 @@ function SentCommentToHeader({ groupId, userName, userId }) {
       });
     });
 
-    setTimeout(()=>{
+    setTimeout(() => {
       setAlertOpen(false);
-    },1000)
+    }, 1000);
   };
 
   return (
@@ -252,7 +262,6 @@ function SentCommentToHeader({ groupId, userName, userId }) {
             送出評論
           </Button>
         </SendCommentWrap>
-
       </Modal>
     </div>
   );
@@ -387,11 +396,11 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
     setMember(memberArr);
   };
 
-  const removeMember = async (index,role) => {
+  const removeMember = async (index, role, member_id) => {
     console.log(groupId);
-    if(role){
-      alert("無法移除團長")
-      return
+    if (role == "header") {
+      alert("無法移除團長");
+      return;
     }
 
     await deleteDoc(
@@ -411,9 +420,14 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
       });
       setMember(afterDeleteMemberArr);
     });
-    const docRefJoinGroup = await doc(db, "joinGroup", userId);
+    const docRefJoinGroup = doc(db, "joinGroup", member_id);
     updateDoc(docRefJoinGroup, {
       group: arrayRemove(groupId),
+    });
+
+    const docRefCreateGroup = doc(db, "CreateCampingGroup", groupId);
+    updateDoc(docRefCreateGroup, {
+      current_number: increment(-1),
     });
     setRenderParticipateArr(true);
   };
@@ -458,7 +472,7 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
                 display: "flex",
               }}>
               <Display>
-                {item.role == "header" && <Tag width="35px">團長</Tag>}
+                {item.role == "header" && <Tag width='35px'>團長</Tag>}
                 <Font>{item.member_name}</Font>
               </Display>
 
@@ -468,7 +482,7 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
                 ml='20px'
                 boxShadow='none'
                 onClick={() => {
-                  removeMember(index, item.role);
+                  removeMember(index, item.role, item.member_id);
                 }}>
                 移除成員
               </Button>
@@ -526,6 +540,8 @@ export default function Profile({ userName, userId, getLogout }) {
   const [yourParticipateGroup, setYourParticipateGroup] = useState([]);
   const [renderParticipateArr, setRenderParticipateArr] = useState(false);
   const [withDrawGrop, setWithDrawGrop] = useState(false);
+  const navigate = useNavigate();
+  const auth = getAuth();
 
   const ContextByUserId = useContext(UserContext);
 
@@ -544,31 +560,57 @@ export default function Profile({ userName, userId, getLogout }) {
   }, []);
 
   useEffect(async () => {
+    console.log(yourParticipateGroup);
+    setWithDrawGrop(false);
+    const groups = [];
     //先抓joingroup團員參與過的團ID
     let participateGroupArr = [];
     const q = query(doc(db, "joinGroup", params.id));
     const docSnap = await getDoc(q);
     if (docSnap.exists()) {
-      // console.log(docSnap.data());
       participateGroupArr = docSnap.data().group;
     } else {
-      console.log("No such document!");
+      console.log("noway");
     }
-    //拿這些groupID去跟createCampingGroup比對 抓相對應的資料
-    const groups = [];
+    console.log(participateGroupArr);
+
+    if (participateGroupArr.length === 0) {
+      setYourParticipateGroup([]);
+    }
+
+    let showGroupArr = [];
     participateGroupArr.map(async (item) => {
-      const q = query(
-        collection(db, "CreateCampingGroup"),
-        where("group_id", "==", item)
-      );
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        querySnapshot.forEach((item) => {
-          groups.push(item.data());
-        });
-        setYourParticipateGroup(groups);
-      });
+      const docRef = await getDoc(doc(db, "CreateCampingGroup", item));
+      if (docRef.exists()) {
+        console.log(docRef.data());
+        showGroupArr.push(docRef.data());
+        setYourParticipateGroup(showGroupArr);
+      } else {
+        showGroupArr.push(docRef.data());
+      }
     });
+
+    //拿這些groupID去跟createCampingGroup比對 抓相對應的資料
+    // if (participateGroupArr.length == 0) {
+    //   setYourParticipateGroup([]);
+    // } else {
+    //   participateGroupArr.map((item) => {
+    //     const q = query(
+    //       collection(db, "CreateCampingGroup"),
+    //       where("group_id", "==", item)
+    //     );
+    //     const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    //       querySnapshot.forEach((item) => {
+    //         // console.log(item.data());
+    //         groups.push(item.data());
+    //       });
+    //       setYourParticipateGroup(groups);
+    //     });
+    //   });
+    // }
   }, [withDrawGrop]);
+
+  console.log(yourParticipateGroup);
 
   useEffect(() => {
     const q = query(
@@ -578,6 +620,7 @@ export default function Profile({ userName, userId, getLogout }) {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const groups = [];
       querySnapshot.forEach((item) => {
+        console.log(item.data());
         groups.push(item.data());
         if (
           new Date().getTime() <
@@ -587,11 +630,11 @@ export default function Profile({ userName, userId, getLogout }) {
               .split(" ")[0]
           ).getTime()
         ) {
-          updateDoc(doc(db, "CreateCampingGroup", item.id), {
+          updateDoc(doc(db, "CreateCampingGroup", item.data().group_id), {
             status: "進行中",
           });
         } else {
-          updateDoc(doc(db, "CreateCampingGroup", item.id), {
+          updateDoc(doc(db, "CreateCampingGroup", item.data().group_id), {
             status: "已結束",
           });
         }
@@ -623,6 +666,14 @@ export default function Profile({ userName, userId, getLogout }) {
     console.log(id);
     await deleteDoc(doc(db, "CreateCampingGroup", id));
   };
+
+  function getLogout() {
+    signOut(auth)
+      .then(() => {})
+      .catch((error) => {});
+    navigate("/login");
+    // setToken("");
+  }
 
   return (
     <div>
