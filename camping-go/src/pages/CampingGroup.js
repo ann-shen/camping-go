@@ -22,8 +22,9 @@ import { Font, Display, Img, Button, Cloumn } from "../css/style";
 import location from "../image/location.png";
 import location_big from "../image/location_big.png";
 import group_people from "../image/group_people.png";
-
 import landingpage from "../image/landingpage.jpeg";
+import landingpage2 from "../image/landingpage2.png";
+
 import Header from "../component/Header";
 import Modal from "react-modal";
 import { UserContext } from "../utils/userContext";
@@ -64,6 +65,15 @@ const ImgWrap = styled.div`
   margin-bottom: 20px;
 `;
 
+const LandingImgWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+`;
+
 const Tag = styled.div`
   width: 60px;
   height: 25px;
@@ -81,9 +91,10 @@ const Section = styled.div`
 `;
 
 const ImgGroupPeopleWrap = styled.div`
-display: flex;
-justify-content:start;
-margin:60px 0px 0px 9%;`
+  display: flex;
+  justify-content: start;
+  margin: 60px 0px 0px 9%;
+`;
 
 const TitleWrap = styled.div`
   display: flex;
@@ -277,18 +288,10 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
   return (
     <>
       <Header ContextByUserId={ContextByUserId} />
-      <Box
-        sx={{
-          width: "100%",
-          height: 400,
-          "&:hover": {
-            border: 1,
-            opacity: [0.9, 0.8, 0.7],
-          },
-          overflow: "hidden",
-        }}>
-        <Img src={landingpage} width='100%'></Img>
-      </Box>
+      <LandingImgWrap>
+        <Img src={landingpage2} width='100%'></Img>
+      </LandingImgWrap>
+
       <Section>
         <ImgGroupPeopleWrap>
           <Img width='40px' src={group_people} />
