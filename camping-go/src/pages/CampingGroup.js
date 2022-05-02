@@ -18,15 +18,18 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Taiwan from "../component/Taiwan";
 import { Box, Grid, TextField, Alert, AlertTitle, Stack } from "@mui/material";
-import { Font, Display, Img, Button } from "../css/style";
+import { Font, Display, Img, Button, Cloumn } from "../css/style";
 import location from "../image/location.png";
+import location_big from "../image/location_big.png";
+import group_people from "../image/group_people.png";
+
 import landingpage from "../image/landingpage.jpeg";
 import Header from "../component/Header";
 import Modal from "react-modal";
 import { UserContext } from "../utils/userContext";
 import PaginationBar from "../component/Pagination";
 import ReviewCard from "../component/ReviewCard";
-import FindGroup from "./FindGroup"
+import FindGroup from "./FindGroup";
 
 Modal.setAppElement("#root");
 
@@ -68,6 +71,25 @@ const Tag = styled.div`
   color: white;
   border-radius: 10px;
   padding-top: 3px;
+`;
+
+const Section = styled.div`
+  width: 90%;
+  height: auto;
+  margin: 0px auto;
+  justify-content: center;
+`;
+
+const ImgGroupPeopleWrap = styled.div`
+display: flex;
+justify-content:start;
+margin:60px 0px 0px 9%;`
+
+const TitleWrap = styled.div`
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  margin-left: 15px;
 `;
 
 function IsModal({ modalIsOpen, setIsOpen, groupId, groupPassword }) {
@@ -253,7 +275,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
   };
 
   return (
-    <div>
+    <>
       <Header ContextByUserId={ContextByUserId} />
       <Box
         sx={{
@@ -267,39 +289,66 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
         }}>
         <Img src={landingpage} width='100%'></Img>
       </Box>
-      <ReviewCard
-        homePageCampGroup={homePageCampGroup}
-        currentPosts={currentPosts}
-        joinThisGroup={joinThisGroup}
-        groupId={groupId}
-        userName={userName}
-        setIsOpen={setIsOpen}
-        modalIsOpen={modalIsOpen}
-        groupPassword={groupPassword}
-        userId={userId}
-        setGroupId={setGroupId}
-      />
-      <PaginationBar
-        pagination={pagination}
-        totalPosts={homePageCampGroup.length}
-        paginate={paginate}
-      />
-      <Button
-        width='80px'
-        height='80px'
-        borderRadius='50%'
-        ml='90%'
-        fontSize='30px'
-        bgc='#426765'
-        color='#CFC781'
-        boxShadow='none'
-        onClick={() => {
-          navigate("/createGroup");
-        }}>
-        +
-      </Button>
-      <Taiwan />
-    </div>
+      <Section>
+        <ImgGroupPeopleWrap>
+          <Img width='40px' src={group_people} />
+          <TitleWrap>
+            <Font fontSize='27px' letterSpacing='3px'>
+              尋找你的露營趴 所有好玩的都在這。
+            </Font>
+            <Font fontSize='20px'>
+              忙碌的都市生活之餘，讓大自然調劑你緊湊的生活步伐，來場「森」呼吸。
+            </Font>
+          </TitleWrap>
+        </ImgGroupPeopleWrap>
+
+        <ReviewCard
+          homePageCampGroup={homePageCampGroup}
+          currentPosts={currentPosts}
+          joinThisGroup={joinThisGroup}
+          groupId={groupId}
+          userName={userName}
+          setIsOpen={setIsOpen}
+          modalIsOpen={modalIsOpen}
+          groupPassword={groupPassword}
+          userId={userId}
+          setGroupId={setGroupId}
+        />
+        <PaginationBar
+          pagination={pagination}
+          totalPosts={homePageCampGroup.length}
+          paginate={paginate}
+        />
+        <Button
+          width='80px'
+          height='80px'
+          borderRadius='50%'
+          ml='90%'
+          fontSize='30px'
+          bgc='#426765'
+          color='#CFC781'
+          boxShadow='none'
+          onClick={() => {
+            navigate("/createGroup");
+          }}>
+          +
+        </Button>
+        <Display justifyContnet='start' ml='8%'>
+          <Display>
+            <Img src={location} alt='' width='45px' />
+            <TitleWrap>
+              <Font fontSize='27px' letterSpacing='3px'>
+                點擊嚮往縣市
+              </Font>
+              <Font fontSize='20px'>
+                忙碌的都市生活之餘，讓大自然調劑你緊湊的生活步伐，來場「森」呼吸。
+              </Font>
+            </TitleWrap>
+          </Display>
+        </Display>
+        <Taiwan />
+      </Section>
+    </>
   );
 }
 

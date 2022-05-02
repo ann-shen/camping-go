@@ -315,7 +315,7 @@ function Taiwan() {
             </CityWrap>
           )}
           {position == "north" && (
-            <CityWrap top='0px' left='35%'>
+            <CityWrap top='70px' left='33%'>
               <Font fontSize='23px'>{targetCity}</Font>
               <Display m='10px 20px 20px 20px' alignItems='end'>
                 <img src={tent} alt='' />
@@ -354,7 +354,7 @@ function Taiwan() {
             </CityWrap>
           )}
           {position == "south" && (
-            <CityWrap top='600px' left='25%'>
+            <CityWrap top='600px' left='22%'>
               <Font fontSize='23px'>{targetCity}</Font>
               <Display m='10px 20px 20px 20px' alignItems='end'>
                 <img src={tent} alt='' />

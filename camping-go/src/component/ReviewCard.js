@@ -65,10 +65,10 @@ const SelectTag = styled.div`
 const GroupWrap = styled.div`
   display: flex;
   /* flex-direction: column; */
-  width: 90%;
+  width: 100%;
   display: flex;
   justify-content: center;
-  margin: 50px auto;
+  margin: 0px auto;
   align-items: start;
 `;
 

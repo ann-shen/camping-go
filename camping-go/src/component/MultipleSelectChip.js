@@ -82,7 +82,7 @@ export default function MultipleSelectChip({ userId, path, groupId }) {
   };
 
   return (
-    <div>
+
       <FormControl sx={{ ml: 3, mt: 2, width: "500px" }}>
         <InputLabel id='demo-multiple-chip-label'>喜愛</InputLabel>
 
@@ -119,6 +119,6 @@ export default function MultipleSelectChip({ userId, path, groupId }) {
           ))}
         </Select>
       </FormControl>
-    </div>
+
   );
 }
