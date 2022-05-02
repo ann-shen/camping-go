@@ -80,8 +80,10 @@
 .recommend-after {
   justify-content: center;
   align-items: center;
-  width: 40%;
+  padding-top: 20px;
+  width: 23%;
   height: 55%;
+  border-radius: 40px;
   background-color: transparent;
   border:2px solid #CFC781;
 }
