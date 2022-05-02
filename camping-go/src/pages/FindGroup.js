@@ -239,14 +239,15 @@ function FindGroup({ userId, userName, setGroupId }) {
         <GroupWrap>
           <Card
             sx={{
-              width: "24%",
+              width: "35%",
               height: "auto",
               boxShadow:
-                "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+                "0.2rem 0.2rem 0.2rem #CFC781 , -0.3rem -0.3rem 0.4rem #ffffff",
               borderRadius: 7.5,
               padding: 1,
               margin: 5,
               backgroundColor: "#F4F4EE",
+              transition: "1s",
             }}>
             <ImgWrap>
               <CardMedia

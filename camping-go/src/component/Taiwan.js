@@ -328,7 +328,7 @@ function Taiwan() {
             </CityWrap>
           )}
           {position == "northEast" && (
-            <CityWrap top='0px' left='80%'>
+            <CityWrap top='0px' left='75%'>
               <Font fontSize='23px'>{targetCity}</Font>
               <Display m='10px 20px 20px 20px' alignItems='end'>
                 <img src={tent} alt='' />
