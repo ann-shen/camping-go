@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import React from "react";
+import { Font, Cloumn, Wrap } from "../css/style";
+import { TextField} from "@mui/material";
 
 const Label = styled.label`
   font-size: 16px;
@@ -12,8 +14,7 @@ const Input = styled.input`
   height: 30px;
   margin: 20px;
 `;
-function CampSupplies({ setCampSupplies,campSupplies }) {
-
+function CampSupplies({ setCampSupplies, campSupplies }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCampSupplies((prevState) => ({
@@ -23,18 +24,20 @@ function CampSupplies({ setCampSupplies,campSupplies }) {
   };
 
   return (
-    <div>
-      <Label>要帶的物品</Label>
-      <Input
-        // value={campSupplies.supplies}
+    <Wrap width='auto' direction='column' alignItems='start' m="10px 30px 0px 0px">
+      <Font fontSize='14px' marginLeft='10px'>
+        備註
+      </Font>
+      <TextField
+        sx={{ marginBottom: "30px", marginTop: "5px" }}
         name='supplies'
-        onChange={handleChange}></Input>
-      <Label>備註</Label>
-      <Input 
-      // value={campSupplies.note}
-        name='note'
-        onChange={handleChange}></Input>
-    </div>
+        onChange={handleChange}
+        size='small'></TextField>
+      <Font fontSize='14px' marginLeft='10px'>
+        新增物品
+      </Font>
+      <TextField name='note' onChange={handleChange} size='small'></TextField>
+    </Wrap>
   );
 }
 

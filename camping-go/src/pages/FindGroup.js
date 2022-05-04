@@ -57,6 +57,7 @@ const Tag = styled.div`
   background-color: #426765;
   border: 1.5px solid #cfc781;
   color: white;
+  text-align: center;
 `;
 
 const SelectTag = styled.div`

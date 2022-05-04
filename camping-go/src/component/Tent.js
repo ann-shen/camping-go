@@ -1,9 +1,10 @@
 import styled from "styled-components";
 import React from "react";
-import { useState} from "react";
+import { useState } from "react";
 import "../pages/reuite.css";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
+import { Display, Font, Wrap } from "../css/style";
 
 const Label = styled.label`
   font-size: 16px;
@@ -17,22 +18,23 @@ const Input = styled.input`
   margin: 20px;
 `;
 
-function FormPropsTextFields({ tentInfo, setTentInfo, setSeat,seat}) {
+function FormPropsTextFields({ tentInfo, setTentInfo, setSeat, seat }) {
   return (
     <div>
       <Box
         component='form'
         sx={{
-          "& .MuiTextField-root": { m: 1, width: "25ch" },
+          "& .MuiTextField-root": { mt: 1, width: "25ch" },
         }}
         noValidate
         autoComplete='off'>
         <div>
           <TextField
+            size='small'
             name='max_number'
             // value={tentInfo.max_number}
             id='standard-number'
-            label='Number'
+            label=''
             type='number'
             InputLabelProps={{
               shrink: true,
@@ -111,22 +113,23 @@ function FormPropsTextFieldsStorage({ tentInfo, setTentInfo, seat }) {
 //   );
 // }
 
-function Tent({ tentInfo, setTentInfo, setAllMemberArr, allMemberArr}) {
+function Tent({ tentInfo, setTentInfo, setAllMemberArr, allMemberArr }) {
   const [seat, setSeat] = useState(0);
-  
 
   return (
     <div>
-      <Label>帳篷</Label>
-      <br />
-      <Label>可容納</Label>
-      <FormPropsTextFields
-        setTentInfo={setTentInfo}
-        tentInfo={tentInfo}
-        setSeat={setSeat}
-        seat={seat}
-      />
-      <Label>已有</Label>
+      <Wrap direction="column" m=" 0px 30px 0px 0px" width="auto" alignItems="start">
+          <Font fontSize='14px' marginLeft='10px'>
+            帳篷可容納人數
+          </Font>
+        <FormPropsTextFields
+          setTentInfo={setTentInfo}
+          tentInfo={tentInfo}
+          setSeat={setSeat}
+          seat={seat}
+        />
+      </Wrap>
+      {/* <Label>已有</Label> */}
       {/* <FormPropsTextFieldsStorage
         setTentInfo={setTentInfo}
         tentInfo={tentInfo}

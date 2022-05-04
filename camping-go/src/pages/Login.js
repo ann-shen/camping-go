@@ -9,6 +9,7 @@ import {
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
+import login from "../css/login.css"
 
 const Title = styled.div`
   color: #333;
@@ -40,6 +41,7 @@ const LoginWrap = styled.div`
   margin-left: 10%;
   width: 30%;
 `;
+
 
 function Loogin({ setUserId, setUserName, userName }) {
   const [email, setEmail] = useState("");
@@ -136,6 +138,83 @@ function Loogin({ setUserId, setUserName, userName }) {
 
   return (
     <>
+      <div className='login_wrap'>
+        <section id='login'></section>
+        <br />
+        <section className='orderListWrapn'>
+          <div className='top_wrap'>
+            <p>Don't you have an account?</p>
+            <a href='#signup'>
+              <button>Sign Up</button>
+            </a>
+          </div>
+          <h1>歡迎回來</h1>
+          <h5>請登入您的帳號</h5>
+          <label htmlFor=''>UserEmail</label>
+          <input
+            type='text'
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
+          />
+          <label htmlFor=''>Password</label>
+          <input
+            type='password'
+            name='password'
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+          />
+          <div className='btnWrap'>
+            <button onClick={handellogin}>Sign In</button>
+            <br />
+          </div>
+        </section>
+        <section className='orderListWrapn' id='signup'>
+          <div className='top_wrap'>
+            <p>already have an account?</p>
+            <a href='#login'>
+              <button>Sign In</button>
+            </a>
+          </div>
+          <h1>歡迎來到 camping go</h1>
+          <h5>註冊成為會員</h5>
+          <label htmlFor=''>Username</label>
+          <input
+            type='text'
+            onChange={(e) => {
+              setUserName(e.target.value);
+            }}
+          />
+          <label htmlFor=''>Email</label>
+          <input
+            type='text'
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
+          />
+          <label htmlFor=''>Password</label>
+          <input
+            type='password'
+            name='password'
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+          />
+          <label htmlFor=''>Confirm Password</label>
+          <input
+            type='password'
+            name='password'
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+          />
+          <div className='btnWrap'>
+            <button onClick={register}>Sign up</button>
+          </div>
+        </section>
+      </div>
       <LoginWrap>
         <Title>
           username

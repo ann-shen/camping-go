@@ -82,43 +82,40 @@ export default function MultipleSelectChip({ userId, path, groupId }) {
   };
 
   return (
-
-      <FormControl sx={{ ml: 3, mt: 2, width: "500px" }}>
-        <InputLabel id='demo-multiple-chip-label'>喜愛</InputLabel>
-
-        <Select
-          labelId='demo-multiple-chip-label'
-          id='demo-multiple-chip'
-          multiple
-          value={personName}
-          onChange={handleChange}
-          input={<OutlinedInput id='select-multiple-chip' label='Chip' />}
-          renderValue={(selected) => (
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              {selected.map((value) => (
-                <Chip
-                  sx={{
-                    backgroundColor: "#F4F4EE",
-                    border: " 2px solid #cfc781",
-                    color: "#426765",
-                  }}
-                  key={value}
-                  label={value}
-                />
-              ))}
-            </Box>
-          )}
-          MenuProps={MenuProps}>
-          {names.map((name) => (
-            <MenuItem
-              key={name}
-              value={name}
-              style={getStyles(name, personName, theme)}>
-              {name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
+    <FormControl sx={{ ml: 0, mt: 0, width: "100%" }} size='small'>
+      <InputLabel id='demo-multiple-chip-label'>喜愛</InputLabel>
+      <Select
+        labelId='demo-multiple-chip-label'
+        id='demo-multiple-chip'
+        multiple
+        value={personName}
+        onChange={handleChange}
+        input={<OutlinedInput id='select-multiple-chip' label='Chip' />}
+        renderValue={(selected) => (
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            {selected.map((value) => (
+              <Chip
+                sx={{
+                  backgroundColor: "#F4F4EE",
+                  border: " 2px solid #cfc781",
+                  color: "#426765",
+                }}
+                key={value}
+                label={value}
+              />
+            ))}
+          </Box>
+        )}
+        MenuProps={MenuProps}>
+        {names.map((name) => (
+          <MenuItem
+            key={name}
+            value={name}
+            style={getStyles(name, personName, theme)}>
+            {name}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 }

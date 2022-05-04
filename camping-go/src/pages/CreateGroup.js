@@ -15,23 +15,28 @@ import { useNavigate } from "react-router-dom";
 import Tent from "../component/Tent";
 import CampSupplies from "../component/CampSupplies";
 import Stack from "@mui/material/Stack";
-import { TextField, Box } from "@mui/material";
+import { TextField, Box, Autocomplete } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import GoogleMapBasic from "../component/GoogleMapBasic";
 import MultipleSelectChip from "../component/MultipleSelectChip";
-import { Display, Cloumn,Button } from "../css/style";
+import { Display, Cloumn, Button, Wrap } from "../css/style";
+import landingPage04 from "../image/landingpage-04.png";
 
-const Wrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin: 200px;
+const RockImg = styled.img`
+  width: 150px;
+  position: absolute;
+  top: -110px;
+  left: -30px;
 `;
+
 const CreateLabel = styled.label`
-  font-size: 16px;
+  font-size: 18px;
   margin-left: 20px;
   margin: 5px 0px;
+  letter-spacing: 2px;
+  color: #605f56;
 `;
 const Input = styled.input`
   font-size: 16px;
@@ -44,11 +49,139 @@ const Select = styled.select`
   height: 30px;
   margin-top: 10px;
 `;
+
+const Title = styled.p`
+  font-size: 35px;
+  color: #426765;
+  margin: 20px auto;
+`;
 const AddButton = styled.button`
-  width: 150px;
+  &:hover {
+    color: #797659;
+    background-color: none;
+    box-shadow: none;
+  }
+  width: auto;
+  height: 30px;
+  background-color: none;
+  border: 1px solid #605f56;
+  border-radius: 10px;
+  color: #797659;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 16px 5px 16px;
+  margin: 15px 0px;
+  display: flex;
+  justify-content: center;
 `;
 const CalendarWrap = styled.div`
   width: 250px;
+`;
+
+const FileLabel = styled.label`
+  &:hover {
+    color: #797659;
+    background-color: none;
+    box-shadow: none;
+  }
+  width: 60px;
+  height: 20px;
+  background-color: none;
+  border: 1px solid #605f56;
+  border-radius: 10px;
+  color: #797659;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 3px 5px 3px;
+  margin: 20px 10px;
+  display: flex;
+  justify-content: center;
+`;
+const FileInput = styled.input`
+  display: none;
+  color: rgba(0, 0, 0, 0);
+`;
+
+const Form = styled.form`
+  width: 65%;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  flex-direction: column;
+  border: 2px solid #cfc781;
+  padding: 60px;
+  padding-top: 30px;
+  border-radius: 20px;
+  margin-top: 150px;
+  position: relative;
+`;
+
+const options = ["公開", "私人"];
+
+const PriviewImg = styled.img`
+  width: 100%;
+`;
+
+const PriviewImgWrap = styled.div`
+  width: 250px;
+  height: 150px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  margin-right: 20px;
+`;
+
+const PriviewDeleteImgButton = styled.button`
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: white;
+  background-color: gray;
+  border: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+`;
+
+const MeetingTimeWrap = styled.div`
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  margin-left: 140px;
+`;
+
+const TimeWrap = styled.div`
+  width: 100%;
+  display: flex;
+  margin-bottom: 40px;
+`;
+
+const SecondSection = styled.div`
+  width: 100%;
+`;
+
+const TentWrap = styled.div`
+  width: 90%;
+  height: auto;
+  margin: 40px auto 0px auto;
+  padding: 40px 0px;
+  border-top: 2px dashed #cfc781;
+  border-bottom: 2px dashed #cfc781;
+`;
+
+const SuppliesWrap = styled.div`
+  width: 90%;
+  height: auto;
+  margin: 0px auto 20px auto;
+  padding: 40px 0px;
+  border-bottom: 2px dashed #cfc781;
 `;
 
 //calnader
@@ -127,35 +260,48 @@ function Multiple({ setUpLoadFile }) {
 
   return (
     <form>
-      <div className='form-group preview'>
-        {file.length > 0 &&
-          file.map((item, index) => {
-            return (
-              <div key={item}>
-                <img src={item} alt='' />
-                <button type='button' onClick={() => deleteFile(index)}>
-                  delete
-                </button>
-              </div>
-            );
-          })}
-      </div>
       <Display>
+        <CreateLabel>細節照片</CreateLabel>
         <div className='form-group'>
-          <input
-            type='file'
-            disabled={file.length === 5}
-            className='form-control'
-            onChange={uploadSingleFile}
-          />
+          <FileLabel>
+            上傳
+            <FileInput
+              required
+              type='file'
+              accept='image/*'
+              disabled={file.length === 5}
+              className='form-control'
+              onChange={uploadSingleFile}></FileInput>
+          </FileLabel>
         </div>
-        <button
+        <Button
+          height='30px'
+          width='100px'
           type='button'
           className='btn btn-primary btn-block'
           onClick={upload}>
           Upload
-        </button>
+        </Button>
       </Display>
+      <div className='form-group preview'>
+        <Display>
+          {file.length > 0 &&
+            file.map((item, index) => {
+              return (
+                <Display key={item}>
+                  <PriviewImgWrap>
+                    <PriviewImg src={item} alt='' />
+                    <PriviewDeleteImgButton
+                      type='button'
+                      onClick={() => deleteFile(index)}>
+                      x
+                    </PriviewDeleteImgButton>
+                  </PriviewImgWrap>
+                </Display>
+              );
+            })}
+        </Display>
+      </div>
     </form>
   );
 }
@@ -222,15 +368,18 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     url: "",
     detail_picture: [],
   });
-
   const navigate = useNavigate();
   let path = window.location.pathname;
+  const [privacyValue, setPrivacyValue] = useState(options[0]);
   const formRef = React.useRef();
 
   console.log(path);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (e.target.name == groupInfo.privacy) {
+      console.log("privacy");
+    }
     console.log(e.target.value);
     setGroupInfo((prevState) => ({
       ...prevState,
@@ -248,7 +397,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
   };
 
   const setUpGroup = async () => {
-    //group
+    // group
     console.log(upload);
     const storage = getStorage();
     const imageRef = ref(storage, upload.file.name);
@@ -326,6 +475,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
         city: state.city,
         picture: upload.url,
         detail_picture: upload.detail_picture,
+        privacy: privacyValue,
       });
     }
   }, [upload.url]);
@@ -368,161 +518,216 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
 
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
-    console.log(e.target.files[0]);
+    console.log(e.target.files[0].name);
   };
 
-  const handleSubmit = (e)=>{
+  console.log(upload.file.name);
+
+  useEffect(() => {
+    if (upload) {
+    } else {
+      return;
+    }
+  }, [upload]);
+
+  const handleSubmit = (e) => {
     e.preventDefault();
     console.log("SUBMIT", e);
-  }
+  };
 
   return (
-    <Wrap>
-      <form onSubmit={handleSubmit}>
-        {/* <CreateLabel>露營團名稱</CreateLabel> */}
-        <TextField
-          label='露營團名稱'
-          name='group_title'
-          required
-          value={groupInfo.group_title}
-          onChange={handleChange}></TextField>
-        <Button type='submit' variant='outlined'>
-          Validate
-        </Button>
-      </form>
-      <Cloumn>
-        <Display alignItems='center'>
-          <CreateLabel>封面照片</CreateLabel>
-          <input type='file' accept='image/*' onChange={handleFiles}></input>
-        </Display>
-        <Display>
-          <CreateLabel>細節照片</CreateLabel>
-          <Multiple setUpLoadFile={setUpLoadFile} />
-        </Display>
-        <CreateLabel>公開狀態</CreateLabel>
-        <Select
+    <Form onSubmit={handleSubmit}>
+      <RockImg src={landingPage04} alt='' />
+      <Title>創建你的露營團</Title>
+      {/* <CreateLabel>露營團名稱</CreateLabel> */}
+      <TextField
+        size='small'
+        sx={{ width: "100%", marginBottom: "30px" }}
+        label='露營團名稱'
+        name='group_title'
+        required
+        value={groupInfo.group_title}
+        onChange={handleChange}></TextField>
+      <TextField
+        sx={{ width: "100%", marginRight: "20px", marginBottom: "30px" }}
+        // helperText='Incorrect entry.'
+        size='small'
+        label='最多幾人'
+        name='max_member_number'
+        required
+        value={groupInfo.max_member_number}
+        onChange={handleChange}></TextField>
+      <Wrap width='100%'>
+        <Autocomplete
+          size='small'
+          sx={{ width: "150%" }}
           name='privacy'
-          onChange={handleChange}
-          value={groupInfo.privacy}>
-          <option value='公開'>公開</option>
-          <option value='私人'>私人</option>
-        </Select>
-        <CreateLabel>最多幾人</CreateLabel>
-        <Input
-          name='max_member_number'
-          value={groupInfo.max_member_number}
-          onChange={handleChange}></Input>
-        <CreateLabel>密碼</CreateLabel>
-        <Input
-          name='password'
-          value={groupInfo.password}
-          onChange={handleChange}></Input>
-        <button onClick={addNewGroup}>確認</button>
-
-        {clickConfirm && (
-          <div>
-            <Cloumn>
-              <CreateLabel>營區網站</CreateLabel>
+          value={privacyValue}
+          onChange={(event, newValue) => {
+            setPrivacyValue(newValue);
+          }}
+          id='controllable-states-demo'
+          options={options}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label='狀態'
+              helperText='如果設為私人，需要輸入密碼才可加團'
+            />
+          )}
+        />
+        {privacyValue == "私人" && (
+          <TextField
+            sx={{ width: "100%", marginLeft: "20px", marginBottom: "30px" }}
+            size='small'
+            required
+            label='密碼'
+            name='password'
+            value={groupInfo.password}
+            onChange={handleChange}></TextField>
+        )}
+      </Wrap>
+      <Display alignItems='center' m='50px 0px 50px 0px'>
+        <Cloumn>
+          <Display>
+            <CreateLabel>封面照片</CreateLabel>
+            <FileLabel>
+              上傳
+              <FileInput
+                required
+                type='file'
+                accept='image/*'
+                onChange={handleFiles}></FileInput>
+            </FileLabel>
+          </Display>
+          {upload.file && upload.file.name}
+          {/* <PriviewImgWrap>
+              {upload.url && <PriviewImg src={upload.url}></PriviewImg>}
+            </PriviewImgWrap> */}
+        </Cloumn>
+      </Display>
+      <Button width='100%' onClick={addNewGroup} mt='40px'>
+        下一步
+      </Button>
+      {clickConfirm && (
+        <SecondSection>
+          <Cloumn>
+            <TextField
+              sx={{
+                width: "100%",
+                marginRight: "20px",
+                marginBottom: "30px",
+                marginTop: "30px",
+              }}
+              size='small'
+              label='營區網站'
+              name='site'
+              required
+              value={groupInfo.site}
+              onChange={handleChange}></TextField>
+            <TextField
+              sx={{
+                width: "100%",
+                marginRight: "20px",
+                marginBottom: "30px",
+                marginTop: "20px",
+              }}
+              required
+              size='small'
+              label='公告'
+              name='announcement'
+              value={groupInfo.announcement}
+              onChange={handleChange}></TextField>
+            <TextField
+              sx={{
+                width: "100%",
+                marginRight: "20px",
+                marginBottom: "50px",
+                marginTop: "20px",
+              }}
+              required
+              label='注意事項'
+              size='small'
+              name='notice'
+              value={groupInfo.notice}
+              onChange={handleChange}></TextField>
+            <CreateLabel>添加露營團標籤</CreateLabel>
+            <MultipleSelectChip path={path} groupId={groupId} />
+            {/* <CreateLabel>營區網站</CreateLabel>
               <Input
                 name='site'
                 value={groupInfo.site}
-                onChange={handleChange}></Input>
-              <CreateLabel>時間</CreateLabel>
-              <Calander
-                setStartDate={setStartDate}
-                setEndDate={setEndDate}
-                startDate={startDate}
-                endDate={endDate}
-              />
-            </Cloumn>
-
+                onChange={handleChange}></Input> */}
+            <TimeWrap>
+              <Cloumn>
+                <CreateLabel>時間</CreateLabel>
+                <Calander
+                  setStartDate={setStartDate}
+                  setEndDate={setEndDate}
+                  startDate={startDate}
+                  endDate={endDate}
+                />
+              </Cloumn>
+              <MeetingTimeWrap>
+                <CreateLabel>集合時間</CreateLabel>
+                <MaterialUIPickers setTime={setTime} />
+              </MeetingTimeWrap>
+            </TimeWrap>
+            <CreateLabel>地點</CreateLabel>
             <GoogleMapBasic setState={setState} state={state} />
-            <Cloumn>
-              <CreateLabel>集合時間</CreateLabel>
-              <MaterialUIPickers setTime={setTime} />
-              <CreateLabel>公告</CreateLabel>
-              <Input
-                maxlength='150'
-                name='announcement'
-                value={groupInfo.announcement}
-                onChange={handleChange}></Input>
-              <CreateLabel>標籤</CreateLabel>
-              <MultipleSelectChip path={path} groupId={groupId} />
-              <CreateLabel>注意事項</CreateLabel>
-              <Input
-                maxlength='150'
-                name='notice'
-                value={groupInfo.notice}
-                onChange={handleChange}></Input>
-            </Cloumn>
-            <Box
-              sx={{
-                width: "100%",
-                height: "auto",
-                "&:hover": {
-                  border: 1,
-                  opacity: [0.9, 0.8, 0.7],
-                },
-                boxShadow: 3,
-                overflow: "hidden",
-                borderRadius: 6,
-                padding: 3,
-                margin: 2,
-              }}>
-              <Tent
-                setTentInfo={setTentInfo}
-                tentInfo={tentInfo}
-                setAllMemberArr={setAllMemberArr}
-                allMemberArr={allMemberArr}
-              />
-              {tentArr.map((_, index) => (
-                <div key={index}>
-                  <Tent
-                    setTentInfo={setTentInfo}
-                    tentInfo={tentInfo}
-                    setAllMemberArr={setAllMemberArr}
-                    allMemberArr={allMemberArr}
-                  />
-                </div>
-              ))}
+            <TentWrap>
+              <CreateLabel>新增帳篷</CreateLabel>
+              <Display justifyContent='start' m=' 30px 0px 30px 0px'>
+                <Tent
+                  setTentInfo={setTentInfo}
+                  tentInfo={tentInfo}
+                  setAllMemberArr={setAllMemberArr}
+                  allMemberArr={allMemberArr}
+                />
+                {tentArr.map((_, index) => (
+                  <div key={index}>
+                    <Tent
+                      setTentInfo={setTentInfo}
+                      tentInfo={tentInfo}
+                      setAllMemberArr={setAllMemberArr}
+                      allMemberArr={allMemberArr}
+                    />
+                  </div>
+                ))}
+              </Display>
               <AddButton onClick={addNewTent}>新增</AddButton>
-            </Box>
-            <br />
-            <Box
-              sx={{
-                width: "100%",
-                height: "auto",
-                "&:hover": {
-                  border: 1,
-                  opacity: [0.9, 0.8, 0.7],
-                },
-                boxShadow: 3,
-                overflow: "hidden",
-                borderRadius: 6,
-                padding: 3,
-                margin: 2,
-              }}>
-              <CampSupplies
-                setCampSupplies={setCampSupplies}
-                campSupplies={campSupplies}
-              />
-              {suppliesArr.map((_, index) => (
-                <div key={index}>
+            </TentWrap>
+            <SuppliesWrap>
+              <CreateLabel>新增需要團員們認領的物品</CreateLabel>
+              <Cloumn>
+                <Display>
                   <CampSupplies
                     setCampSupplies={setCampSupplies}
                     campSupplies={campSupplies}
                   />
-                </div>
-              ))}
-              <AddButton onClick={addSupplies}>新增物品</AddButton>
-            </Box>
-            <br />
-            <br />
-            <AddButton onClick={setUpGroup}>建立露營團</AddButton>
-          </div>
-        )}
-      </Cloumn>
-    </Wrap>
+                  {suppliesArr.map((_, index) => (
+                    <div key={index}>
+                      <CampSupplies
+                        setCampSupplies={setCampSupplies}
+                        campSupplies={campSupplies}
+                      />
+                    </div>
+                  ))}
+                </Display>
+                <AddButton onClick={addSupplies}>新增</AddButton>
+              </Cloumn>
+            </SuppliesWrap>
+            <Display>
+              <Multiple setUpLoadFile={setUpLoadFile} />
+            </Display>
+            <Button width='100%' mt="60px" onClick={setUpGroup}>建立露營團</Button>
+          </Cloumn>
+        </SecondSection>
+      )}
+      {/* <Button width='20%' type='submit' variant='outlined'>
+          Validate
+        </Button> */}
+    </Form>
   );
 }
 

@@ -68,7 +68,7 @@ const GroupWrap = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin: 0px auto;
+  margin: 30px auto;
   align-items: start;
 `;
 
@@ -312,8 +312,11 @@ export default function ReviewCard({
                 textAlign: "start",
                 height: "160px",
               }}>
-              <Span>團長</Span>
-              <Span>{item.header_name}</Span>
+              <a href={`./personal_header/${item.header_id}`}>
+                <Span>團長</Span>
+                <Span>{item.header_name}</Span>
+              </a>
+
               <Font fontSize='25px' m='6px 0px 6px 0px'>
                 {item.group_title}
               </Font>

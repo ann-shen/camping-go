@@ -706,12 +706,15 @@ export default function Profile({ userName, userId, getLogout }) {
             </Display>
           </Wrap>
         </Display>
-        <Button width='100px' onClick={getLogout}>
-          登出
-        </Button>
+        {params.id == userId ? (
+          <Button width='100px' onClick={getLogout}>
+            登出
+          </Button>
+        ) : (
+          <></>
+        )}
       </Wrap>
-
-      <Box
+      { userId == params.id ? <Box
         sx={{
           width: "75%",
           height: "auto",
@@ -941,7 +944,10 @@ export default function Profile({ userName, userId, getLogout }) {
           )}
           <TabPanel value={value} index={1} dir={theme.direction}></TabPanel>
         </SwipeableViews>
-      </Box>
+      </Box> : <div>123
+        </div>}
+
+      
     </div>
   );
 }
