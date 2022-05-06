@@ -184,6 +184,26 @@ const SuppliesWrap = styled.div`
   border-bottom: 2px dashed #cfc781;
 `;
 
+const AddAlertItems = styled.button`
+  width: 150px;
+  margin: 0px;
+  &:hover {
+    color: #797659;
+    background-color: none;
+    box-shadow: none;
+  }
+  height: 30px;
+  background-color: none;
+  border: 1px solid #605f56;
+  border-radius: 10px;
+  color: #797659;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 16px 5px 16px;
+  display: flex;
+  justify-content: center;
+`;
+
 //calnader
 function Calander({ setEndDate, setStartDate, startDate, endDate }) {
   // const [startDate, setStartDate] = useState(new Date());
@@ -360,9 +380,10 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
   });
   const [tentArr, setTentArr] = useState([]);
   const [suppliesArr, setSuppliesArr] = useState([]);
+  const [alertItemsArr, setAlertItemsArr] = useState([]);
+  const [addNotice, setAddNotice] = useState([]);
   const [time, setTime] = useState("");
   const [clickConfirm, setClickConfirm] = useState(false);
-  // const [tentMember, setTentMember] = useState([]);
   const [upload, setUpLoadFile] = useState({
     file: "",
     url: "",
@@ -373,19 +394,24 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
   const [privacyValue, setPrivacyValue] = useState(options[0]);
   const formRef = React.useRef();
 
-  console.log(path);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (e.target.name == groupInfo.privacy) {
-      console.log("privacy");
-    }
     console.log(e.target.value);
+
     setGroupInfo((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
+
+
+  
+  console.log(addNotice);
+
+  const AddNotice = (e) => {
+    setAddNotice((prev) => [...prev, groupInfo.notice]);
+  };
+  console.log(addNotice);
 
   const addNewGroup = async (event) => {
     event.preventDefault();
@@ -476,6 +502,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
         picture: upload.url,
         detail_picture: upload.detail_picture,
         privacy: privacyValue,
+        notice: addNotice,
       });
     }
   }, [upload.url]);
@@ -516,12 +543,16 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     );
   };
 
+  
+
+  // console.log(alertItemsArr);
+
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
     console.log(e.target.files[0].name);
   };
 
-  console.log(upload.file.name);
+  // console.log(upload.file.name);
 
   useEffect(() => {
     if (upload) {
@@ -649,8 +680,26 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
               label='注意事項'
               size='small'
               name='notice'
-              value={groupInfo.notice}
+              // value={groupInfo.notice}
               onChange={handleChange}></TextField>
+            {alertItemsArr.map((_, index) => (
+              <TextField
+                key={index}
+                sx={{
+                  width: "100%",
+                  marginRight: "20px",
+                  marginBottom: "50px",
+                  marginTop: "20px",
+                }}
+                required
+                label='注意事項'
+                size='small'
+                name='notice'
+                // value={groupInfo.notice}
+                onChange={handleChange}></TextField>
+            ))}
+            <AddAlertItems onClick={AddNotice}>新增事項</AddAlertItems>
+
             <CreateLabel>添加露營團標籤</CreateLabel>
             <MultipleSelectChip path={path} groupId={groupId} />
             {/* <CreateLabel>營區網站</CreateLabel>
@@ -720,7 +769,9 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
             <Display>
               <Multiple setUpLoadFile={setUpLoadFile} />
             </Display>
-            <Button width='100%' mt="60px" onClick={setUpGroup}>建立露營團</Button>
+            <Button width='100%' mt='60px' onClick={setUpGroup}>
+              建立露營團
+            </Button>
           </Cloumn>
         </SecondSection>
       )}

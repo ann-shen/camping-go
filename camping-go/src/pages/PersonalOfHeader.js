@@ -53,6 +53,9 @@ const ProfileImgWrap = styled.div`
 
 function PersonalOfHeader() {
   const [yourCreateGroup, setYourCreateGroup] = useState([]);
+  const [feedback, setFeedback] = useState([]);
+  const [feedbackArr, setFeedbackArr] = useState([]);
+
   const ContextByUserId = useContext(UserContext);
 
   let params = useParams();
@@ -72,7 +75,40 @@ function PersonalOfHeader() {
     setYourCreateGroup(CreateGroupArr);
   }, []);
 
-  console.log(yourCreateGroup);
+  // console.log(yourCreateGroup);
+
+  useEffect(() => {
+    yourCreateGroup.forEach((item) => {
+      const querySnapshot = getDocs(
+        collection(db, "CreateCampingGroup", item.group_id, "feedback")
+      );
+    });
+    const test = yourCreateGroup.map(async (item) => {
+      const querySnapshot = await getDocs(
+        collection(db, "CreateCampingGroup", item.group_id, "feedback")
+      );
+      let thisGroupFeedback = [];
+
+      querySnapshot.forEach((doc) => {
+        thisGroupFeedback.push(doc.data());
+      });
+      return thisGroupFeedback;
+      // setFeedbackArr((prev) => [...prev, thisGroupFeedback]);
+    });
+
+    Promise.all(test).then((array) => {
+      console.log(array);
+      setFeedbackArr(array);
+      // setFeedbackArr((prev) => [...prev, array]);
+    });
+  }, [yourCreateGroup]);
+
+  console.log(feedbackArr[0]);
+
+  // feedbackArr[0].map(item=>{
+  //   console.log(item);
+
+  // })
 
   return (
     <>
@@ -180,7 +216,18 @@ function PersonalOfHeader() {
                       </Display>
                     </Display>
                     <Display ml='100px'>
-                      {item.comment.length !== 0 ? (
+                      <Cloumn>
+                        {feedbackArr.length !== 0 &&
+                          feedbackArr[index].map((item, i) => (
+                            <CommentWrap key={i}>
+                              <Font fontSize='16px' color='#426765'>
+                                {item.name}
+                              </Font>
+                              <Font fontSize='14px'>{item.note}</Font>
+                            </CommentWrap>
+                          ))}
+                      </Cloumn>
+                      {/* {item.comment?(
                         <div>
                           <Font letterSpacing='3px'>評論</Font>
                           {item.comment.map((item, index) => (
@@ -191,7 +238,7 @@ function PersonalOfHeader() {
                         </div>
                       ) : (
                         <p>露營還沒結束尚未開評論唷！</p>
-                      )}
+                      )} */}
                     </Display>
                   </Display>
                   {item.total_score && (

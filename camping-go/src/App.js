@@ -23,6 +23,8 @@ function App() {
   const [allMemberArr, setAllMemberArr] = useState([]);
   const auth = getAuth();
   console.log(userName);
+
+  
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -44,7 +46,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route
-              path='/createGroup'
+              path='/create_group'
               element={
                 <CreateGroup
                   userId={userId}
@@ -72,16 +74,12 @@ function App() {
                   setAllMemberArr={setAllMemberArr}
                   allMemberArr={allMemberArr}
                   userName={userName}
+                  userId={userId}
                 />
               }></Route>
             <Route
               path='profile/:id'
-              element={
-                <Profile
-                  userName={userName}
-                  userId={userId}
-                />
-              }></Route>
+              element={<Profile userName={userName} userId={userId} />}></Route>
             <Route
               path='login'
               element={
@@ -102,9 +100,7 @@ function App() {
               element={<PersonalOfHeader />}></Route>
             <Route
               path='find_group'
-              element={
-                <FindGroup userId={userId} />
-              }></Route>
+              element={<FindGroup userId={userId} />}></Route>
           </Routes>
         </BrowserRouter>
       </UserContext.Provider>

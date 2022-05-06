@@ -1,5 +1,5 @@
 // import { styled } from "@mui/material/styles";
-import styled,{keyframes} from "styled-components";
+import styled, { keyframes } from "styled-components";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
@@ -7,7 +7,7 @@ import CardActions from "@mui/material/CardActions";
 import Collapse from "@mui/material/Collapse";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Font, Display, Img, Button } from "../css/style";
+import { Font, Display, Img, Button, Hr, Cloumn, Wrap } from "../css/style";
 import { ExpandMore } from "./ReviewCard_Component/ExpanMore";
 import location from "../image/location.png";
 import { useState, useEffect } from "react";
@@ -16,9 +16,13 @@ import Modal from "react-modal";
 import { TextField, Alert, AlertTitle, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 import FindGroup from "../pages/FindGroup";
+import landingpage04 from "../image/landingpage-04.png";
+import landingpage03 from "../image/landingpage-03.png";
+import alertIcon from "../image/alert.png";
+import { height, width } from "@mui/system";
 
 const Span = styled.span`
-  font-size: 16px;
+  font-size: 14px;
   margin-left: 6px;
   color: #797659;
 `;
@@ -26,13 +30,13 @@ const Span = styled.span`
 const ButtonWrap = styled.div`
   display: flex;
   justify-content: center;
-  margin: 20px 0px;
+  margin: 5px;
 `;
 
 const ImgWrap = styled.div`
   position: relative;
   width: 100%;
-  height: 230px;
+  height: 200px;
   border-radius: 30px;
   overflow: hidden;
 `;
@@ -48,18 +52,19 @@ const Tag = styled.div`
   background-color: #426765;
   border: 1.5px solid #cfc781;
   color: white;
+  margin-top: 10px;
 `;
 
 const SelectTag = styled.div`
   width: auto;
   height: 25px;
-  padding: 2px 7px 0px 7px;
+  padding: 4px 7px 0px 7px;
   border-radius: 10px;
   margin: 0px 4px;
   border: 1.5px solid #cfc781;
-
   background-color: #ebebeb;
   color: #797659;
+  font-size: 14px;
 `;
 
 const GroupWrap = styled.div`
@@ -68,7 +73,7 @@ const GroupWrap = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin: 30px auto;
+  margin: 10px auto;
   align-items: start;
 `;
 
@@ -99,17 +104,17 @@ to {
 
 const FindGroupButton = styled.button`
   width: 150px;
-  height: 60px;
+  height: 35px;
   border: none;
-  background-color: #fffef4;
+  background-color: #eae5be;
   letter-spacing: 3px;
   /* border: 2px solid #cfc781; */
-  font-size: 18px;
-  padding: 10px;
-  margin: 40px 10px;
+  font-size: 14px;
+  padding: 3px;
+  margin-top: 40px;
   box-shadow: 0.2rem 0.2rem 0.7rem #eae5be, -0.2rem -0.2rem 0.2rem #fffef4;
   border-radius: 30px;
-  color: #cfc781;
+  color: #797659;
   animation: ${fadeIn} 2.5s infinite linear;
   cursor: pointer;
   &:hover {
@@ -121,7 +126,20 @@ const FindGroupButton = styled.button`
   }
 `;
 
-function IsModal({ modalIsOpen, setIsOpen, groupId, groupPassword }) {
+const AnnouncementFontWrap = styled.div`
+  width: 80%;
+  line-height: 30px;
+  margin-bottom: 30px;
+`;
+
+function IsModal({
+  modalIsOpen,
+  setIsOpen,
+  currentPosts,
+  index,
+  joinThisGroup,
+  header_name,
+}) {
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState(false);
   const navigate = useNavigate();
@@ -131,12 +149,13 @@ function IsModal({ modalIsOpen, setIsOpen, groupId, groupPassword }) {
   };
 
   const checkPassword = (e) => {
-    if (value == groupPassword) {
-      navigate(`/joinGroup/${groupId}`);
+    if (value == currentPosts[index].password) {
+      navigate(`/joinGroup/${currentPosts[index].group_id}`);
     } else {
       setAlert(true);
     }
   };
+  console.log(currentPosts[index]);
 
   return (
     <div className='App'>
@@ -155,24 +174,92 @@ function IsModal({ modalIsOpen, setIsOpen, groupId, groupPassword }) {
         }}
         closeTimeoutMS={500}>
         <Display direction='column'>
-          <TextField
-            required
-            id='outlined-required'
-            label='Required'
-            defaultValue=''
-            onChange={handleChange}
-          />
-          {alert && (
-            <Stack sx={{ width: "100%" }} spacing={2}>
-              <Alert severity='error'>
-                <AlertTitle>Error</AlertTitle>
-                密碼錯誤 <strong>請再輸入一次!</strong>
-              </Alert>
-            </Stack>
+          {currentPosts[index] ? (
+            <>
+              <Font letterSpacing='3px'>介紹-即將加入露營團</Font>
+              <Hr width='80%' m='10px 0px 20px 0px'></Hr>
+              <AnnouncementFontWrap>
+                <Font fontSize='14px'>{currentPosts[index].announcement}</Font>
+              </AnnouncementFontWrap>
+              <Font fontSize='18px' color='#426765'>
+                注意事項
+              </Font>
+              <Hr width='80%' m='10px 0px 20px 0px'></Hr>
+              <Display mb='15px'>
+                <Img src={alertIcon} width='30px'></Img>
+                <Font fontSize='14px' marginLeft='10px'>
+                  位於花蓮縣壽豐鄉的布萊頓霍夫莊園
+                </Font>
+              </Display>
+              <Display>
+                <Img src={alertIcon} width='30px'></Img>
+                <Font fontSize='14px' marginLeft='10px'>
+                  位於花蓮縣壽豐鄉的布萊頓霍夫莊園
+                </Font>
+              </Display>
+              {currentPosts[index].privacy == "公開" && (
+                <Display>
+                  <Button
+                    width='200px'
+                    mt='30px'
+                    onClick={() => setIsOpen(false)}>
+                    我再考慮
+                  </Button>
+                  <Button
+                    width='200px'
+                    mt='30px'
+                    ml='20px'
+                    onClick={() => {
+                      joinThisGroup(index, header_name);
+                    }}>
+                    確認加入
+                  </Button>
+                </Display>
+              )}
+
+              {currentPosts[index].privacy == "私人" ? (
+                <>
+                  <TextField
+                    required
+                    id='outlined-required'
+                    label='Required'
+                    defaultValue=''
+                    onChange={handleChange}
+                    size='small'
+                    helperText='此為私人團，請輸入密碼'
+                    sx={{ marginTop: "40px", width: "200px" }}
+                  />
+                  {alert && (
+                    <Stack sx={{ width: "60%"}} spacing={0}>
+                      <Alert severity='error' variant='outlined' >
+                        密碼錯誤 <strong>請再輸入一次!</strong>
+                      </Alert>
+                    </Stack>
+                  )}
+                  <Display>
+                    <Button
+                      width='200px'
+                      mt='30px'
+                      onClick={() => setIsOpen(false)}>
+                      我再考慮
+                    </Button>
+                    <Button
+                      mt='30px'
+                      ml='20px'
+                      onClick={checkPassword}
+                      width=' 200px'
+                      boxShadow='none'>
+                      確認加入
+                    </Button>
+                  </Display>
+                </>
+              ) : (
+                <></>
+              )}
+            </>
+          ) : (
+            <></>
           )}
-          <Button onClick={checkPassword} width=' 200px' boxShadow='none'>
-            送出
-          </Button>
         </Display>
       </Modal>
     </div>
@@ -220,37 +307,35 @@ function Recommend({
   );
 }
 
-function Expanded({ expanded, currentPosts, targetIndex }) {
-  // console.log(targetIndex);
-  // console.log(currentPosts[targetIndex]);
-  return (
-    <Collapse in={expanded} timeout='auto' unmountOnExit>
-      <CardContent>
-        {targetIndex !== "" && (
-          <>
-            <Typography paragraph>注意事項:</Typography>
-            <Typography paragraph>
-              {targetIndex ? (
-                <p>{currentPosts[targetIndex].announcement}</p>
-              ) : (
-                <p>{currentPosts[targetIndex].announcement}</p>
-              )}
-            </Typography>
-          </>
-        )}
-      </CardContent>
-    </Collapse>
-  );
-}
+// function Expanded({ expanded, currentPosts, targetIndex }) {
+//   // console.log(targetIndex);
+//   // console.log(currentPosts[targetIndex]);
+//   return (
+//     <Collapse in={expanded} timeout='auto' unmountOnExit>
+//       <CardContent>
+//         {targetIndex !== "" && (
+//           <>
+//             <Typography paragraph>注意事項:</Typography>
+//             <Typography paragraph>
+//               {targetIndex ? (
+//                 <p>{currentPosts[targetIndex].announcement}</p>
+//               ) : (
+//                 <p>{currentPosts[targetIndex].announcement}</p>
+//               )}
+//             </Typography>
+//           </>
+//         )}
+//       </CardContent>
+//     </Collapse>
+//   );
+// }
 
 export default function ReviewCard({
   currentPosts,
   joinThisGroup,
-  groupId,
   userName,
   setIsOpen,
   modalIsOpen,
-  groupPassword,
   userId,
   setGroupId,
 }) {
@@ -275,9 +360,11 @@ export default function ReviewCard({
     setExpandedArr([...prev, cloneExpandedArr[index], ...after]);
   };
 
-  // useEffect(() => {
-  //   console.log(expandedArr);
-  // }, [expandedArr]);
+  const confirmJoinThisGroup = (index) => {
+    console.log(index);
+    setTargetIndex(index);
+    setIsOpen(true);
+  };
 
   return (
     <>
@@ -285,20 +372,21 @@ export default function ReviewCard({
         {currentPosts.map((item, index) => (
           <Card
             sx={{
-              width: "24%",
+              width: "23%",
               height: "auto",
               boxShadow:
                 "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
               borderRadius: 7.5,
               padding: 1,
-              margin: 5,
+              margin: 4,
+              marginTop: 0,
               backgroundColor: "#F4F4EE",
             }}>
             <ImgWrap>
               <CardMedia
                 sx={{
                   width: "100%",
-                  height: "230px",
+                  height: "200px",
                 }}
                 component='img'
                 height='194'
@@ -310,17 +398,17 @@ export default function ReviewCard({
             <CardContent
               sx={{
                 textAlign: "start",
-                height: "160px",
+                height: "140px",
               }}>
               <a href={`./personal_header/${item.header_id}`}>
                 <Span>團長</Span>
                 <Span>{item.header_name}</Span>
               </a>
 
-              <Font fontSize='25px' m='6px 0px 6px 0px'>
+              <Font fontSize='20px' m='6px 0px 6px 0px'>
                 {item.group_title}
               </Font>
-              <Font fontSize='16px' m='0px 0px 16px 0px'>
+              <Font fontSize='14px' m='0px 0px 16px 0px'>
                 {
                   new Date(item.start_date.seconds * 1000)
                     .toLocaleString()
@@ -353,31 +441,39 @@ export default function ReviewCard({
                 margin='auto'
                 group_id={item.group_id}
                 variant='outlined'
-                onClick={(e) => {
-                  joinThisGroup(index, item.password, item.header_name);
+                onClick={() => {
+                  confirmJoinThisGroup(index);
                 }}>
-                {item.privacy == "公開" && item.header_name !== userName && (
+                {item.status == "進行中" && <LinkOpen>我要加入</LinkOpen>}
+
+                {/* {item.privacy == "公開" && item.header_name !== userName && (
                   <LinkPrivate to={`joinGroup/${item.group_id}`}>
                     我要加入
                   </LinkPrivate>
                 )}
                 {item.privacy == "私人" && item.header_name !== userName && (
                   <LinkOpen>我要加入</LinkOpen>
+                )} */}
+                {item.status == "已結束" && (
+                  <LinkOpen style={{ cursor: "not-allowed" }}>
+                    已結束哭哭
+                  </LinkOpen>
                 )}
-                {item.header_name == userName && <LinkOpen>我要加入</LinkOpen>}
               </Button>
             </ButtonWrap>
             <IsModal
+              currentPosts={currentPosts}
               modalIsOpen={modalIsOpen}
               setIsOpen={setIsOpen}
-              groupId={groupId}
-              groupPassword={groupPassword}
+              joinThisGroup={joinThisGroup}
+              index={targetIndex}
+              header_name={item.header_name}
             />
             <CardActions disableSpacing>
               {item.select_tag
                 .map((obj) => <SelectTag>{obj}</SelectTag>)
                 .slice(0, 3)}
-              <ExpandMore
+              {/* <ExpandMore
                 sx={{ zIndex: "10" }}
                 name='gogo'
                 expand={expandedArr[index]}
@@ -389,17 +485,26 @@ export default function ReviewCard({
                 <ExpandMoreIcon
                   sx={{ pointerEvents: "none", cursor: "not-allowed" }}
                 />
-              </ExpandMore>
+              </ExpandMore> */}
             </CardActions>
-            <Expanded
+            {/* <Expanded
               expanded={expandedArr[index]}
               currentPosts={currentPosts}
               targetIndex={targetIndex}
-            />
+            /> */}
           </Card>
         ))}
       </GroupWrap>
-      <Font>找不到喜愛的？一鍵找尋你的最佳推薦露營團</Font>
+      <Wrap
+        width='90%'
+        m='20px 0px 30px 8%'
+        direction='column'
+        alignItems='start'>
+        <Img src={landingpage04} width='120px'></Img>
+        <Hr width='90%' m='0px'></Hr>
+      </Wrap>
+
+      <Font letterSpacing='3px'>找不到喜愛的？一鍵找尋你的最佳推薦露營團</Font>
       <FindGroupButton
         onClick={() => {
           setRecommendIsOpen(true);
@@ -414,6 +519,9 @@ export default function ReviewCard({
         userId={userId}
         setGroupId={setGroupId}
       />
+      <Wrap width='100%' justifyContent='end' m=' -80px 0px 0px 0px'>
+        <Img src={landingpage03} width='300px'></Img>
+      </Wrap>
     </>
   );
 }
