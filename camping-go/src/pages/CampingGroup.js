@@ -35,7 +35,7 @@ const LinkRoute = styled(Link)`
   margin: 5px 5px;
   font-size: 14px;
   color: gray;
-  margin-left: 12%;
+  margin-left: ${(props) => props.ml || "53%"};
   display: flex;
 `;
 
@@ -358,20 +358,20 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
             <LinkRoute to={`/profile/${userId}`}>
               <NavFont style={{ color: navFontColor }}>我的露營團</NavFont>
             </LinkRoute>
-            <LinkRoute to={`/personal_header/${userId}`}>
+            {/* <LinkRoute to={`/personal_header/${userId}`}>
               <NavFont
                 style={{ color: navFontColor }}
                 m='0px 0px -10px 0px'
                 fontSize='16px'>
                 開團歷史紀錄
               </NavFont>
-            </LinkRoute>
-            <LinkRoute to={`/create_group`}>
+            </LinkRoute> */}
+            <LinkRoute to={`/create_group`} ml='10%'>
               <AddIcon sx={{ marginBottom: "-10px" }}></AddIcon>
               <NavFont style={{ color: navFontColor }}>建立露營團</NavFont>
             </LinkRoute>
-            { !userId && (
-              <LinkRoute to={`/login`}>
+            {!userId && (
+              <LinkRoute to={`/login`} ml='10%'>
                 <NavFontSetGroup style={{ color: navFontColor }}>
                   登入
                 </NavFontSetGroup>
