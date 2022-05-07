@@ -400,7 +400,7 @@ export default function ReviewCard({
                 textAlign: "start",
                 height: "140px",
               }}>
-              <a href={`./personal_header/${item.header_id}`}>
+              <a href={`./profile/${item.header_id}`}>
                 <Span>團長</Span>
                 <Span>{item.header_name}</Span>
               </a>

@@ -43,7 +43,7 @@ import tent from "../image/tent.png";
 import { v4 as uuidv4 } from "uuid";
 import { UserContext } from "../utils/userContext";
 import { useNavigate } from "react-router-dom";
-
+import CampSupplies from "../component/CampSupplies";
 
 const TargetContainer = {
   display: "flex",
@@ -230,6 +230,13 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   const [currentTentId, setCurrentTentId] = useState("");
   const [alreadyTentId, setAlreadyTentId] = useState("");
   const ContextByUserId = useContext(UserContext);
+  const [campSupplies, setCampSupplies] = useState({
+    bring_person: "",
+    note: "",
+    supplies: "",
+  });
+  const [suppliesArr, setSuppliesArr] = useState([]);
+  const [addNewSuppliesSection, setAddNewSuppliesSection] = useState(false);
 
   //------------------------DND ------------------------//
 
@@ -262,9 +269,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   //     }
   //   }
   // }, []);
-
-
-
 
   const dragStart = async (e) => {
     e.dataTransfer.setData("text/plain", e.target.id);
@@ -409,16 +413,16 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
     setAllTentArr(tentsArr);
   }, []);
   //getSuppliesData
+
   useEffect(() => {
     const eventListenerpage = query(
       collection(db, "CreateCampingGroup", params.id, "supplies")
     );
     onSnapshot(eventListenerpage, (snapshot) => {
       let suppliesArr = [];
-      snapshot.docChanges().forEach(async (change) => {
-        if (change.type === "added") {
-          suppliesArr.push(change.doc.data());
-        }
+      snapshot.forEach((doc) => {
+        console.log(doc.data());
+        suppliesArr.push(doc.data());
       });
       setAllSupplies(suppliesArr);
     });
@@ -440,7 +444,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
       setRenderParticipateArr(true);
     });
   }, []);
-
 
   //getMember
   // async function getinfo(id) {
@@ -529,8 +532,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
         member: allMemberArr,
         create_time: serverTimestamp(),
       }
-    )
-    .then(async () => {
+    ).then(async () => {
       let tentsArr = [];
       const citiesRef = collection(db, "CreateCampingGroup", params.id, "tent");
       const q = query(citiesRef, orderBy("create_time", "desc"));
@@ -543,6 +545,26 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
       console.log(tentsArr);
     });
     setAllMemberArr("");
+  };
+
+  const addSupplies = async () => {
+    // setSuppliesArr((prev) => [...prev, 1]);
+    const ondocRefNewSupplies = doc(
+      collection(db, "CreateCampingGroup", params.id, "supplies")
+    );
+    await setDoc(ondocRefNewSupplies, campSupplies);
+    updateDoc(
+      doc(
+        db,
+        "CreateCampingGroup",
+        params.id,
+        "supplies",
+        ondocRefNewSupplies.id
+      ),
+      {
+        supplies_id: ondocRefNewSupplies.id,
+      }
+    );
   };
 
   //------------------------FIX ME ------------------------//
@@ -902,10 +924,10 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                   marginTop: 3,
                   marginBottom: 5,
                 }}>
-                <Font fontSize='20px' alignSelf='start'>
+                <Font fontSize='20px' alignSelf='start' m="0px 0px 30px 0px">
                   新增帳篷
                 </Font>
-                <Display>
+                <Display justifyContent="center">
                   <Tent
                     setTentInfo={setTentInfo}
                     tentInfo={tentInfo}
@@ -981,17 +1003,54 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
               </Box>
             </Box>
           </Display>
-          <Button
-            width='80px'
-            height='80px'
-            borderRadius='50%'
-            fontSize='30px'
-            bgc='#426765'
-            color='#CFC781'
-            boxShadow='none'
-            ml='20px'>
-            +
-          </Button>
+          <Display justifyContent='end'>
+            <Button
+              width='80px'
+              height='80px'
+              borderRadius='50%'
+              fontSize='30px'
+              bgc='#426765'
+              color='#CFC781'
+              boxShadow='none'
+              ml='20px'
+              onClick={() => {
+                setAddNewSuppliesSection(true);
+              }}>
+              +
+            </Button>
+          </Display>
+          {addNewSuppliesSection && (
+            <Box
+              sx={{
+                width: "100%",
+                height: "auto",
+                boxShadow:
+                  "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+                borderRadius: 10,
+                padding: 3,
+                paddingLeft: 6,
+                alignItems: "center",
+                marginTop: 3,
+                marginBottom: 5,
+              }}>
+                <Font m="0px 0px 30px 0px">新增需要團員們認領的物品</Font>
+                  <Display justifyContent="center" mb="30px">
+                    <CampSupplies
+                      setCampSupplies={setCampSupplies}
+                      campSupplies={campSupplies}
+                    />
+                    {suppliesArr.map((_, index) => (
+                      <div key={index}>
+                        <CampSupplies
+                          setCampSupplies={setCampSupplies}
+                          campSupplies={campSupplies}
+                        />
+                      </div>
+                    ))}
+                  </Display>
+                  <Button onClick={addSupplies} width="100px">新增</Button>
+            </Box>
+          )}
 
           <Cloumn>
             <Font fontSize='20px'>團員</Font>
