@@ -985,6 +985,17 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
               </Box>
             </Box>
           </Display>
+          <Button
+            width='80px'
+            height='80px'
+            borderRadius='50%'
+            fontSize='30px'
+            bgc='#426765'
+            color='#CFC781'
+            boxShadow='none'
+            ml='20px'>
+            +
+          </Button>
 
           <Cloumn>
             <Font fontSize='20px'>團員</Font>

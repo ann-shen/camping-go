@@ -484,7 +484,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     });
 
     alert("已成功建立");
-    // navigate("/");
+    navigate("/");
   };
 
   useEffect(() => {

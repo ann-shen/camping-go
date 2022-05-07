@@ -744,7 +744,7 @@ export default function Profile({ userName, userId, getLogout }) {
             width='500px'
             direction='column'
             alignItems='start'
-            m='0px 0px 0px 20px'
+            m='0px 0px 0px 60px'
             boxShadow='none'>
             <Font
               fontSize='40px'

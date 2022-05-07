@@ -28,7 +28,6 @@ import PaginationBar from "../component/Pagination";
 import ReviewCard from "../component/ReviewCard";
 import AddIcon from "@mui/icons-material/Add";
 
-
 Modal.setAppElement("#root");
 
 const LinkRoute = styled(Link)`
@@ -36,7 +35,7 @@ const LinkRoute = styled(Link)`
   margin: 5px 5px;
   font-size: 14px;
   color: gray;
-  margin-left: 9%;
+  margin-left: 12%;
   display: flex;
 `;
 
@@ -242,8 +241,6 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     }));
   }, []);
 
-  
-
   const indexOfLastPost = pagination.currentPage * pagination.posts_per_page;
   const indexOfFirstPost = indexOfLastPost - pagination.posts_per_page;
   const currentPosts = homePageCampGroup.slice(
@@ -370,14 +367,16 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
               </NavFont>
             </LinkRoute>
             <LinkRoute to={`/create_group`}>
-              <AddIcon sx={{marginBottom:"-10px"}}></AddIcon>
+              <AddIcon sx={{ marginBottom: "-10px" }}></AddIcon>
               <NavFont style={{ color: navFontColor }}>建立露營團</NavFont>
             </LinkRoute>
-            <LinkRoute to={`/login`}>
-              <NavFontSetGroup style={{ color: navFontColor }}>
-                登入
-              </NavFontSetGroup>
-            </LinkRoute>
+            { !userId && (
+              <LinkRoute to={`/login`}>
+                <NavFontSetGroup style={{ color: navFontColor }}>
+                  登入
+                </NavFontSetGroup>
+              </LinkRoute>
+            )}
           </LogoImgWrap>
         </nav>
 

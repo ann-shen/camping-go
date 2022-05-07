@@ -20,7 +20,7 @@ const LogoImg = styled.img`
 const ALink = styled(Link)`
   color: #797659;
   text-decoration: none;
-  font-size: 20px;
+  font-size: 16px;
   margin-right: 50px;
 `;
 
