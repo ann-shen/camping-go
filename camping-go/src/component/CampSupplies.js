@@ -26,7 +26,7 @@ function CampSupplies({ setCampSupplies, campSupplies }) {
   return (
     <Wrap width='auto' direction='column' alignItems='start' m="10px 30px 0px 0px">
       <Font fontSize='14px' marginLeft='10px'>
-        備註
+        新增物品
       </Font>
       <TextField
         sx={{ marginBottom: "30px", marginTop: "5px" }}
@@ -34,7 +34,7 @@ function CampSupplies({ setCampSupplies, campSupplies }) {
         onChange={handleChange}
         size='small'></TextField>
       <Font fontSize='14px' marginLeft='10px'>
-        新增物品
+        備註
       </Font>
       <TextField name='note' onChange={handleChange} size='small'></TextField>
     </Wrap>

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import logo from "../image/logo.png";
 import { Link } from "react-router-dom";
-import { Label, AddButton, Font, Img, Display, Button } from "../css/style";
+import { Display } from "../css/style";
 
 const Nav = styled.div`
   background-color: #cfc781;
@@ -33,8 +33,9 @@ function Header({ ContextByUserId }) {
           <LogoImg src={logo}></LogoImg>
         </ALink>
         <Display>
-          <ALink to={`/profile/${ContextByUserId}`}>我的露營趴</ALink>
-          <ALink to={`/login`}>登入</ALink>
+          <ALink to={`/create_group`}>建立露營團</ALink>
+          {!ContextByUserId && <ALink to={`/login`}>登入</ALink>}
+          <ALink to={`/profile/${ContextByUserId}`}>我的露營團</ALink>
           {/* <ALink to={`/personal_header/${ContextByUserId}`}>開團歷史紀錄</ALink> */}
         </Display>
       </Nav>

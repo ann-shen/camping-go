@@ -94,7 +94,8 @@ export const Button = styled.button`
   background-color: ${(props) => props.bgc || "#eae5be"};
   font-size: ${(props) => props.fontSize || "16px"};
   color: ${(props) => props.color || "#797659"};
-  border: ${(props) => props.mt || "none"};
+  border: ${(props) => props.border || "none"};
+  cursor: ${(props) => props.cursor || "pointer"};
   /* box-shadow: ${(props) =>
     props.boxShadow ||
     "inset 0.2rem 0.2rem 1rem #FFFEF4, inset -0.2rem -0.2rem 1rem #DCD8B3, 0.2rem 0.2rem 0.6rem #D7D2AE, -0.2rem -0.2rem 0.5rem #ffffff"}; */

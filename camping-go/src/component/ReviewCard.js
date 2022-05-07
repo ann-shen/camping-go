@@ -150,12 +150,14 @@ function IsModal({
 
   const checkPassword = (e) => {
     if (value == currentPosts[index].password) {
+      joinThisGroup(index, currentPosts[index].header_name);
       navigate(`/joinGroup/${currentPosts[index].group_id}`);
     } else {
       setAlert(true);
     }
   };
   console.log(currentPosts[index]);
+  console.log(header_name);
 
   return (
     <div className='App'>
@@ -210,7 +212,7 @@ function IsModal({
                     mt='30px'
                     ml='20px'
                     onClick={() => {
-                      joinThisGroup(index, header_name);
+                      joinThisGroup(index, currentPosts[index].header_name);
                     }}>
                     確認加入
                   </Button>
@@ -400,7 +402,7 @@ export default function ReviewCard({
                 textAlign: "start",
                 height: "140px",
               }}>
-              <a href={`./profile/${item.header_id}`}>
+              <a href={`./personal_header/${item.header_id}`}>
                 <Span>團長</Span>
                 <Span>{item.header_name}</Span>
               </a>
@@ -446,14 +448,7 @@ export default function ReviewCard({
                 }}>
                 {item.status == "進行中" && <LinkOpen>我要加入</LinkOpen>}
 
-                {/* {item.privacy == "公開" && item.header_name !== userName && (
-                  <LinkPrivate to={`joinGroup/${item.group_id}`}>
-                    我要加入
-                  </LinkPrivate>
-                )}
-                {item.privacy == "私人" && item.header_name !== userName && (
-                  <LinkOpen>我要加入</LinkOpen>
-                )} */}
+                
                 {item.status == "已結束" && (
                   <LinkOpen style={{ cursor: "not-allowed" }}>
                     已結束哭哭

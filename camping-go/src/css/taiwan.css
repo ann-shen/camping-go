@@ -4,13 +4,13 @@
 svg {
   height: 80vh; }
 
-path {
+.taiwan {
   stroke: #CDC789;
   stroke-width:2;
   fill: transparent;
   transition: 0.5s;
   cursor: pointer; }
-  path:hover {
+.taiwan:hover {
     fill: #CDC789;
     transform: translate(-5px, -5px); }
 
@@ -18,4 +18,58 @@ path {
       fill: #B99362;
     } */
 
+.taipei_city{
+  fill: #E9E5C2;
+}
 
+.new_taipei_city{
+  fill: #FFFEF0;
+}
+
+.keelung_city{
+  fill: #F2EFE4;
+}
+
+.hsinchu_country{
+  fill: #E9E5C2;
+}
+.taitung_country{
+  fill: #E9E5C2;
+}
+
+.chiayi_country{
+  fill: #E8E6C7;
+}
+
+.pingtung_country{
+  fill: #F2EFE4;
+}
+
+.yilan_country{
+  fill: #F2EFE4;
+}
+
+.hualien_country{
+  fill: #F2EFE4;
+}
+
+.taichung_city{
+  fill: #F2EFE4;
+}
+
+.changhua_country{
+  fill: #F2EFE4;
+  }
+
+.taoyuan_country{
+  fill: #F2EFE4;
+}
+
+.hsinchu_city, .tainan_city{
+  fill:#F2EFE4
+}
+
+.miaoli_country, .nantou_country, .yunlin_country, .kaohsiung_city{
+  fill: #FFFEF0;
+  
+}
