@@ -49,76 +49,78 @@ export default function MultipleSelectChip({ userId, path, groupId }) {
   const theme = useTheme();
   const [personName, setPersonName] = useState([]);
   // const [chosenTag, setChosenTag] = useState([]);
-  
+console.log(groupId);
   useEffect(async () => {
-    if (path == "/createGroup") {
+    if (path == "/create_group") {
+      console.log("create");
       await updateDoc(doc(db, "CreateCampingGroup", groupId), {
         select_tag: personName,
       });
     }
   }, [personName]);
 
+  console.log(personName);
+
   useEffect(async () => {
-    const docRef = doc(db, "joinGroup", userId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      // setChosenTag(docSnap.data().select_tag);
-      setPersonName(docSnap.data().select_tag);
-    } else {
-      console.log("No such document!");
+    if (path !== "/create_group") {
+      const docRef = doc(db, "joinGroup", userId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        // setChosenTag(docSnap.data().select_tag);
+        setPersonName(docSnap.data().select_tag);
+      } else {
+        console.log("No such document!");
+      }
     }
   }, []);
-
-
 
   const handleChange = async (event) => {
     const value = event.target.value;
     setPersonName(value, value.toString().split(",")[value.length - 1]);
     // typeof value === "string" ? value.split(",") : value;
 
-    await updateDoc(doc(db, "joinGroup", userId), {
-      select_tag: arrayUnion(value.toString().split(",")[value.length - 1]),
-    });
+    if (path !== "/create_group") {
+      await updateDoc(doc(db, "joinGroup", userId), {
+        select_tag: arrayUnion(value.toString().split(",")[value.length - 1]),
+      });
+    }
   };
 
   return (
-    <div>
-      <FormControl sx={{ ml: 3, mt: 2, width: "500px" }}>
-        <InputLabel id='demo-multiple-chip-label'>喜愛</InputLabel>
-
-        <Select
-          labelId='demo-multiple-chip-label'
-          id='demo-multiple-chip'
-          multiple
-          value={personName}
-          onChange={handleChange}
-          input={<OutlinedInput id='select-multiple-chip' label='Chip' />}
-          renderValue={(selected) => (
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              {selected.map((value) => (
-                <Chip
-                  sx={{
-                    backgroundColor: "#F4F4EE",
-                    border: " 2px solid #cfc781",
-                    color: "#426765",
-                  }}
-                  key={value}
-                  label={value}
-                />
-              ))}
-            </Box>
-          )}
-          MenuProps={MenuProps}>
-          {names.map((name) => (
-            <MenuItem
-              key={name}
-              value={name}
-              style={getStyles(name, personName, theme)}>
-              {name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </div>
+    <FormControl sx={{ ml: 0, mt: 0, width: "100%" }} size='small'>
+      <InputLabel id='demo-multiple-chip-label'>喜愛</InputLabel>
+      <Select
+        labelId='demo-multiple-chip-label'
+        id='demo-multiple-chip'
+        multiple
+        value={personName}
+        onChange={handleChange}
+        input={<OutlinedInput id='select-multiple-chip' label='Chip' />}
+        renderValue={(selected) => (
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            {selected.map((value) => (
+              <Chip
+                sx={{
+                  backgroundColor: "#F4F4EE",
+                  border: " 2px solid #cfc781",
+                  color: "#426765",
+                }}
+                key={value}
+                label={value}
+              />
+            ))}
+          </Box>
+        )}
+        MenuProps={MenuProps}>
+        {names.map((name) => (
+          <MenuItem
+            key={name}
+            value={name}
+            style={getStyles(name, personName, theme)}>
+            {name}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 }

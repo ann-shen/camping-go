@@ -52,7 +52,7 @@ export const Wrap = styled.div`
   padding-bottom: ${(props) => props.paddingBottom || "0px"};
   box-shadow: ${(props) =>
     props.boxShadow ||
-    "0.8rem 0.8rem 3.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff"};
+    "none"};
   background-color: ${(props) => props.bgc || "none"};
 `;
 
@@ -118,4 +118,10 @@ export const Cloumn = styled.div`
   display: flex;
   flex-direction: column;
   align-items: start;
+`;
+
+export const Hr = styled.hr`
+  width: ${(props) => props.width || "60px"};
+  border: ${(props) => props.border || " 1px solid #CFC781"};
+  margin: ${(props) => props.m || "10px 0px"};
 `;

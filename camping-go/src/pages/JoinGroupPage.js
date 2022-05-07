@@ -29,6 +29,7 @@ import {
   Cloumn,
   Wrap,
   Tag,
+  Hr,
 } from "../css/style";
 import Tent from "../component/Tent";
 import Header from "../component/Header";
@@ -36,28 +37,32 @@ import { Box, Paper } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import location from "../image/location.png";
+import alert from "../image/alert.png";
+import tentColor from "../image/tentColor.png";
 import tent from "../image/tent.png";
 import { v4 as uuidv4 } from "uuid";
 import { UserContext } from "../utils/userContext";
+import { useNavigate } from "react-router-dom";
+
 
 const TargetContainer = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  border: "3px dotted #426765",
+  border: "2.3px dashed #426765",
   width: "60px",
-  height: "60px",
+  height: "55px",
   backgroundColor: "#f5f4e8",
-  borderRadius: "10px",
+  borderRadius: "18px",
   margin: "10px",
   paddingTop: "5px",
 };
 
 const SourseContainer = styled.div`
   display: flex;
-  justify-content: start;
+  justify-content: space-between;
   align-items: center;
-  width: 300px;
+  width: auto;
   height: 80px;
   margin: 10px;
 `;
@@ -66,11 +71,16 @@ const PersonWrap = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 50px;
-  height: 50px;
-  background-color: white;
-  border: 2px solid #797659;
-  border-radius: 5px;
+  width: 60px;
+  height: 60px;
+  background-color: rgb(245, 244, 232);
+  border: 2px solid #cfc781;
+  border-radius: 18px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #eae5be;
+  }
 `;
 
 const pulse = keyframes`
@@ -87,11 +97,12 @@ const pulse = keyframes`
 const AnimationIndicators = styled.span`
   position: relative;
   display: inline-block;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 60%;
+  margin-left: 20px;
   background: #ffda72;
+  z-index: -1;
   &:before {
     background: #ffda72;
     content: "";
@@ -99,8 +110,8 @@ const AnimationIndicators = styled.span`
     position: absolute;
     left: -5px;
     top: -5px;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     animation: ${pulse} 1.5s infinite ease-in;
   }
@@ -113,16 +124,16 @@ const GroupTitle = styled.div`
 
 const HeaderName = styled.div`
   width: 130px;
-  height: 30px;
+  height: 25px;
   border-radius: 10px;
-  padding-top: 7px;
+  padding-top: 3px;
   background-color: #426765;
   color: white;
 `;
 
 const ImagesWrap = styled.div`
-  width: 500px;
-  height: 300px;
+  width: 100%;
+  height: 400px;
   border-radius: 20px;
   margin: 40px 0px;
   overflow: hidden;
@@ -132,7 +143,7 @@ const ImagesWrap = styled.div`
 `;
 
 const GroupImg = styled.img`
-  width: 105%;
+  width: 100%;
 `;
 
 const ProfileImgWrap = styled.div`
@@ -162,10 +173,47 @@ const AllMemberWrap = styled.div`
   justify-content: start;
   align-items: center;
   padding: 10px;
-  margin-top: 50px;
 `;
 
-function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
+const FontDetail = styled.p`
+  font-size: 16px;
+  line-height: 30px;
+  color: #797659;
+`;
+
+const TentIndexNumber = styled.p`
+  font-size: 25px;
+  color: #797659;
+  position: absolute;
+  top: 20px;
+  left: 40px;
+`;
+
+const TentSectionWrap = styled.div`
+  width: 100%;
+  display: flex;
+  /* justify-content:center; */
+  flex-wrap: wrap;
+`;
+
+const IsMemberInTheTentFont = styled.p`
+  font-size: 22px;
+  color: #cfc781;
+  font-weight: 900;
+  margin: 0px;
+  padding-right: 5px;
+`;
+
+const SuppliesWrap = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  margin: 10px 0px 0px 6%;
+  border-bottom: 1px dashed #f3ea98;
+  padding-bottom: 20px;
+`;
+
+function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   const [homePageCampGroup, setHomePageCampGroup] = useState("");
   const [allTentArr, setAllTentArr] = useState([]);
   const [allSupplies, setAllSupplies] = useState([]);
@@ -182,13 +230,41 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
   const [currentTentId, setCurrentTentId] = useState("");
   const [alreadyTentId, setAlreadyTentId] = useState("");
   const ContextByUserId = useContext(UserContext);
-  
 
   //------------------------DND ------------------------//
 
   const dragSource = useRef();
   const dropTarget = useRef();
+  const navigate = useNavigate();
+
   let params = useParams();
+
+  // useEffect(async () => {
+  //   if (!userId) {
+  //     navigate("/");
+  //     console.log("return");
+  //     return;
+  //   } else{
+  //     const docRefMember = collection(
+  //       db,
+  //       "CreateCampingGroup",
+  //       params.id,
+  //       "member"
+  //     );
+  //     const querySnapshot = await getDocs(docRefMember);
+  //     let memberArr = [];
+  //     querySnapshot.forEach((doc) => {
+  //       console.log(doc.data().member_id);
+  //       memberArr.push(doc.data().member_id);
+  //     });
+  //     if (memberArr.includes(userId) == false) {
+  //       navigate("/");
+  //     }
+  //   }
+  // }, []);
+
+
+
 
   const dragStart = async (e) => {
     e.dataTransfer.setData("text/plain", e.target.id);
@@ -365,6 +441,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     });
   }, []);
 
+
   //getMember
   // async function getinfo(id) {
   //   const docRef = doc(db, "joinGroup", id);
@@ -408,14 +485,14 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
     const querySnapshot = await getDocs(q);
     let thisGroupMemberArr = [];
     querySnapshot.forEach((doc) => {
-      console.log(doc.data().info)
+      console.log(doc.data().info);
       thisGroupMemberArr.push(doc.data());
     });
-    console.log(thisGroupMemberArr);
+    // console.log(thisGroupMemberArr);
     setThisGroupMember(thisGroupMemberArr);
   }, []);
 
-  console.log(thisGroupMember);
+  // console.log(thisGroupMember);
 
   const takeAway = async (id) => {
     console.log(id);
@@ -452,18 +529,18 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
         member: allMemberArr,
         create_time: serverTimestamp(),
       }
-    ).then(async () => {
+    )
+    .then(async () => {
       let tentsArr = [];
       const citiesRef = collection(db, "CreateCampingGroup", params.id, "tent");
       const q = query(citiesRef, orderBy("create_time", "desc"));
-      const querySnapshot = await getDocs(
-        collection(db, "CreateCampingGroup", params.id, "tent")
-      );
+      const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
         console.log(doc.id, " => ", doc.data());
         tentsArr.push(doc.data());
       });
       setAllTentArr(tentsArr);
+      console.log(tentsArr);
     });
     setAllMemberArr("");
   };
@@ -482,7 +559,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
 
         <Box
           sx={{
-            width: "75%",
+            width: "70%",
             height: "auto",
             // boxShadow:
             //   "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
@@ -508,23 +585,28 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             <Display alignItems='center' m='20px 0px '>
               <Img src={location} width='20px'></Img>
               {homePageCampGroup.city && (
-                <Font marginLeft='8px'>{homePageCampGroup.city} | </Font>
+                <Font marginLeft='15px'>{homePageCampGroup.city} | </Font>
               )}
               <Label mt='0px'>
-                {homePageCampGroup &&
-                  new Date(homePageCampGroup.start_date.seconds * 1000)
-                    .toLocaleString()
-                    .split(" ")[0]}
-                ~
-                {homePageCampGroup &&
-                  new Date(homePageCampGroup.end_date.seconds * 1000)
-                    .toLocaleString()
-                    .split(" ")[0]}
+                {homePageCampGroup && (
+                  <Font fontSize='18px' letterSpacing='2px' marginLeft='15px'>
+                    {
+                      new Date(homePageCampGroup.start_date.seconds * 1000)
+                        .toLocaleString()
+                        .split(" ")[0]
+                    }
+                    ~
+                    {homePageCampGroup &&
+                      new Date(homePageCampGroup.end_date.seconds * 1000)
+                        .toLocaleString()
+                        .split(" ")[0]}
+                  </Font>
+                )}
               </Label>
             </Display>
           </GroupTitle>
           <Display justifyContent='space-between'>
-            <Font fontSize='35px' letterSpacing='3px'>
+            <Font fontSize='30px' letterSpacing='3px' m='10px 0px 0px 0px '>
               {homePageCampGroup.group_title}
             </Font>
             <Font fontSize='30px' letterSpacing='3px'>
@@ -544,18 +626,21 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             <Box
               sx={{
                 width: "50%",
-                height: "200px",
+                height: "140px",
                 borderRadius: 15,
-                padding: 5,
+                padding: 3,
+                paddingBottom: 8,
+                paddingLeft: 7,
                 marginTop: 3,
                 justifyContent: "start",
                 backgroundColor: "#426765",
+                alignItems: "center",
               }}>
               <Cloumn>
                 <Font fontSize='20px' m='10px 0px' color='#F3EA98'>
                   詳細地址
                 </Font>
-                <Font fontSize='20px' m='0px 0px 25px 0px' color='#F3EA98'>
+                <Font fontSize='16px' m='0px 0px 25px 0px' color='#F3EA98'>
                   {homePageCampGroup.position}
                 </Font>
               </Cloumn>
@@ -564,7 +649,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                   <Font fontSize='20px' m='10px 0px' color='#F3EA98'>
                     營區網站
                   </Font>
-                  <Font fontSize='20px' color='#F3EA98'>
+                  <Font fontSize='16px' color='#F3EA98'>
                     {homePageCampGroup.site}
                   </Font>
                 </Cloumn>
@@ -574,19 +659,17 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             <Box
               sx={{
                 width: "30%",
-                height: "200px",
-                boxShadow:
-                  "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-                borderRadius: 10,
+                height: "140px",
+                borderRadius: 15,
+                border: "2px solid #CFC781",
                 padding: 5,
                 marginTop: 3,
                 marginLeft: 5,
                 justifyContent: "start",
               }}>
               <Cloumn>
-                <Font fontSize='20px' m='10px'>
-                  集合時間
-                </Font>
+                <Font fontSize='20px'>集合時間</Font>
+                <Hr width='280px'></Hr>
                 <Font fontSize='20px'>
                   {homePageCampGroup &&
                     new Date(homePageCampGroup.meeting_time.seconds * 1000)
@@ -609,118 +692,161 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
               </Cloumn>
             </Box>
           </Display>
+          <Display>
+            <Box
+              sx={{
+                width: "60%",
+                height: "auto",
+                marginTop: 6,
+                marginBottom: 8,
+                justifyContent: "start",
+                textAlign: "start",
+              }}>
+              <Cloumn>
+                <Font fontSize='20px'>介紹</Font>
+                <Hr width='100px'></Hr>
+                <FontDetail>{homePageCampGroup.announcement}</FontDetail>
+              </Cloumn>
+            </Box>
+            <Box
+              sx={{
+                width: "38%",
+                height: "140px",
+                marginLeft: 7,
+                justifyContent: "start",
+                textAlign: "start",
+              }}>
+              <Cloumn>
+                <Display mb='20px'>
+                  <Img src={alert} alt='' width='40px' />
+                  <Font fontSize='16px' marginLeft='10px'>
+                    營區提供租借帳篷
+                  </Font>
+                </Display>
+                <Display mb='20px'>
+                  <Img src={alert} alt='' width='40px' />
+                  <Font fontSize='16px' marginLeft='10px'>
+                    自行準備晚餐/隔天早餐
+                  </Font>
+                </Display>
+                <Display mb='20px'>
+                  <Img src={alert} alt='' width='40px' />
+                  <Font fontSize='16px' marginLeft='10px'>
+                    營區提供租借帳篷
+                  </Font>
+                </Display>
+              </Cloumn>
+            </Box>
+          </Display>
 
-          <Box
-            sx={{
-              width: "95%",
-              height: "auto",
-              boxShadow:
-                "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-              borderRadius: 10,
-              padding: 2,
-              marginTop: 8,
-              marginBottom: 8,
-              justifyContent: "start",
-            }}>
-            <Cloumn>
-              <Font fontSize='16px'>公告</Font>
-              <Font fontSize='16px'>{homePageCampGroup.announcement}</Font>
-            </Cloumn>
-          </Box>
           <Cloumn>
-            <Font fontSize='30px'>加入帳篷</Font>
-            <Font fontSize='16px'>
+            <Font fontSize='20px'>加入帳篷</Font>
+            <Hr width='100px'></Hr>
+            <Font fontSize='14px'>
               請選擇想加入的帳篷！如有自備帳篷請按加號，並輸入預計可容納人數。
             </Font>
           </Cloumn>
-          <Display justifyContent='center'>
+          <TentSectionWrap justifyContent='center'>
             {allTentArr.map((item, index) => (
               <Box
                 sx={{
-                  width: "100%",
-                  height: "350px",
-                  boxShadow:
-                    "0.3rem 0.3rem 0.8rem #E0DCBA , -0.5rem -0.5rem 0.6rem #ffffff",
-                  borderRadius: 10,
-                  paddingTop: 5,
-                  paddingBottom: 5,
-                  margin: 2,
-                  backgroundColor: "#EAE5BE",
+                  width: "47%",
+                  height: "330px",
+                  borderRadius: 15,
+                  paddingTop: 2,
+                  paddingBottom: 2,
+                  margin: 3,
+                  marginLeft: 0,
+                  border: "2px solid #CFC781",
+                  position: "relative",
                 }}>
-                <Font>{index + 1}</Font>
+                <TentIndexNumber>{index + 1}</TentIndexNumber>
                 <Display key={index} direction='column'>
-                  <Img src={tent}></Img>
+                  <Img src={tentColor} width='200px'></Img>
                   <Label fontSize='35px'>
                     {item.current_number}/{item.max_number}
                   </Label>
-                  <Font fontSize='16px'>
+                  <Font fontSize='16px' letterSpacing='2px'>
                     還有
                     {Number(item.max_number) - Number(item.current_number)}
                     個位置
                   </Font>
-                  <Display>
-                    {item.member &&
-                      item.member.map((seat, index) => (
-                        <Display direction='column' justifyContent='center'>
-                          <Font margin='10px' marginLeft='10px'>
-                            {seat !== userName && <div>{seat}</div>}
-                            {seat === userName && <div>{seat}</div>}
-                          </Font>
-                          {seat !== userName && (
-                            <AccountCircleIcon
-                              key={index}
-                              color='primary'
-                              fontSize='large'></AccountCircleIcon>
-                          )}
-                          {seat === userName && (
-                            <PersonWrap
+                  <Display m='20px 0px 0px 0px'>
+                    <Display>
+                      {item.member &&
+                        item.member.map((seat, index) => (
+                          <Display
+                            direction='column'
+                            justifyContent='center'
+                            alignItems='center'
+                            m='0px 10px 10px 0px'
+                            mb='20px'>
+                            <Font margin='10px' marginLeft='10px'>
+                              {seat !== userName && (
+                                <Font fontSize='18px' m='0px 0px 20px 0px'>
+                                  {seat}
+                                </Font>
+                              )}
+                              {seat === userName && (
+                                <IsMemberInTheTentFont>
+                                  {seat}
+                                </IsMemberInTheTentFont>
+                              )}
+                            </Font>
+                            {seat !== userName && (
+                              <AccountCircleIcon
+                                key={index}
+                                color='primary'
+                                fontSize='large'></AccountCircleIcon>
+                            )}
+                            {seat === userName && (
+                              <PersonWrap
+                                data-key={item.tent_id}
+                                id='drag-source'
+                                draggable='true'
+                                onDragStart={dragStart}>
+                                <AssignmentIndIcon
+                                  sx={{
+                                    pointerEvents: "none",
+                                    cursor: "not-allowed",
+                                  }}
+                                  fontSize='large'></AssignmentIndIcon>
+                              </PersonWrap>
+                            )}
+                          </Display>
+                        ))}
+                    </Display>
+                    <Display>
+                      {Array(
+                        Number(item.max_number) - Number(item.current_number)
+                      )
+                        .fill(null)
+                        .map(() => (
+                          <label key={uuidv4()}>
+                            <div
                               data-key={item.tent_id}
-                              id='drag-source'
-                              draggable='true'
-                              onDragStart={dragStart}>
-                              <AssignmentIndIcon
-                                sx={{
-                                  pointerEvents: "none",
-                                  cursor: "not-allowed",
-                                }}
-                                fontSize='large'></AssignmentIndIcon>
-                            </PersonWrap>
-                          )}
-                        </Display>
-                      ))}
-                  </Display>
-                  <Display>
-                    {Array(
-                      Number(item.max_number) - Number(item.current_number)
-                    )
-                      .fill(null)
-                      .map(() => (
-                        <label key={uuidv4()}>
-                          <div
-                            data-key={item.tent_id}
-                            style={TargetContainer}
-                            ref={dropTarget}
-                            onDrop={drop}
-                            onDragEnter={onDragEnter}
-                            onDragOver={onDragOver}
-                            onDragLeave={onDragLeave}></div>
-                        </label>
-                      ))}
+                              style={TargetContainer}
+                              ref={dropTarget}
+                              onDrop={drop}
+                              onDragEnter={onDragEnter}
+                              onDragOver={onDragOver}
+                              onDragLeave={onDragLeave}></div>
+                          </label>
+                        ))}
+                    </Display>
                   </Display>
                 </Display>
               </Box>
             ))}
-          </Display>
+          </TentSectionWrap>
           <Box
             sx={{
               width: "auto",
               height: "auto",
-              boxShadow:
-                "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
               borderRadius: 10,
-              padding: 2,
-              marginTop: 8,
-              marginBottom: 8,
+              padding: 0,
+              marginTop: 0,
+              marginBottom: 5,
             }}>
             <SourseContainer id='source-container' ref={dragSource}>
               {!IsMemberInTheTent && (
@@ -735,37 +861,126 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
                 </PersonWrap>
               )}
               <Display>
-                <Font fontSize='14px'>拖移小人偶至指定帳篷</Font>
                 <AnimationIndicators />
+                <Font fontSize='14px' marginLeft='10px'>
+                  拖移小人偶至帳篷
+                </Font>
+              </Display>
+              <Display>
+                <Cloumn>
+                  <Font fontSize='14px'>有自帶帳篷？</Font>
+                  <Font fontSize='14px'>請按新增按鈕</Font>
+                </Cloumn>
+
+                <Button
+                  width='80px'
+                  height='80px'
+                  borderRadius='50%'
+                  fontSize='30px'
+                  bgc='#426765'
+                  color='#CFC781'
+                  boxShadow='none'
+                  ml='20px'
+                  onClick={handleAddTentSection}>
+                  +
+                </Button>
               </Display>
             </SourseContainer>
           </Box>
-          {addNewTentSection && (
-            <Box
-              sx={{
-                width: "auto",
-                height: "auto",
-                boxShadow:
-                  "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-                borderRadius: 10,
-                padding: 2,
-                marginTop: 8,
-                marginBottom: 8,
-              }}>
-              <Tent
-                setTentInfo={setTentInfo}
-                tentInfo={tentInfo}
-                setAllMemberArr={setAllMemberArr}
-                allMemberArr={allMemberArr}
-              />
-              <AddButton onClick={addNewTent}>新增</AddButton>
-              {/* {tentArr.map((_, index) => (
+          <Wrap width='100%'>
+            {addNewTentSection && (
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "auto",
+                  boxShadow:
+                    "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+                  borderRadius: 10,
+                  padding: 3,
+                  paddingLeft: 6,
+                  alignItems: "center",
+                  marginTop: 3,
+                  marginBottom: 5,
+                }}>
+                <Font fontSize='20px' alignSelf='start'>
+                  新增帳篷
+                </Font>
+                <Display>
+                  <Tent
+                    setTentInfo={setTentInfo}
+                    tentInfo={tentInfo}
+                    setAllMemberArr={setAllMemberArr}
+                    allMemberArr={allMemberArr}
+                  />
+                  <Button width='100px' onClick={addNewTent}>
+                    新增
+                  </Button>
+                </Display>
+                {/* {tentArr.map((_, index) => (
             <div key={index}>
               <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
             </div>
           ))} */}
+              </Box>
+            )}
+          </Wrap>
+          <Cloumn>
+            <Font fontSize='20px'>需要大家幫忙帶的用品</Font>
+            <Hr width='100px'></Hr>
+            <Font fontSize='14px'>
+              請選擇能幫忙帶的露營用品，有你的幫忙，讓這次旅程更完整～
+            </Font>
+          </Cloumn>
+
+          <Display>
+            <Box
+              sx={{
+                width: "100%",
+                height: "auto",
+                borderRadius: 15,
+                padding: 5,
+                marginTop: 3,
+                marginBottom: 5,
+                justifyContent: "start",
+                backgroundColor: "#426765",
+              }}>
+              <Box>
+                <Display justifyContent='start'>
+                  <Font color='#F4F4EE' marginLeft='10%'>
+                    項目
+                  </Font>
+                  <Font color='#F4F4EE' marginLeft='20%'>
+                    備註
+                  </Font>
+                  <Font color='#F4F4EE' marginLeft='20%'>
+                    認領
+                  </Font>
+                </Display>
+                {allSupplies.map((item, index) => (
+                  <SuppliesWrap key={index}>
+                    <Label fontSize='16px' color='#F3EA98' ml='5%'>
+                      {item.supplies}
+                    </Label>
+                    <Label fontSize='16px' ml='20%' color='#F3EA98'>
+                      {item.note}
+                    </Label>
+                    <Label ml='20%' color='#F3EA98'>
+                      {item.bring_person}
+                    </Label>
+                    <Button
+                      width='150px'
+                      fontSize='16px'
+                      ml='20%'
+                      onClick={() => {
+                        takeAway(item.supplies_id);
+                      }}>
+                      我可以幫忙帶
+                    </Button>
+                  </SuppliesWrap>
+                ))}
+              </Box>
             </Box>
-          )}
+          </Display>
           <Button
             width='80px'
             height='80px'
@@ -774,66 +989,14 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName }) {
             bgc='#426765'
             color='#CFC781'
             boxShadow='none'
-            ml='90%'
-            onClick={handleAddTentSection}>
+            ml='20px'>
             +
           </Button>
 
-          <Display>
-            <Box
-              sx={{
-                width: "100%",
-                height: "200px",
-                borderRadius: 15,
-                padding: 5,
-                marginTop: 3,
-                justifyContent: "start",
-                backgroundColor: "#426765",
-              }}>
-              <Box>
-                <Font fontSize='30px' m='10px 0px' color='#F3EA98'>
-                  需要大家幫忙帶的用品
-                </Font>
-                <br />
-                <br />
-                {allSupplies.map((item, index) => (
-                  <div key={index}>
-                    <Label fontSize='16px' color='#F3EA98'>
-                      {item.supplies}
-                    </Label>
-                    <Label fontSize='16px' ml='30px' color='#F3EA98'>
-                      {item.note}
-                    </Label>
-                    <Label ml='30px' color='#F3EA98'>
-                      {item.bring_person}
-                    </Label>
-                    <Button
-                      width='150px'
-                      fontSize='16px'
-                      ml='40px'
-                      onClick={() => {
-                        takeAway(item.supplies_id);
-                      }}>
-                      我可以幫忙帶
-                    </Button>
-                  </div>
-                ))}
-              </Box>
-            </Box>
-            <Box
-              sx={{
-                width: "50%",
-                height: "200px",
-                boxShadow:
-                  "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-                borderRadius: 10,
-                padding: 5,
-                marginTop: 3,
-                marginLeft: -13,
-                justifyContent: "start",
-                zIndex: -1,
-              }}></Box>
-          </Display>
+          <Cloumn>
+            <Font fontSize='20px'>團員</Font>
+            <Hr width='100px'></Hr>
+          </Cloumn>
           <AllMemberWrap>
             {thisGroupMember.map((item) => (
               <MemberWrap>

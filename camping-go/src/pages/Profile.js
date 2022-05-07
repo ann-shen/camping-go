@@ -28,6 +28,7 @@ import {
   Tag,
   ImgWrap,
   Cloumn,
+  Hr,
 } from "../css/style";
 import Modal from "react-modal";
 import "../css/modal.css";
@@ -62,14 +63,14 @@ const CheckCommentWrap = styled.div`
   position: relative;
   padding: 40px 10px;
   margin-right: 40px;
+`;
+
+const ScrollWrap = styled.div`
+  height: 280px;
+  margin-top: 30px;
   overflow: scroll;
-
-  /* ::-webkit-scrollbar {
-    background-color: red;
-    border-radius: 10px;
-  } */
-
   ::-webkit-scrollbar {
+    height: 0px;
     width: 6px;
     border-radius: 3px;
     border-left: 6px solid #e6ecf8;
@@ -98,17 +99,29 @@ const CommentTitleWrap = styled.div`
 `;
 
 const DeleteModalButton = styled.button`
-  width: 20px;
+  width: 30px;
+  height: 30px;
   position: absolute;
   top: 30px;
   left: 30px;
   border: none;
   color: #426765;
-  background-color: #fffef4;
+  background-color: #eae5be;
+  border-radius: 10px;
   cursor: pointer;
   &:hover {
     color: #cfc781;
   }
+`;
+
+const ProfileWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
 `;
 
 function TabPanel(props) {
@@ -142,6 +155,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
   const [alertOpen, setAlertOpen] = useState(false);
   const [value, setValue] = useState("Controlled");
   const [startValue, setStartValue] = React.useState(2);
+  const [profileImg, setProfileImg] = useState("");
 
   // console.log(groupId);
   const handleChange = (event) => {
@@ -149,8 +163,9 @@ function SentCommentToHeader({ groupId, userName, userId }) {
   };
 
   const sendComment = async () => {
-    console.log(groupId);
+    // console.log(groupId);
     setAlertOpen(true);
+
     const feedbackInCreateRef = doc(
       db,
       "CreateCampingGroup",
@@ -158,11 +173,22 @@ function SentCommentToHeader({ groupId, userName, userId }) {
       "feedback",
       userId
     );
+
+    let profile_img;
+
+    const docRefJoinGroup = doc(db, "joinGroup", userId);
+    const docMemberInfo = await getDoc(docRefJoinGroup);
+    if (docMemberInfo.exists()) {
+      console.log(docMemberInfo.data().profile_img);
+      profile_img = docMemberInfo.data().profile_img;
+    }
+
     await setDoc(feedbackInCreateRef, {
       name: userName,
       note: value,
       score: startValue,
       user_id: userId,
+      profile_img: profile_img,
     }).then(async () => {
       let scoreArr = [];
       let commentArr = [];
@@ -172,6 +198,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
         groupId,
         "feedback"
       );
+
       const querySnapshot = await getDocs(commentRef);
       querySnapshot.forEach((doc) => {
         scoreArr.push(Number(doc.data().score));
@@ -180,7 +207,9 @@ function SentCommentToHeader({ groupId, userName, userId }) {
       let totalScore = scoreArr.reduce(function (total, e) {
         return total + e;
       }, 0);
-      console.log(totalScore);
+
+      // console.log(totalScore);
+
       updateDoc(doc(db, "CreateCampingGroup", groupId), {
         total_score: totalScore / scoreArr.length,
         comment: commentArr,
@@ -216,10 +245,11 @@ function SentCommentToHeader({ groupId, userName, userId }) {
             X
           </DeleteModalButton>
           <Font>評論</Font>
-          <hr></hr>
+          <Hr width='60%'></Hr>
           <TextField
+            sx={{ width: "60%" }}
             id='filled-multiline-static'
-            label='建議'
+            label=''
             multiline
             rows={4}
             defaultValue=''
@@ -315,7 +345,7 @@ function CheckCommentFromMember({ groupId }) {
   return (
     <div className='App'>
       <Button
-        width=' 200px'
+        width=' 150px'
         onClick={checkComment}
         setCommentIsOpen={setCommentIsOpen}>
         查看評論
@@ -338,37 +368,53 @@ function CheckCommentFromMember({ groupId }) {
           <DeleteModalButton onClick={() => setCommentIsOpen(false)}>
             X
           </DeleteModalButton>
-          <CommentTitleWrap>
-            <Font fontSize='30px'>你的評論</Font>
-            <Display>
-              {totalScore ? (
-                <div>
-                  <Font>總分</Font>
-                  <Font>{totalScore}</Font>
-                </div>
-              ) : (
-                <Font>尚未有回饋唷！</Font>
-              )}
-            </Display>
-          </CommentTitleWrap>
+          {/* <CommentTitleWrap> */}
+          <Font fontSize='20px' letterSpacing='3px'>
+            你的評論
+          </Font>
+          <Hr width='60%'></Hr>
+          <Display>
+            {totalScore ? (
+              <div>
+                <Display>
+                  <Font fontSize='16px'>總分</Font>
+                  <Font fontSize='35px' marginLeft='3px'>
+                    {totalScore}
+                  </Font>
+                </Display>
+              </div>
+            ) : (
+              <Font>尚未有回饋唷！</Font>
+            )}
+          </Display>
+          {/* </CommentTitleWrap> */}
 
-          <div>
+          <ScrollWrap>
             {comment &&
               comment.map((item) => (
                 <Box
                   sx={{
                     width: "500px",
                     height: "auto",
-                    borderBottom: " 1.4px solid #EAE5BE",
-                    padding: 3,
+                    padding: 1,
                     margin: 1,
                   }}>
-                  <Font>{item.name}</Font>
-                  <Font>{item.note}</Font>
-                  <Font>{item.score}</Font>
+                  <Display
+                    justifyContent='space-around'
+                    borderBottom='1.4px solid #EAE5BE'
+                    paddingBottom='20px'>
+                    <Wrap direction='column' width='100px'>
+                      <ProfileWrap>
+                        <Img src={item.profile_img}></Img>
+                      </ProfileWrap>
+                      <Font fontSize='14px'>{item.name}</Font>
+                    </Wrap>
+                    <Font fontSize='14px'>{item.note}</Font>
+                    <Font>{item.score}分</Font>
+                  </Display>
                 </Box>
               ))}
-          </div>
+          </ScrollWrap>
         </CheckCommentWrap>
       </Modal>
     </div>
@@ -435,7 +481,7 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
   return (
     <div>
       <Button
-        width=' 200px'
+        width=' 150px'
         onClick={checkMemberList}
         setMemberIsOpen={setMemberIsOpen}>
         查看團員名單
@@ -458,9 +504,9 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
           <DeleteModalButton onClick={() => setMemberIsOpen(false)}>
             X
           </DeleteModalButton>
-          <CommentTitleWrap>
-            <Font fontSize='30px'>你的團員</Font>
-          </CommentTitleWrap>
+          <Font fontSize='20px'>你的團員</Font>
+          <Hr width='60%'></Hr>
+
           {member.map((item, index) => (
             <Box
               sx={{
@@ -470,22 +516,28 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
                 padding: 3,
                 margin: 1,
                 display: "flex",
+                justifyContent: "space-between",
               }}>
               <Display>
-                {item.role == "header" && <Tag width='35px'>團長</Tag>}
+                {item.role == "header" && (
+                  <Tag width='35px' p="3px 0px 0px 5px" fontSize="14px" height="25px" m="0px 10px 0px 0px">
+                    團長
+                  </Tag>
+                )}
                 <Font>{item.member_name}</Font>
               </Display>
-
-              <Button
-                width='150px'
-                mt='10px'
-                ml='20px'
-                boxShadow='none'
-                onClick={() => {
-                  removeMember(index, item.role, item.member_id);
-                }}>
-                移除成員
-              </Button>
+              {item.role == "member" && (
+                <Button
+                  width='150px'
+                  mt='10px'
+                  ml='20px'
+                  boxShadow='none'
+                  onClick={() => {
+                    removeMember(index, item.role, item.member_id);
+                  }}>
+                  移除成員
+                </Button>
+              )}
             </Box>
           ))}
         </CheckCommentWrap>
@@ -692,7 +744,7 @@ export default function Profile({ userName, userId, getLogout }) {
             width='500px'
             direction='column'
             alignItems='start'
-            m='0px 0px 0px 20px'
+            m='0px 0px 0px 60px'
             boxShadow='none'>
             <Font
               fontSize='40px'
@@ -706,148 +758,58 @@ export default function Profile({ userName, userId, getLogout }) {
             </Display>
           </Wrap>
         </Display>
-        <Button width='100px' onClick={getLogout}>
-          登出
-        </Button>
+        {params.id == userId ? (
+          <Button width='100px' onClick={getLogout}>
+            登出
+          </Button>
+        ) : (
+          <></>
+        )}
       </Wrap>
-
-      <Box
-        sx={{
-          width: "75%",
-          height: "auto",
-          boxShadow:
-            "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-          borderRadius: 10,
-          paddingTop: 8,
-          margin: "auto",
-          marginBottom: "100px",
-          paddingBottom: "50px",
-        }}>
-        <AppBar position='static' sx={{ bgcolor: "#426765" }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            // indicatorColor='secondary'
-            textColor='inherit'
-            variant='fullWidth'
-            aria-label='full width tabs example'
-            TabIndicatorProps={{
-              style: {
-                backgroundColor: "#CFC781",
-              },
-            }}>
-            <Tab
-              label='開團'
-              {...a11yProps(0)}
-              sx={{ fontSize: "20px", letterSpacing: "px" }}
-            />
-            <Tab
-              label='加入'
-              {...a11yProps(1)}
-              sx={{ fontSize: "20px", letterSpacing: "px" }}
-            />
-          </Tabs>
-        </AppBar>
-        <SwipeableViews
-          axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-          index={value}
-          onChangeIndex={handleChangeIndex}>
-          <TabPanel value={value} index={0} dir={theme.direction}>
-            {yourCreateGroup.map((item, index) => (
-              <Box
-                key={index}
-                sx={{
-                  width: "85%",
-                  height: "auto",
-                  boxShadow:
-                    "0.8rem 0.8rem 3.2rem #E2E1D3 , -1.0rem -1.0rem 1rem #ffffff",
-                  borderRadius: 6,
-                  padding: 5,
-                  margin: "auto",
-                  marginTop: "30px",
-                  border: "1px solid #CFC781 ",
-                  justifyContent: "space-around",
-                }}>
-                <Display justifyContent='space-between' ml='20px'>
-                  <LinkRoute to={`/joinGroup/${item.group_id}`}>
-                    <Display direction='column' alignItems='start'>
-                      <Display alignItems='start'>
-                        <ImgWrap>
-                          <Img src={item.picture} width='100%' m='0px'></Img>
-                        </ImgWrap>
-                        <Display
-                          direction='column'
-                          alignItems='start'
-                          ml='30px'>
-                          <Tag bgc='#CFC781' color='white'>
-                            {item.status}
-                          </Tag>
-                          <Font fontSize='30px' m='10px 0px 10px 0px'>
-                            {item.group_title}
-                          </Font>
-                          <Font fontSize='16px' m='0px 0px 15px 0px'>
-                            {
-                              new Date(item.start_date.seconds * 1000)
-                                .toLocaleString()
-                                .split(" ")[0]
-                            }
-                            ~
-                            {
-                              new Date(item.end_date.seconds * 1000)
-                                .toLocaleString()
-                                .split(" ")[0]
-                            }
-                          </Font>
-                          <Display>
-                            <Img
-                              src={location}
-                              width='24px'
-                              m=' 0px 8px 0px -3px '></Img>
-                            <Font fontSize='20px'>{item.city}</Font>
-                          </Display>
-                        </Display>
-                      </Display>
-                      <Display alignItems='center'>
-                        {/* {item.score && (
-                          <Display>
-                            <Font fontSize='40px'>{item.score}</Font>
-                            <Font fontSize='20px'>分</Font>
-                          </Display>
-                        )} */}
-                      </Display>
-                    </Display>
-                  </LinkRoute>
-                  <Wrap
-                    direction='column'
-                    alignItems='end'
-                    height='250px'
-                    justifyContent='space-evenly'
-                    m='20px'>
-                    {item.status == "已結束" && (
-                      <CheckCommentFromMember groupId={item.group_id} />
-                    )}
-                    <CheckOfGroupMember
-                      setRenderParticipateArr={setRenderParticipateArr}
-                      groupId={item.group_id}
-                      userId={userId}
-                    />
-                    <Button
-                      border='#CFC781'
-                      bgc='#FFFEF4'
-                      width='200px'
-                      onClick={(id) => {
-                        deleteThisGroup(item.group_id);
-                      }}>
-                      刪除此團
-                    </Button>
-                  </Wrap>
-                </Display>
-              </Box>
-            ))}
-          </TabPanel>
-          {yourParticipateGroup && (
-            <div>
-              {yourParticipateGroup.map((item, index) => (
+      {userId == params.id ? (
+        <Box
+          sx={{
+            width: "75%",
+            height: "auto",
+            boxShadow:
+              "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+            borderRadius: 10,
+            paddingTop: 8,
+            margin: "auto",
+            marginBottom: "100px",
+            paddingBottom: "50px",
+          }}>
+          <AppBar position='static' sx={{ bgcolor: "#426765" }}>
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              // indicatorColor='secondary'
+              textColor='inherit'
+              variant='fullWidth'
+              aria-label='full width tabs example'
+              TabIndicatorProps={{
+                style: {
+                  backgroundColor: "#CFC781",
+                },
+              }}>
+              <Tab
+                label='開團'
+                {...a11yProps(0)}
+                sx={{ fontSize: "20px", letterSpacing: "px" }}
+              />
+              <Tab
+                label='加入'
+                {...a11yProps(1)}
+                sx={{ fontSize: "20px", letterSpacing: "px" }}
+              />
+            </Tabs>
+          </AppBar>
+          <SwipeableViews
+            axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+            index={value}
+            onChangeIndex={handleChangeIndex}>
+            <TabPanel value={value} index={0} dir={theme.direction}>
+              {yourCreateGroup.map((item, index) => (
                 <Box
                   key={index}
                   sx={{
@@ -876,10 +838,13 @@ export default function Profile({ userName, userId, getLogout }) {
                             <Tag bgc='#CFC781' color='white'>
                               {item.status}
                             </Tag>
-                            <Font fontSize='30px' m='10px 0px 10px 0px'>
+                            <Font
+                              fontSize='25px'
+                              letterSpacing='3px'
+                              m='10px 0px 0px 0px'>
                               {item.group_title}
                             </Font>
-                            <Font fontSize='16px' m='0px 0px 15px 0px'>
+                            <Font fontSize='14px' m='0px 0px 15px 0px'>
                               {
                                 new Date(item.start_date.seconds * 1000)
                                   .toLocaleString()
@@ -895,19 +860,19 @@ export default function Profile({ userName, userId, getLogout }) {
                             <Display>
                               <Img
                                 src={location}
-                                width='24px'
+                                width='20px'
                                 m=' 0px 8px 0px -3px '></Img>
-                              <Font fontSize='20px'>{item.city}</Font>
+                              <Font fontSize='16px'>{item.city}</Font>
                             </Display>
                           </Display>
                         </Display>
                         <Display alignItems='center'>
                           {/* {item.score && (
-                            <Display>
-                              <Font fontSize='40px'>{item.score}</Font>
-                              {item.score && <Font fontSize='20px'>分</Font>}
-                            </Display>
-                          )} */}
+                          <Display>
+                            <Font fontSize='40px'>{item.score}</Font>
+                            <Font fontSize='20px'>分</Font>
+                          </Display>
+                        )} */}
                         </Display>
                       </Display>
                     </LinkRoute>
@@ -918,30 +883,135 @@ export default function Profile({ userName, userId, getLogout }) {
                       justifyContent='space-evenly'
                       m='20px'>
                       {item.status == "已結束" && (
-                        <SentCommentToHeader
-                          groupId={item.group_id}
-                          userName={userName}
-                          userId={userId}
-                        />
+                        <CheckCommentFromMember groupId={item.group_id} />
                       )}
+                      <CheckOfGroupMember
+                        setRenderParticipateArr={setRenderParticipateArr}
+                        groupId={item.group_id}
+                        userId={userId}
+                      />
                       <Button
                         border='#CFC781'
                         bgc='#FFFEF4'
-                        width='200px'
+                        width='150px'
                         onClick={(id) => {
-                          memberWithdrawGroup(item.group_id, userId);
+                          deleteThisGroup(item.group_id);
                         }}>
-                        我要退團
+                        刪除此團
                       </Button>
                     </Wrap>
                   </Display>
                 </Box>
               ))}
-            </div>
-          )}
-          <TabPanel value={value} index={1} dir={theme.direction}></TabPanel>
-        </SwipeableViews>
-      </Box>
+            </TabPanel>
+            {yourParticipateGroup && (
+              <div>
+                {yourParticipateGroup.map((item, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      width: "85%",
+                      height: "auto",
+                      boxShadow:
+                        "0.8rem 0.8rem 3.2rem #E2E1D3 , -1.0rem -1.0rem 1rem #ffffff",
+                      borderRadius: 6,
+                      padding: 5,
+                      margin: "auto",
+                      marginTop: "30px",
+                      border: "1px solid #CFC781 ",
+                      justifyContent: "space-around",
+                    }}>
+                    <Display justifyContent='space-between' ml='20px'>
+                      <LinkRoute to={`/joinGroup/${item.group_id}`}>
+                        <Display direction='column' alignItems='start'>
+                          <Display alignItems='start'>
+                            <ImgWrap>
+                              <Img
+                                src={item.picture}
+                                width='100%'
+                                m='0px'></Img>
+                            </ImgWrap>
+                            <Display
+                              direction='column'
+                              alignItems='start'
+                              ml='30px'>
+                              <Tag bgc='#CFC781' color='white'>
+                                {item.status}
+                              </Tag>
+                              <Font
+                                fontSize='25px'
+                                letterSpacing='3px'
+                                m='5px 0px 3px 0px'>
+                                {item.group_title}
+                              </Font>
+                              <Font fontSize='14px' m='0px 0px 15px 0px'>
+                                {
+                                  new Date(item.start_date.seconds * 1000)
+                                    .toLocaleString()
+                                    .split(" ")[0]
+                                }
+                                ~
+                                {
+                                  new Date(item.end_date.seconds * 1000)
+                                    .toLocaleString()
+                                    .split(" ")[0]
+                                }
+                              </Font>
+                              <Display>
+                                <Img
+                                  src={location}
+                                  width='24px'
+                                  m=' 0px 8px 0px -3px '></Img>
+                                <Font fontSize='16px'>{item.city}</Font>
+                              </Display>
+                            </Display>
+                          </Display>
+                          <Display alignItems='center'>
+                            {/* {item.score && (
+                            <Display>
+                              <Font fontSize='40px'>{item.score}</Font>
+                              {item.score && <Font fontSize='20px'>分</Font>}
+                            </Display>
+                          )} */}
+                          </Display>
+                        </Display>
+                      </LinkRoute>
+                      <Wrap
+                        direction='column'
+                        alignItems='end'
+                        height='250px'
+                        justifyContent='space-evenly'
+                        m='20px'>
+                        {item.status == "已結束" && (
+                          <SentCommentToHeader
+                            groupId={item.group_id}
+                            userName={userName}
+                            userId={userId}
+                          />
+                        )}
+                        {item.status == "進行中" && (
+                          <Button
+                            border='#CFC781'
+                            bgc='#FFFEF4'
+                            width='200px'
+                            onClick={(id) => {
+                              memberWithdrawGroup(item.group_id, userId);
+                            }}>
+                            我要退團
+                          </Button>
+                        )}
+                      </Wrap>
+                    </Display>
+                  </Box>
+                ))}
+              </div>
+            )}
+            <TabPanel value={value} index={1} dir={theme.direction}></TabPanel>
+          </SwipeableViews>
+        </Box>
+      ) : (
+        <div>123</div>
+      )}
     </div>
   );
 }

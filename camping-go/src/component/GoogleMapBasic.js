@@ -5,45 +5,55 @@ import {
   GoogleMap,
   Marker,
 } from "react-google-maps";
+import styled from "styled-components";
 import Geocode from "react-geocode";
-import {useEffect } from "react";
+import { useEffect } from "react";
 import Autocomplete from "react-google-autocomplete";
-// import {
-//     Autocomplete,
-// } from "@react-google-maps/api";
+import { Display, Cloumn, Button } from "../css/style";
+
+const MapWrap = styled.div`
+  width: 100%;
+`;
 
 let key = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 Geocode.setApiKey(`${key}`);
 const MapWithAMarker = withScriptjs(
   withGoogleMap(({ state, onMakerDragEnd, onPlaceSelected }) => (
-    <GoogleMap
-      defaultZoom={16}
-      defaultCenter={{
-        lat: state.mapPosition.lat,
-        lng: state.mapPosition.lng,
-      }}>
-      <Marker
-        draggable={true}
-        onDragEnd={onMakerDragEnd}
-        position={{
-          lat: state.markerPosition.lat,
-          lng: state.markerPosition.lng,
+      <GoogleMap
+        defaultZoom={16}
+        defaultCenter={{
+          lat: state.mapPosition.lat,
+          lng: state.mapPosition.lng,
         }}>
-        <InfoWindow>
-          <div>{state.address}</div>
-        </InfoWindow>
+        <Marker
+          draggable={true}
+          onDragEnd={onMakerDragEnd}
+          position={{
+            lat: state.markerPosition.lat,
+            lng: state.markerPosition.lng,
+          }}>
+          <InfoWindow>
+            <div>{state.address}</div>
+          </InfoWindow>
+        </Marker>
         <Autocomplete
-          style={{ width: "250px", height: "50px", margin: "20px" }}
+          style={{
+            width: "98%",
+            height: "30px",
+            margin: "20px 0px 0px 0px",
+            backgroundColor: "#F4F4EE",
+            border: "1px solid gray",
+            borderRadius: "5px",
+            padding: "5px",
+          }}
           types={["geocode", "establishment"]}
           onPlaceSelected={onPlaceSelected}
         />
-      </Marker>
-    </GoogleMap>
+      </GoogleMap>
   ))
 );
 
 function GoogleMapBasic({ state, setState }) {
-
   console.log(state);
   useEffect(() => {
     if (navigator.geolocation) {
@@ -195,10 +205,8 @@ function GoogleMapBasic({ state, setState }) {
     });
   };
 
-  
-
   return (
-    <div>
+    <MapWrap>
       <MapWithAMarker
         googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyDGyok70ayGPpyAyxeyAwcVdoQ0rzW5bCo&v=3.exp&libraries=geometry,drawing,places`}
         loadingElement={<div style={{ height: `100%` }} />}
@@ -216,7 +224,7 @@ function GoogleMapBasic({ state, setState }) {
       {/* <div>{state.area}</div> */}
       <div>{state.state}</div>
       <div>{state.address}</div>
-    </div>
+    </MapWrap>
   );
 }
 

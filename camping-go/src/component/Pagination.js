@@ -2,15 +2,15 @@ import styled from "styled-components";
 import { Font, Display, Img, Button } from "../css/style";
 
 const PageWrap = styled.div`
-  width:100%;
+  width:92%;
   display: flex;
   justify-content: center;
-  margin:20px;
+  margin-top:-550px;
 `;
 
 const PageLink = styled.a`
   text-decoration: none;
-  font-size: 20px;
+  font-size: 16px;
   
 `;
 
@@ -21,9 +21,10 @@ const ListLink = styled.li`
     box-shadow: none;
   }
   list-style: none;
-  width: 30px;
+  width: 16px;
   padding: 3px 8px;
   color: #426765;
+  margin-left: 5px;
   border-right: #426765 1px solid;
   cursor: pointer;
 `;
@@ -36,7 +37,7 @@ const PaginationBar = ({ pagination, totalPosts, paginate }) => {
   }
 
   return (
-    <Display width='100%'>
+    <Display width='100%' >
       <PageWrap>
         {pageNumbers.map((number) => (
           <ListLink

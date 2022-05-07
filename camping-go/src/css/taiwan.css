@@ -2,22 +2,20 @@
   font-family: 'Fjalla One'; }
 
 svg {
-  height: 100vh; }
+  height: 80vh; }
 
 path {
-  stroke: rgb(139, 113, 78);
+  stroke: #CDC789;
+  stroke-width:2;
   fill: transparent;
   transition: 0.5s;
   cursor: pointer; }
   path:hover {
-    fill: #B99362;
+    fill: #CDC789;
     transform: translate(-5px, -5px); }
 
-.title_area {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  color: white;
-  font-size: 30px; }
+    /* .chiayi_country{
+      fill: #B99362;
+    } */
 
 

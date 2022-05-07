@@ -34,17 +34,17 @@ const CityWrap = styled.div`
   position: absolute;
   top: ${(props) => props.top || "0px"};
   left: ${(props) => props.left || "0px"};
-  width: 180px;
+  width: 100px;
   height: auto;
   background-color: #f8f7f1;
-  border: 4px solid #cfc781;
+  border: 2px solid #cfc781;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 25px;
   margin: 0px auto;
-  border-radius: 80px;
+  border-radius: 60px;
   animation: ${fadeIn} 0.5s ease-in-out;
 `;
 
@@ -302,66 +302,66 @@ function Taiwan() {
       <div id='app' ref={callPath}>
         <>
           {position == "middle" && (
-            <CityWrap top='100px' left='30%'>
-              <Font fontSize='23px'>{targetCity}</Font>
+            <CityWrap top='180px' left='30%'>
+              <Font fontSize='20px'>{targetCity}</Font>
               <Display m='10px 20px 20px 20px' alignItems='end'>
-                <img src={tent} alt='' />
+                <Img width='50px' mb='5px' src={tent} alt='' />
                 <Font m='0px 3px 5px 0px'>x</Font>
                 <Font fontSize='35px'>{targetCityAmount}</Font>
               </Display>
-              <Font font_size='30px' letterSpacing='3px'>
+              <Font fontSize='14px' letterSpacing='3px'>
                 目前開團數
               </Font>
             </CityWrap>
           )}
           {position == "north" && (
-            <CityWrap top='0px' left='35%'>
-              <Font fontSize='23px'>{targetCity}</Font>
+            <CityWrap top='70px' left='33%'>
+              <Font fontSize='20px'>{targetCity}</Font>
               <Display m='10px 20px 20px 20px' alignItems='end'>
-                <img src={tent} alt='' />
+                <Img width='50px' mb='5px' src={tent} alt='' />
                 <Font m='0px 3px 5px 0px'>x</Font>
                 <Font fontSize='35px'>{targetCityAmount}</Font>
               </Display>
-              <Font font_size='30px' letterSpacing='3px'>
+              <Font fontSize='14px' letterSpacing='3px'>
                 目前開團數
               </Font>
             </CityWrap>
           )}
           {position == "northEast" && (
-            <CityWrap top='0px' left='75%'>
-              <Font fontSize='23px'>{targetCity}</Font>
+            <CityWrap top='50px' left='73%'>
+              <Font fontSize='20px'>{targetCity}</Font>
               <Display m='10px 20px 20px 20px' alignItems='end'>
-                <img src={tent} alt='' />
+                <Img width='50px' mb='5px' src={tent} alt='' />
                 <Font m='0px 3px 5px 0px'>x</Font>
                 <Font fontSize='35px'>{targetCityAmount}</Font>
               </Display>
-              <Font font_size='30px' letterSpacing='3px'>
+              <Font fontSize='14px' letterSpacing='3px'>
                 目前開團數
               </Font>
             </CityWrap>
           )}
           {position == "east" && (
-            <CityWrap top='500px' left='70%'>
-              <Font fontSize='23px'>{targetCity}</Font>
+            <CityWrap top='300px' left='65%'>
+              <Font fontSize='20px'>{targetCity}</Font>
               <Display m='10px 20px 20px 20px' alignItems='end'>
-                <img src={tent} alt='' />
+                <Img width='50px' mb='5px' src={tent} alt='' />
                 <Font m='0px 3px 5px 0px'>x</Font>
                 <Font fontSize='35px'>{targetCityAmount}</Font>
               </Display>
-              <Font font_size='30px' letterSpacing='3px'>
+              <Font fontSize='14px' letterSpacing='3px'>
                 目前開團數
               </Font>
             </CityWrap>
           )}
           {position == "south" && (
-            <CityWrap top='600px' left='25%'>
-              <Font fontSize='23px'>{targetCity}</Font>
+            <CityWrap top='400px' left='24%'>
+              <Font fontSize='20px'>{targetCity}</Font>
               <Display m='10px 20px 20px 20px' alignItems='end'>
-                <img src={tent} alt='' />
+                <Img width='50px' mb='5px' src={tent} alt='' />
                 <Font m='0px 3px 5px 0px'>x</Font>
                 <Font fontSize='35px'>{targetCityAmount}</Font>
               </Display>
-              <Font font_size='30px' letterSpacing='3px'>
+              <Font fontSize='14px' letterSpacing='3px'>
                 目前開團數
               </Font>
             </CityWrap>
@@ -411,7 +411,7 @@ function Taiwan() {
               onMouseEnter={handleMove}
               id='2b6aac2d-ce2d-4c48-89d5-ff2a81000e07'
               data-name='chiayi_country'
-              className='96fdfe13-4732-40bb-9e9c-cdc6e310fcb9'
+              className='96fdfe13-4732-40bb-9e9c-cdc6e310fcb9 chiayi_country'
               d='M193.2,485l-.14-1.13-1.11-.43h-2.58l-.28-1,.11-3.46,2-4.74,1,.09,2.5-1,.87-3.44.68-1.13-.17-2.41-.43-.6-1,.85-.85-.68-.53-1-.09-1.28.7-2.16v-1.13l-1-.26.09-1.2,1.47-2.86h-1.13l-1.11-.6L192,454l.51-1v-1.39l.6-.77.34-1.22.53-.94v-1.3l-1-.43-3.88.26-1.2-.43-.6-1,.26-6.21,1.07-.6,2.63.09,4,1.55h2.59l1,1.55h2.59l1.9-.86,4.31,1.55,2.59.34,1.55-1.21,1.21-1.55.17-2.41-.52-2.07,1.38-1.38h2.24v2.24l2.41.86.69-1.9,3.28-1.9.52-2.41,1.21-1.38,4.31-1.72,1.9,1,1.21-4.14,1-1.72,2.76.17,1.72-.86.69-2.07,4-1.21.69-1.9,1.55-1.21,1.21-1.55,1.9.86,1.55,1.21,1.9.69,4-1.55h5.17l3.62-1.9L267,415l1,3.45,2.93,2.41,1,1.55,1.72,1,2.41.17,1.55,1.21,2.07.69,9.49,1,1.9-1,1.21-1.38,3.79.17-.34,2.59,1.38,2.24,1.38-1.38,2.24-.52,1.38,1.38,2.07-.17,1.9-.69,2.41.17,1.9,1,2.41.34.86-1.72v-2.41l-.52-2.07-1-1.55,1.12-1.64,4.4-.43,7.93,2.93h2.59l2.24.52.86,1.72.17,5.86-.52,2.24-1.9,1.55v2.59l1,1.72,1.55,1.38.34,5,1.72,4,1.38,1.55,7.76.86,3.79-1.55,7.59.69,1.9.69,5.83.15-.83.19-1.72.86-4.48.69-1.55,1-4.31.86-2.93,2.41-1,1.72-1.9.86-1.55,1.21-2.24.35-1.55,1.72-1.21,2.93-1.21,1-.69,1.9-1.21,1.38-.17,2.41-1.9.69h-2.59L327.51,475l-1,1.72-2.76,2.76-4.83.34-1.55,4-3.45,1.72-.69,1.9-4.48.34-.86,4.48-5.52-.17-1.55-1.38-5.35-.17-.86,7.93.86,1.9,1.38,1.72v2.59l-1.38,1.21-1.72-.86-4.31.86-2.07-.69-2.41-1.72-2.59,3.8-2.07.52-2.24-.17-2.93-2.07-4.14-1.21-.69-1.72,2.24-3.28-.52-1.72-1.38-2.24-.35-1.72.86-1.72-.69-1.9-.17-2.41,1-1.9,1.55-1.21.17-2.07-.69-1.9-2.41-.17-2.59-.86-.69-1.55,1.72-1.21-.17-2.24-5.35-.34v-2.24l1.72-1.21,1-1.55L264.21,468l-1.55.86-2.07-.52-1.72-1.38-2.24-.69-1.21-1.55-2.59-.69-.17.34-1.55,1-2.24.17-1.38-1.38-2.24.35-3.62,1.72h-5.17l-4.14,2.41-.17.17-1,1.72-4.31-.17.17,2.07-4.83.34-.34,2.24-.86,1.72-1.21,1-1.72-1-1.38,1.38.69,1.9-.34,1.21-6.55,3.28-.52,2.07-2.24,3.28-2.07.86-3.1-.86-.86-1.38v1.89l-1.72-.17-1.55-1.38-.69-2.07-2.59-.52L193.2,485h0Z'
             />
           </Link>
