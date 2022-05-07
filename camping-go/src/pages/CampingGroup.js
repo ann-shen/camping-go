@@ -366,7 +366,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
                 開團歷史紀錄
               </NavFont>
             </LinkRoute> */}
-            <LinkRoute to={`/create_group`} ml='10%'>
+            <LinkRoute to={`/create_group`} ml='7%'>
               <AddIcon sx={{ marginBottom: "-10px" }}></AddIcon>
               <NavFont style={{ color: navFontColor }}>建立露營團</NavFont>
             </LinkRoute>
