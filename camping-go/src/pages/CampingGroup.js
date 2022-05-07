@@ -21,48 +21,14 @@ import { Font, Display, Img, Button, Cloumn, Hr, Wrap } from "../css/style";
 import location_big from "../image/location_big.png";
 import group_people from "../image/group_people.png";
 import landingpage from "../image/landingpage.png";
-import logoColor from "../image/logoColor2.png";
 import Modal from "react-modal";
 import { UserContext } from "../utils/userContext";
 import PaginationBar from "../component/Pagination";
 import ReviewCard from "../component/ReviewCard";
-import AddIcon from "@mui/icons-material/Add";
-
+import NavBar from "../component/NavBar";
 Modal.setAppElement("#root");
 
-const LinkRoute = styled(Link)`
-  text-decoration: none;
-  margin: 5px 5px;
-  font-size: 14px;
-  color: gray;
-  margin-left: ${(props) => props.ml || "53%"};
-  display: flex;
-`;
 
-const NavFont = styled.p`
-  margin: 0px 0px -10px 0px;
-  font-size: 16px;
-  &:hover {
-    color: #426765;
-  }
-`;
-
-const NavFontSetGroup = styled.p`
-  margin: 0px 0px -10px 25px;
-  font-size: 16px;
-  &:hover {
-    color: #426765;
-  }
-`;
-
-const LogoImgWrap = styled.div`
-  display: flex;
-  /* justify-content: start; */
-  align-items: center;
-  width: 100%;
-  margin: 15px 60px;
-  z-index: 6;
-`;
 
 const HeaderSection = styled.div`
   margin: 0px;
@@ -95,14 +61,6 @@ const LandingImgWrap = styled.div`
   /* margin-top: -180px; */
 `;
 
-const Tag = styled.div`
-  width: 60px;
-  height: 25px;
-  background-color: #797659;
-  color: white;
-  border-radius: 10px;
-  padding-top: 3px;
-`;
 
 const Section = styled.div`
   width: 90%;
@@ -124,63 +82,6 @@ const TitleWrap = styled.div`
   margin-left: 15px;
 `;
 
-// function IsModal({ modalIsOpen, setIsOpen, groupId, groupPassword }) {
-//   const [value, setValue] = useState("");
-//   const [alert, setAlert] = useState(false);
-//   const navigate = useNavigate();
-
-//   const handleChange = (event) => {
-//     setValue(event.target.value);
-//   };
-
-//   const checkPassword = (e) => {
-//     if (value == groupPassword) {
-//       navigate(`/joinGroup/${groupId}`);
-//     } else {
-//       setAlert(true);
-//     }
-//   };
-
-//   return (
-//     <div className='App'>
-//       <Modal
-//         isOpen={modalIsOpen}
-//         onRequestClose={() => setIsOpen(false)}
-//         overlayClassName={{
-//           base: "overlay-base",
-//           afterOpen: "overlay-after",
-//           beforeClose: "overlay-before",
-//         }}
-//         className={{
-//           base: "content-base",
-//           afterOpen: "content-after",
-//           beforeClose: "content-before",
-//         }}
-//         closeTimeoutMS={500}>
-//         <Display direction='column'>
-//           <TextField
-//             required
-//             id='outlined-required'
-//             label='Required'
-//             defaultValue=''
-//             onChange={handleChange}
-//           />
-//           {alert && (
-//             <Stack sx={{ width: "100%" }} spacing={2}>
-//               <Alert severity='error'>
-//                 <AlertTitle>Error</AlertTitle>
-//                 密碼錯誤 <strong>請再輸入一次!</strong>
-//               </Alert>
-//             </Stack>
-//           )}
-//           <Button onClick={checkPassword} width=' 200px' boxShadow='none'>
-//             送出
-//           </Button>
-//         </Display>
-//       </Modal>
-//     </div>
-//   );
-// }
 
 function CampingGroup({ setGroupId, userId, userName, groupId }) {
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
@@ -193,21 +94,18 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     posts_per_page: 3,
   });
   const navigate = useNavigate();
-  const [navSize, setnavSize] = useState("6rem");
-  const [navColor, setnavColor] = useState("transparent");
-  const [navFontColor, setnavFontColor] = useState("gray");
 
-  const listenScrollEvent = () => {
-    window.scrollY > 10 ? setnavColor("#426765") : setnavColor("transparent");
-    window.scrollY > 10 ? setnavSize("5rem") : setnavSize("7rem");
-    window.scrollY > 10 ? setnavFontColor("#F4F4EE") : setnavFontColor("gray");
-  };
-  useEffect(() => {
-    window.addEventListener("scroll", listenScrollEvent);
-    return () => {
-      window.removeEventListener("scroll", listenScrollEvent);
-    };
-  }, []);
+  const indexOfLastPost = pagination.currentPage * pagination.posts_per_page;
+  const indexOfFirstPost = indexOfLastPost - pagination.posts_per_page;
+  const currentPosts = homePageCampGroup.slice(
+    indexOfFirstPost,
+    indexOfLastPost
+  );
+  const paginate = (pageNumber) =>
+    setPaagination((prevState) => ({
+      ...prevState,
+      currentPage: pageNumber,
+    }));
 
   //render all camping group
   useEffect(async () => {
@@ -240,18 +138,6 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       loading: false,
     }));
   }, []);
-
-  const indexOfLastPost = pagination.currentPage * pagination.posts_per_page;
-  const indexOfFirstPost = indexOfLastPost - pagination.posts_per_page;
-  const currentPosts = homePageCampGroup.slice(
-    indexOfFirstPost,
-    indexOfLastPost
-  );
-  const paginate = (pageNumber) =>
-    setPaagination((prevState) => ({
-      ...prevState,
-      currentPage: pageNumber,
-    }));
 
   //particular city
   useEffect(async () => {
@@ -305,10 +191,16 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       console.log(docMemberInfo.data().select_tag);
       userSelect = docMemberInfo.data().select_tag;
     }
+
     updateDoc(docRefJoinGroup, {
       group: arrayUnion(currentPosts[index].group_id),
     });
-    console.log(userSelect);
+    updateDoc(doc(db, "joinGroup", currentPosts[index].header_id), {
+      alert: arrayUnion({
+        alert_content: `${userName}已加入「${currentPosts[index].group_title}」`,
+        is_read: false,
+      }),
+    });
 
     setDoc(docRefMember, {
       role: "member",
@@ -343,8 +235,8 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
   return (
     <>
       <HeaderSection>
-        {/* <Header ContextByUserId={ContextByUserId} /> */}
-        <nav
+        <NavBar userId={userId} />
+        {/* <nav
           style={{
             backgroundColor: navColor,
             height: navSize,
@@ -354,22 +246,15 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
             width: "100%",
           }}>
           <LogoImgWrap>
-            <Img src={logoColor} width='240px'></Img>
-            <LinkRoute to={`/profile/${userId}`}>
-              <NavFont style={{ color: navFontColor }}>我的露營團</NavFont>
-            </LinkRoute>
-            {/* <LinkRoute to={`/personal_header/${userId}`}>
-              <NavFont
-                style={{ color: navFontColor }}
-                m='0px 0px -10px 0px'
-                fontSize='16px'>
-                開團歷史紀錄
-              </NavFont>
-            </LinkRoute> */}
-            <LinkRoute to={`/create_group`} ml='7%'>
+            <Img src={logoColor} width='240px' height='100%'></Img>
+            <LinkRoute to={`/create_group`} ml='45%'>
               <AddIcon sx={{ marginBottom: "-10px" }}></AddIcon>
               <NavFont style={{ color: navFontColor }}>建立露營團</NavFont>
             </LinkRoute>
+            <LinkRoute to={`/profile/${userId}`} ml='5%'>
+              <NavFont style={{ color: navFontColor }}>我的露營團</NavFont>
+            </LinkRoute>
+            <Alert userId={userId}></Alert>
             {!userId && (
               <LinkRoute to={`/login`} ml='10%'>
                 <NavFontSetGroup style={{ color: navFontColor }}>
@@ -378,7 +263,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
               </LinkRoute>
             )}
           </LogoImgWrap>
-        </nav>
+        </nav> */}
 
         <LandingSubTitleWrap>
           <Font fontSize='14px'>揪團去露營。</Font>

@@ -18,6 +18,7 @@ import {
   setDoc,
   increment,
   getDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import {
   Font,
@@ -389,39 +390,50 @@ function CheckCommentFromMember({ groupId }) {
           </Display>
           {/* </CommentTitleWrap> */}
 
-          <ScrollWrap>
-            {comment &&
-              comment.map((item) => (
-                <Box
-                  sx={{
-                    width: "500px",
-                    height: "auto",
-                    padding: 1,
-                    margin: 1,
-                  }}>
-                  <Display
-                    justifyContent='space-around'
-                    borderBottom='1.4px solid #EAE5BE'
-                    paddingBottom='20px'>
-                    <Wrap direction='column' width='100px'>
-                      <ProfileWrap>
-                        <Img src={item.profile_img}></Img>
-                      </ProfileWrap>
-                      <Font fontSize='14px'>{item.name}</Font>
+          {totalScore && (
+            <ScrollWrap>
+              {comment &&
+                comment.map((item) => (
+                  <Box
+                    sx={{
+                      width: "500px",
+                      height: "auto",
+                      padding: 1,
+                      margin: 1,
+                    }}>
+                    <Wrap
+                      width='500px'
+                      borderBottom='1.4px solid #EAE5BE'
+                      paddingBottom='20px'>
+                      <Wrap justifyContent='space-between' width='500px'>
+                        <Display>
+                          <Wrap
+                            direction='column'
+                            width='100px'
+                            m='0px 40px 0px 0px'>
+                            <ProfileWrap>
+                              <Img src={item.profile_img}></Img>
+                            </ProfileWrap>
+                            <Font fontSize='14px'>{item.name}</Font>
+                          </Wrap>
+                          <Wrap width='200px'>
+                            <Font fontSize='14px'>{item.note}</Font>
+                          </Wrap>
+                        </Display>
+                        <Font marginLeft='100px'>{item.score}分</Font>
+                      </Wrap>
                     </Wrap>
-                    <Font fontSize='14px'>{item.note}</Font>
-                    <Font>{item.score}分</Font>
-                  </Display>
-                </Box>
-              ))}
-          </ScrollWrap>
+                  </Box>
+                ))}
+            </ScrollWrap>
+          )}
         </CheckCommentWrap>
       </Modal>
     </div>
   );
 }
 
-function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
+function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
   const [memberIsOpen, setMemberIsOpen] = useState(false);
   const [member, setMember] = useState([]);
   const checkMemberList = async () => {
@@ -444,10 +456,6 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
 
   const removeMember = async (index, role, member_id) => {
     console.log(groupId);
-    if (role == "header") {
-      alert("無法移除團長");
-      return;
-    }
 
     await deleteDoc(
       doc(db, "CreateCampingGroup", groupId, "member", member[index].member_id)
@@ -474,6 +482,13 @@ function CheckOfGroupMember({ groupId, userId, setRenderParticipateArr }) {
     const docRefCreateGroup = doc(db, "CreateCampingGroup", groupId);
     updateDoc(docRefCreateGroup, {
       current_number: increment(-1),
+    });
+
+    updateDoc(doc(db, "joinGroup", member_id), {
+      alert: arrayUnion({
+        alert_content: `哭哭，你已被移除「${group_title}」。`,
+        is_read: false,
+      }),
     });
     setRenderParticipateArr(true);
   };
@@ -700,7 +715,7 @@ export default function Profile({ userName, userId, getLogout }) {
     });
   }, []);
 
-  const memberWithdrawGroup = async (id, userId) => {
+  const memberWithdrawGroup = async (id, userId, index) => {
     await updateDoc(doc(db, "joinGroup", userId), {
       group: arrayRemove(id),
     });
@@ -708,6 +723,39 @@ export default function Profile({ userName, userId, getLogout }) {
       current_number: increment(-1),
     });
     await deleteDoc(doc(db, "CreateCampingGroup", id, "member", userId));
+
+    updateDoc(doc(db, "joinGroup", yourParticipateGroup[index].header_id), {
+      alert: arrayUnion({
+        alert_content: `${userName}已退出「${yourParticipateGroup[index].group_title}」`,
+        is_read: false,
+      }),
+    });
+
+    const q = query(
+      collection(db, "CreateCampingGroup", id, "tent"),
+      where("member", "array-contains", userName)
+    );
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((item) => {
+      console.log(item.id, " => ", item.data());
+      updateDoc(doc(db, "CreateCampingGroup", id, "tent", item.id), {
+        current_number: increment(-1),
+        member: arrayRemove(userName),
+      });
+    });
+
+    const getSupplies = query(
+      collection(db, "CreateCampingGroup", id, "supplies"),
+      where("bring_person", "==", userName)
+    );
+    const querySupplies = await getDocs(getSupplies);
+    querySupplies.forEach((item) => {
+      console.log(item.id, " => ", item.data());
+      updateDoc(doc(db, "CreateCampingGroup", id, "supplies", item.id), {
+        bring_person: " ",
+      });
+    });
+
     setWithDrawGrop(true);
   };
 
@@ -898,6 +946,7 @@ export default function Profile({ userName, userId, getLogout }) {
                             setRenderParticipateArr={setRenderParticipateArr}
                             groupId={item.group_id}
                             userId={userId}
+                            group_title={item.group_title}
                           />
                           <Button
                             border='#CFC781'
@@ -1004,7 +1053,11 @@ export default function Profile({ userName, userId, getLogout }) {
                                 bgc='#FFFEF4'
                                 width='200px'
                                 onClick={(id) => {
-                                  memberWithdrawGroup(item.group_id, userId);
+                                  memberWithdrawGroup(
+                                    item.group_id,
+                                    userId,
+                                    index
+                                  );
                                 }}>
                                 我要退團
                               </Button>
@@ -1175,7 +1228,6 @@ export default function Profile({ userName, userId, getLogout }) {
                           {item.status == "已結束" && (
                             <CheckCommentFromMember groupId={item.group_id} />
                           )}
-                          
                         </Wrap>
                       </Display>
                     </Box>

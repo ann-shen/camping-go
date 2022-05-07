@@ -33,29 +33,28 @@ import {
 } from "../css/style";
 import Tent from "../component/Tent";
 import Header from "../component/Header";
-import { Box, Paper } from "@mui/material";
+import { Box } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import location from "../image/location.png";
 import alert from "../image/alert.png";
 import tentColor from "../image/tentColor.png";
-import tent from "../image/tent.png";
 import { v4 as uuidv4 } from "uuid";
 import { UserContext } from "../utils/userContext";
 import { useNavigate } from "react-router-dom";
 import CampSupplies from "../component/CampSupplies";
+import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 
 const TargetContainer = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   border: "2.3px dashed #426765",
-  width: "60px",
-  height: "55px",
+  width: "57px",
+  height: "57px",
   backgroundColor: "#f5f4e8",
   borderRadius: "18px",
   margin: "10px",
-  paddingTop: "5px",
 };
 
 const SourseContainer = styled.div`
@@ -197,20 +196,33 @@ const TentSectionWrap = styled.div`
 `;
 
 const IsMemberInTheTentFont = styled.p`
-  font-size: 22px;
+  font-size: 16px;
   color: #cfc781;
   font-weight: 900;
   margin: 0px;
+  margin-bottom: 3px;
   padding-right: 5px;
 `;
 
 const SuppliesWrap = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: start;
   width: 90%;
   margin: 10px 0px 0px 6%;
   border-bottom: 1px dashed #f3ea98;
   padding-bottom: 20px;
+`;
+
+const SuppliesNotAllowedButton = styled.button`
+  width: 180px;
+  height: 40px;
+  font-size: 16px;
+  background-color: #426765;
+  color: #ebebeb;
+  border: 1px solid #ebebeb;
+  margin-left: 5%;
+  cursor: not-allowed;
+  border-radius: 15px;
 `;
 
 function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
@@ -400,6 +412,32 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
       }
     );
   }, []);
+
+  //getGroupMember
+  useEffect(async () => {
+    const q = query(
+      collection(db, "joinGroup"),
+      where("group", "array-contains", params.id)
+    );
+    // const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    //   querySnapshot.forEach((doc) => {
+    //     thisGroupMemberArr.push(doc.data());
+    //   });
+    //   console.log(thisGroupMemberArr);
+    // });
+
+    const querySnapshot = await getDocs(q);
+    let thisGroupMemberArr = [];
+    querySnapshot.forEach((doc) => {
+      console.log(doc.data().info);
+      thisGroupMemberArr.push(doc.data());
+    });
+    // console.log(thisGroupMemberArr);
+    setThisGroupMember(thisGroupMemberArr);
+  }, [allTentArr]);
+
+  // console.log(thisGroupMember);
+
   //getTentData
   useEffect(async () => {
     let tentsArr = [];
@@ -472,30 +510,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   //       });
   //   });
   // }, [allTentArr]);
-
-  useEffect(async () => {
-    const q = query(
-      collection(db, "joinGroup"),
-      where("group", "array-contains", params.id)
-    );
-    // const unsubscribe = onSnapshot(q, (querySnapshot) => {
-    //   querySnapshot.forEach((doc) => {
-    //     thisGroupMemberArr.push(doc.data());
-    //   });
-    //   console.log(thisGroupMemberArr);
-    // });
-
-    const querySnapshot = await getDocs(q);
-    let thisGroupMemberArr = [];
-    querySnapshot.forEach((doc) => {
-      console.log(doc.data().info);
-      thisGroupMemberArr.push(doc.data());
-    });
-    // console.log(thisGroupMemberArr);
-    setThisGroupMember(thisGroupMemberArr);
-  }, []);
-
-  // console.log(thisGroupMember);
 
   const takeAway = async (id) => {
     console.log(id);
@@ -801,11 +815,11 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                             direction='column'
                             justifyContent='center'
                             alignItems='center'
-                            m='0px 10px 10px 0px'
+                            m='0px 20px 10px 0px'
                             mb='20px'>
                             <Font margin='10px' marginLeft='10px'>
                               {seat !== userName && (
-                                <Font fontSize='18px' m='0px 0px 20px 0px'>
+                                <Font fontSize='18px' m='0px 0px 10px 0px'>
                                   {seat}
                                 </Font>
                               )}
@@ -818,8 +832,12 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                             {seat !== userName && (
                               <AccountCircleIcon
                                 key={index}
-                                color='primary'
-                                fontSize='large'></AccountCircleIcon>
+                                fontSize='large'
+                                sx={{
+                                  color: "#CFC781",
+                                  marginBottom: "16px",
+                                  fontSize: "45px",
+                                }}></AccountCircleIcon>
                             )}
                             {seat === userName && (
                               <PersonWrap
@@ -827,12 +845,14 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                                 id='drag-source'
                                 draggable='true'
                                 onDragStart={dragStart}>
-                                <AssignmentIndIcon
+                                <EmojiPeopleIcon
                                   sx={{
                                     pointerEvents: "none",
                                     cursor: "not-allowed",
+                                    color: "#426765",
+                                    fontSize: "45px",
                                   }}
-                                  fontSize='large'></AssignmentIndIcon>
+                                  fontSize='large'></EmojiPeopleIcon>
                               </PersonWrap>
                             )}
                           </Display>
@@ -871,18 +891,23 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
               marginBottom: 5,
             }}>
             <SourseContainer id='source-container' ref={dragSource}>
-              {!IsMemberInTheTent && (
-                <PersonWrap
-                  id='drag-source'
-                  draggable='true'
-                  onDragStart={dragStart}>
-                  <AssignmentIndIcon
-                    sx={{ pointerEvents: "none", cursor: "not-allowed" }}
-                    color='primary'
-                    fontSize='large'></AssignmentIndIcon>
-                </PersonWrap>
-              )}
               <Display>
+                {!IsMemberInTheTent && (
+                  <PersonWrap
+                    id='drag-source'
+                    draggable='true'
+                    onDragStart={dragStart}>
+                    <EmojiPeopleIcon
+                      sx={{
+                        pointerEvents: "none",
+                        cursor: "not-allowed",
+                        color: "#426765",
+                        fontSize: "45px",
+                      }}
+                      color='primary'
+                      fontSize='large'></EmojiPeopleIcon>
+                  </PersonWrap>
+                )}
                 <AnimationIndicators />
                 <Font fontSize='14px' marginLeft='10px'>
                   拖移小人偶至帳篷
@@ -924,10 +949,10 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                   marginTop: 3,
                   marginBottom: 5,
                 }}>
-                <Font fontSize='20px' alignSelf='start' m="0px 0px 30px 0px">
+                <Font fontSize='20px' alignSelf='start' m='0px 0px 30px 0px'>
                   新增帳篷
                 </Font>
-                <Display justifyContent="center">
+                <Display justifyContent='center'>
                   <Tent
                     setTentInfo={setTentInfo}
                     tentInfo={tentInfo}
@@ -979,26 +1004,60 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                   </Font>
                 </Display>
                 {allSupplies.map((item, index) => (
-                  <SuppliesWrap key={index}>
-                    <Label fontSize='16px' color='#F3EA98' ml='5%'>
-                      {item.supplies}
-                    </Label>
-                    <Label fontSize='16px' ml='20%' color='#F3EA98'>
-                      {item.note}
-                    </Label>
-                    <Label ml='20%' color='#F3EA98'>
-                      {item.bring_person}
-                    </Label>
-                    <Button
-                      width='150px'
+                  <Wrap width='100%' justifyContent='space-between'>
+                    <SuppliesWrap key={index}>
+                      <Wrap width='150px' justifyContent='start'>
+                        <Label fontSize='16px' color='#F3EA98' ml='5%'>
+                          {item.supplies}
+                        </Label>
+                      </Wrap>
+                      <Wrap
+                        width='150px'
+                        m='0px 0px 0px 15%'
+                        justifyContent='start'>
+                        <Label fontSize='16px' color='#F3EA98'>
+                          {item.note}
+                        </Label>
+                      </Wrap>
+                      <Label ml='13%' color='#F3EA98'>
+                        {item.bring_person}
+                      </Label>
+                    </SuppliesWrap>
+                    {/* <Button
+                      width='180px'
                       fontSize='16px'
-                      ml='20%'
+                      ml='5%'
                       onClick={() => {
                         takeAway(item.supplies_id);
                       }}>
                       我可以幫忙帶
-                    </Button>
-                  </SuppliesWrap>
+                    </Button> */}
+                    {item.bring_person == "" ? (
+                      <Button
+                        width='180px'
+                        fontSize='16px'
+                        ml='5%'
+                        onClick={() => {
+                          takeAway(item.supplies_id);
+                        }}>
+                        我可以幫忙帶
+                      </Button>
+                    ) : (
+                      <SuppliesNotAllowedButton
+                        width='180px'
+                        fontSize='16px'
+                        bgc='#426765'
+                        color='#EBEBEB'
+                        border='1px solid #EBEBEB'
+                        ml='5%'
+                        cursor='not-allowed'
+                        onClick={() => {
+                          takeAway(item.supplies_id);
+                        }}>
+                        已認領
+                      </SuppliesNotAllowedButton>
+                    )}
+                  </Wrap>
                 ))}
               </Box>
             </Box>
@@ -1033,22 +1092,24 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                 marginTop: 3,
                 marginBottom: 5,
               }}>
-                <Font m="0px 0px 30px 0px">新增需要團員們認領的物品</Font>
-                  <Display justifyContent="center" mb="30px">
+              <Font m='0px 0px 30px 0px'>新增需要團員們認領的物品</Font>
+              <Display justifyContent='center' mb='30px'>
+                <CampSupplies
+                  setCampSupplies={setCampSupplies}
+                  campSupplies={campSupplies}
+                />
+                {suppliesArr.map((_, index) => (
+                  <div key={index}>
                     <CampSupplies
                       setCampSupplies={setCampSupplies}
                       campSupplies={campSupplies}
                     />
-                    {suppliesArr.map((_, index) => (
-                      <div key={index}>
-                        <CampSupplies
-                          setCampSupplies={setCampSupplies}
-                          campSupplies={campSupplies}
-                        />
-                      </div>
-                    ))}
-                  </Display>
-                  <Button onClick={addSupplies} width="100px">新增</Button>
+                  </div>
+                ))}
+              </Display>
+              <Button onClick={addSupplies} width='100px'>
+                新增
+              </Button>
             </Box>
           )}
 
