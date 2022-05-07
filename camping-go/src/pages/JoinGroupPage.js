@@ -529,16 +529,12 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
         member: allMemberArr,
         create_time: serverTimestamp(),
       }
-    ).then(async () => {
+    )
+    .then(async () => {
       let tentsArr = [];
       const citiesRef = collection(db, "CreateCampingGroup", params.id, "tent");
       const q = query(citiesRef, orderBy("create_time", "desc"));
-      const querySnapshot = await getDocs(
-        db,
-        "CreateCampingGroup",
-        params.id,
-        "tent"
-      );
+      const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
         console.log(doc.id, " => ", doc.data());
         tentsArr.push(doc.data());
