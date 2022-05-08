@@ -45,6 +45,9 @@ import { useNavigate } from "react-router-dom";
 import CampSupplies from "../component/CampSupplies";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 
+const Alink = styled.a`
+text-decoration:none;`
+
 const TargetContainer = {
   display: "flex",
   justifyContent: "center",
@@ -419,12 +422,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
       collection(db, "joinGroup"),
       where("group", "array-contains", params.id)
     );
-    // const unsubscribe = onSnapshot(q, (querySnapshot) => {
-    //   querySnapshot.forEach((doc) => {
-    //     thisGroupMemberArr.push(doc.data());
-    //   });
-    //   console.log(thisGroupMemberArr);
-    // });
 
     const querySnapshot = await getDocs(q);
     let thisGroupMemberArr = [];
@@ -432,11 +429,17 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
       console.log(doc.data().info);
       thisGroupMemberArr.push(doc.data());
     });
-    // console.log(thisGroupMemberArr);
-    setThisGroupMember(thisGroupMemberArr);
-  }, [allTentArr]);
 
-  // console.log(thisGroupMember);
+    const docRef = doc(db, "joinGroup", homePageCampGroup.header_id);
+    const getHeaderInfo = await getDoc(docRef);
+    if (getHeaderInfo.exists()) {
+      console.log(getHeaderInfo.data());
+      thisGroupMemberArr.push(getHeaderInfo.data());
+    }
+
+    console.log(thisGroupMemberArr);
+    setThisGroupMember(thisGroupMemberArr);
+  }, [allTentArr, homePageCampGroup]);
 
   //getTentData
   useEffect(async () => {
@@ -1119,21 +1122,23 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
           </Cloumn>
           <AllMemberWrap>
             {thisGroupMember.map((item) => (
-              <MemberWrap>
-                <ProfileImgWrap>
-                  <ProfileImg src={item.profile_img} />
-                </ProfileImgWrap>
-                <Font>{item.info.user_name}</Font>
-                <Display m='3px'>
-                  {item.select_tag
-                    .map((obj) => (
-                      <Tag width='auto' m='3px'>
-                        {obj}
-                      </Tag>
-                    ))
-                    .slice(0, 3)}
-                </Display>
-              </MemberWrap>
+              <Alink href={`/profile/${item.info.user_id}`}>
+                <MemberWrap>
+                  <ProfileImgWrap>
+                    <ProfileImg src={item.profile_img} />
+                  </ProfileImgWrap>
+                  <Font>{item.info.user_name}</Font>
+                  <Display m='3px'>
+                    {item.select_tag
+                      .map((obj) => (
+                        <Tag width='auto' m='3px'>
+                          {obj}
+                        </Tag>
+                      ))
+                      .slice(0, 3)}
+                  </Display>
+                </MemberWrap>
+              </Alink>
             ))}
           </AllMemberWrap>
         </Box>

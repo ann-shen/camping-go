@@ -45,7 +45,9 @@ import location from "../image/location.png";
 import MultipleSelectChip from "../component/MultipleSelectChip";
 import { signOut, getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-
+import SecondHand from "./SecondHand";
+import { async } from "@firebase/util";
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 Modal.setAppElement("#root");
 
 const LinkRoute = styled(Link)`
@@ -604,6 +606,140 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
   );
 }
 
+function SecondHandInvitation({
+  inviteIsOpen,
+  setInviteIsOpen,
+  inviteInfo,
+  inviteInfoIndex,
+  userId,
+}) {
+  console.log(inviteInfo[inviteInfoIndex]);
+
+  const rejectInvite = async () => {
+    inviteInfo[inviteInfoIndex].buyer_name = "";
+    inviteInfo[inviteInfoIndex].buyer_id = "";
+    inviteInfo[inviteInfoIndex].change_supplies_picture = "";
+    inviteInfo[inviteInfoIndex].change_supplies = "";
+    inviteInfo[inviteInfoIndex].invite = false;
+
+    const docRef = doc(db, "joinGroup", userId);
+    await updateDoc(docRef, { second_hand: inviteInfo });
+
+    setInviteIsOpen(false);
+  };
+
+  const acceptInvite = async () => {
+    inviteInfo[inviteInfoIndex].invite = false;
+    inviteInfo[inviteInfoIndex].change_status = true;
+    alert("交換成功");
+
+    const docRef = doc(db, "joinGroup", userId);
+    await updateDoc(docRef, { second_hand: inviteInfo });
+
+    const inviteDocRef = doc(
+      db,
+      "joinGroup",
+      inviteInfo[inviteInfoIndex].buyer_id
+    );
+    const getInviteDocRef = await getDoc(inviteDocRef);
+    if (getInviteDocRef.exists()) {
+      // console.log(getInviteDocRef.data().second_hand);
+
+      //全部資料
+      let data = getInviteDocRef.data().second_hand;
+      let thisIndex = inviteInfo[inviteInfoIndex].inviteSupplies_index; //0
+      let targetChangeStatus = data[thisIndex];
+      console.log(targetChangeStatus.change_status);
+      targetChangeStatus.change_status = true;
+      updateDoc(inviteDocRef, {
+        second_hand: data,
+      });
+    }
+  };
+  return (
+    <>
+      <Modal
+        isOpen={inviteIsOpen}
+        onRequestClose={() => setInviteIsOpen(false)}
+        overlayClassName={{
+          base: "overlay-base",
+          afterOpen: "overlay-after",
+          beforeClose: "overlay-before",
+        }}
+        className={{
+          base: "content-base",
+          afterOpen: "content-after",
+          beforeClose: "content-before",
+        }}
+        closeTimeoutMS={500}>
+        <CheckCommentWrap>
+          <DeleteModalButton onClick={() => setInviteIsOpen(false)}>
+            X
+          </DeleteModalButton>
+          {inviteInfo ? (
+            <>
+              <Wrap
+                width='100%'
+                justifyContent='center'
+                direction='column'
+                alignItems='center'>
+                <Font>{inviteInfo[inviteInfoIndex].buyer_name}想要用</Font>
+                <Hr width='70%'></Hr>
+                <Wrap width='auto' m='30px 0px 50px 0px'>
+                  <Wrap width='200px' direction='column' m='0px 30px 0px 30px'>
+                    <ImgWrap width='170px' height='120px'>
+                      <Img
+                        width='100%'
+                        src={
+                          inviteInfo[inviteInfoIndex].change_supplies_picture
+                        }></Img>
+                    </ImgWrap>
+                    <Font fontSize='16px' m='15px 0px 0px 0px'>
+                      {inviteInfo[inviteInfoIndex].change_supplies}
+                    </Font>
+                    <Font fontSize='14px'>
+                      {inviteInfo[inviteInfoIndex].note}
+                    </Font>
+                  </Wrap>
+                  <Cloumn>
+                    <Font fontSize='16px'>跟你換</Font>
+                    <CompareArrowsIcon
+                      sx={{
+                        fontSize: "70px",
+                        color: "#426765",
+                      }}></CompareArrowsIcon>
+                  </Cloumn>
+                  <Wrap width='200px' direction='column' m='0px 0px 0px 30px'>
+                    <ImgWrap width='170px' height='120px'>
+                      <Img
+                        width='100%'
+                        src={inviteInfo[inviteInfoIndex].picture}></Img>
+                    </ImgWrap>
+                    <Font fontSize='16px' m='15px 0px 0px 0px'>
+                      {inviteInfo[inviteInfoIndex].name}
+                    </Font>
+                  </Wrap>
+                </Wrap>
+                <Display>
+                  <Button onClick={acceptInvite} width='150px'>
+                    確認交換
+                  </Button>
+                  <Button onClick={rejectInvite} width='150px' ml='40px'>
+                    忍痛拒絕
+                  </Button>
+                </Display>
+              </Wrap>
+            </>
+          ) : (
+            <></>
+          )}
+        </CheckCommentWrap>
+      </Modal>
+      )
+    </>
+  );
+}
+
 export default function Profile({ userName, userId, getLogout }) {
   let params = useParams();
   const theme = useTheme();
@@ -612,10 +748,33 @@ export default function Profile({ userName, userId, getLogout }) {
   const [yourParticipateGroup, setYourParticipateGroup] = useState([]);
   const [renderParticipateArr, setRenderParticipateArr] = useState(false);
   const [withDrawGrop, setWithDrawGrop] = useState(false);
+  const [inviteIsOpen, setInviteIsOpen] = useState(false);
+  const [inviteInfo, setInviteInfo] = useState("");
+  const [inviteInfoIndex, setInviteInfoIndex] = useState("");
+
   const navigate = useNavigate();
   const auth = getAuth();
 
   const ContextByUserId = useContext(UserContext);
+
+  useEffect(() => {
+    console.log(userId);
+    if (userId) {
+      const unsub = onSnapshot(doc(db, "joinGroup", userId), (doc) => {
+        console.log("Current data: ", doc.data().second_hand);
+        setInviteInfo(doc.data().second_hand);
+        doc.data().second_hand.map((item, index) => {
+          if (item.invite == true) {
+            setInviteInfoIndex(index);
+            console.log(`${index}ohmygodddddddddddddddd`);
+            setInviteIsOpen(true);
+          }
+        });
+      });
+    }
+  }, []);
+
+  console.log(inviteIsOpen);
 
   useEffect(async () => {
     const q = query(
@@ -632,7 +791,7 @@ export default function Profile({ userName, userId, getLogout }) {
   }, []);
 
   useEffect(async () => {
-    console.log(yourParticipateGroup);
+    // console.log(yourParticipateGroup);
     setWithDrawGrop(false);
     const groups = [];
     //先抓joingroup團員參與過的團ID
@@ -654,7 +813,7 @@ export default function Profile({ userName, userId, getLogout }) {
     participateGroupArr.map(async (item) => {
       const docRef = await getDoc(doc(db, "CreateCampingGroup", item));
       if (docRef.exists()) {
-        console.log(docRef.data());
+        // console.log(docRef.data());
         showGroupArr.push(docRef.data());
         setYourParticipateGroup(showGroupArr);
       } else {
@@ -682,7 +841,7 @@ export default function Profile({ userName, userId, getLogout }) {
     // }
   }, [withDrawGrop]);
 
-  console.log(yourParticipateGroup);
+  // console.log(yourParticipateGroup);
 
   useEffect(() => {
     const q = query(
@@ -692,7 +851,7 @@ export default function Profile({ userName, userId, getLogout }) {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const groups = [];
       querySnapshot.forEach((item) => {
-        console.log(item.data());
+        // console.log(item.data());
         groups.push(item.data());
         if (
           new Date().getTime() <
@@ -752,7 +911,7 @@ export default function Profile({ userName, userId, getLogout }) {
     querySupplies.forEach((item) => {
       console.log(item.id, " => ", item.data());
       updateDoc(doc(db, "CreateCampingGroup", id, "supplies", item.id), {
-        bring_person: " ",
+        bring_person: "",
       });
     });
 
@@ -785,6 +944,14 @@ export default function Profile({ userName, userId, getLogout }) {
       {userId == params.id && (
         <div>
           <Header ContextByUserId={ContextByUserId} />
+          {inviteIsOpen && (
+            <SecondHandInvitation
+              setInviteIsOpen={setInviteIsOpen}
+              inviteIsOpen={inviteIsOpen}
+              inviteInfo={inviteInfo}
+              inviteInfoIndex={inviteInfoIndex}
+              userId={userId}></SecondHandInvitation>
+          )}
           <Wrap
             maxWidth='1440px'
             width='75%'
@@ -854,6 +1021,11 @@ export default function Profile({ userName, userId, getLogout }) {
                   <Tab
                     label='加入'
                     {...a11yProps(1)}
+                    sx={{ fontSize: "20px", letterSpacing: "px" }}
+                  />
+                  <Tab
+                    label='二手交換'
+                    {...a11yProps(2)}
                     sx={{ fontSize: "20px", letterSpacing: "px" }}
                   />
                 </Tabs>
@@ -962,116 +1134,121 @@ export default function Profile({ userName, userId, getLogout }) {
                     </Box>
                   ))}
                 </TabPanel>
-                {yourParticipateGroup && (
-                  <div>
-                    {yourParticipateGroup.map((item, index) => (
-                      <Box
-                        key={index}
-                        sx={{
-                          width: "85%",
-                          height: "auto",
-                          boxShadow:
-                            "0.8rem 0.8rem 3.2rem #E2E1D3 , -1.0rem -1.0rem 1rem #ffffff",
-                          borderRadius: 6,
-                          padding: 5,
-                          margin: "auto",
-                          marginTop: "30px",
-                          border: "1px solid #CFC781 ",
-                          justifyContent: "space-around",
-                        }}>
-                        <Display justifyContent='space-between' ml='20px'>
-                          <LinkRoute to={`/joinGroup/${item.group_id}`}>
-                            <Display direction='column' alignItems='start'>
-                              <Display alignItems='start'>
-                                <ImgWrap>
-                                  <Img
-                                    src={item.picture}
-                                    width='100%'
-                                    m='0px'></Img>
-                                </ImgWrap>
-                                <Display
-                                  direction='column'
-                                  alignItems='start'
-                                  ml='30px'>
-                                  <Tag bgc='#CFC781' color='white'>
-                                    {item.status}
-                                  </Tag>
-                                  <Font
-                                    fontSize='25px'
-                                    letterSpacing='3px'
-                                    m='5px 0px 3px 0px'>
-                                    {item.group_title}
-                                  </Font>
-                                  <Font fontSize='14px' m='0px 0px 15px 0px'>
-                                    {
-                                      new Date(item.start_date.seconds * 1000)
-                                        .toLocaleString()
-                                        .split(" ")[0]
-                                    }
-                                    ~
-                                    {
-                                      new Date(item.end_date.seconds * 1000)
-                                        .toLocaleString()
-                                        .split(" ")[0]
-                                    }
-                                  </Font>
-                                  <Display>
+                <TabPanel value={value} index={1} dir={theme.direction}>
+                  {yourParticipateGroup && (
+                    <div>
+                      {yourParticipateGroup.map((item, index) => (
+                        <Box
+                          key={index}
+                          sx={{
+                            width: "85%",
+                            height: "auto",
+                            boxShadow:
+                              "0.8rem 0.8rem 3.2rem #E2E1D3 , -1.0rem -1.0rem 1rem #ffffff",
+                            borderRadius: 6,
+                            padding: 5,
+                            margin: "auto",
+                            marginTop: "30px",
+                            border: "1px solid #CFC781 ",
+                            justifyContent: "space-around",
+                          }}>
+                          <Display justifyContent='space-between' ml='20px'>
+                            <LinkRoute to={`/joinGroup/${item.group_id}`}>
+                              <Display direction='column' alignItems='start'>
+                                <Display alignItems='start'>
+                                  <ImgWrap>
                                     <Img
-                                      src={location}
-                                      width='24px'
-                                      m=' 0px 8px 0px -3px '></Img>
-                                    <Font fontSize='16px'>{item.city}</Font>
+                                      src={item.picture}
+                                      width='100%'
+                                      m='0px'></Img>
+                                  </ImgWrap>
+                                  <Display
+                                    direction='column'
+                                    alignItems='start'
+                                    ml='30px'>
+                                    <Tag bgc='#CFC781' color='white'>
+                                      {item.status}
+                                    </Tag>
+                                    <Font
+                                      fontSize='25px'
+                                      letterSpacing='3px'
+                                      m='5px 0px 3px 0px'>
+                                      {item.group_title}
+                                    </Font>
+                                    <Font fontSize='14px' m='0px 0px 15px 0px'>
+                                      {
+                                        new Date(item.start_date.seconds * 1000)
+                                          .toLocaleString()
+                                          .split(" ")[0]
+                                      }
+                                      ~
+                                      {
+                                        new Date(item.end_date.seconds * 1000)
+                                          .toLocaleString()
+                                          .split(" ")[0]
+                                      }
+                                    </Font>
+                                    <Display>
+                                      <Img
+                                        src={location}
+                                        width='24px'
+                                        m=' 0px 8px 0px -3px '></Img>
+                                      <Font fontSize='16px'>{item.city}</Font>
+                                    </Display>
                                   </Display>
                                 </Display>
-                              </Display>
-                              <Display alignItems='center'>
-                                {/* {item.score && (
+                                <Display alignItems='center'>
+                                  {/* {item.score && (
                             <Display>
                               <Font fontSize='40px'>{item.score}</Font>
                               {item.score && <Font fontSize='20px'>分</Font>}
                             </Display>
                           )} */}
+                                </Display>
                               </Display>
-                            </Display>
-                          </LinkRoute>
-                          <Wrap
-                            direction='column'
-                            alignItems='end'
-                            height='250px'
-                            justifyContent='space-evenly'
-                            m='20px'>
-                            {item.status == "已結束" && (
-                              <SentCommentToHeader
-                                groupId={item.group_id}
-                                userName={userName}
-                                userId={userId}
-                              />
-                            )}
-                            {item.status == "進行中" && (
-                              <Button
-                                border='#CFC781'
-                                bgc='#FFFEF4'
-                                width='200px'
-                                onClick={(id) => {
-                                  memberWithdrawGroup(
-                                    item.group_id,
-                                    userId,
-                                    index
-                                  );
-                                }}>
-                                我要退團
-                              </Button>
-                            )}
-                          </Wrap>
-                        </Display>
-                      </Box>
-                    ))}
-                  </div>
-                )}
-                <TabPanel
-                  value={value}
-                  index={1}
-                  dir={theme.direction}></TabPanel>
+                            </LinkRoute>
+                            <Wrap
+                              direction='column'
+                              alignItems='end'
+                              height='250px'
+                              justifyContent='space-evenly'
+                              m='20px'>
+                              {item.status == "已結束" && (
+                                <SentCommentToHeader
+                                  groupId={item.group_id}
+                                  userName={userName}
+                                  userId={userId}
+                                />
+                              )}
+                              {item.status == "進行中" && (
+                                <Button
+                                  border='#CFC781'
+                                  bgc='#FFFEF4'
+                                  width='200px'
+                                  onClick={(id) => {
+                                    memberWithdrawGroup(
+                                      item.group_id,
+                                      userId,
+                                      index
+                                    );
+                                  }}>
+                                  我要退團
+                                </Button>
+                              )}
+                            </Wrap>
+                          </Display>
+                        </Box>
+                      ))}
+                    </div>
+                  )}
+                </TabPanel>
+                <TabPanel value={value} index={2} dir={theme.direction}>
+                  <SecondHand
+                    userId={userId}
+                    userName={userName}
+                    current_userId={params.id}
+                  />
+                </TabPanel>
               </SwipeableViews>
             </Box>
           ) : (
@@ -1140,6 +1317,11 @@ export default function Profile({ userName, userId, getLogout }) {
                   <Tab
                     label='開團'
                     {...a11yProps(0)}
+                    sx={{ fontSize: "20px", letterSpacing: "px" }}
+                  />
+                  <Tab
+                    label='查看二手交換物品'
+                    {...a11yProps(1)}
                     sx={{ fontSize: "20px", letterSpacing: "px" }}
                   />
                 </Tabs>
@@ -1232,6 +1414,14 @@ export default function Profile({ userName, userId, getLogout }) {
                       </Display>
                     </Box>
                   ))}
+                </TabPanel>
+                <TabPanel value={value} index={1} dir={theme.direction}>
+                  <SecondHand
+                    userId={params.id}
+                    current_userId={userId}
+                    userName={userName}
+                    // userName={yourCreateGroup[0].header_name}
+                  />
                 </TabPanel>
               </SwipeableViews>
             </Box>

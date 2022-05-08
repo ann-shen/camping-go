@@ -55,6 +55,7 @@ function NavBar({ userId }) {
       window.removeEventListener("scroll", listenScrollEvent);
     };
   }, []);
+  console.log(userId);
 
   return (
     <nav
@@ -79,7 +80,7 @@ function NavBar({ userId }) {
         </LinkRoute>
         <Alert userId={userId}></Alert>
         {!userId && (
-          <LinkRoute to={`/login`} ml='10%'>
+          <LinkRoute to={`/login`} ml='1%'>
             <NavFontSetGroup style={{ color: navFontColor }}>
               登入
             </NavFontSetGroup>

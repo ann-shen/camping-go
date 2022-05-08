@@ -21,6 +21,9 @@ import landingpage03 from "../image/landingpage-03.png";
 import alertIcon from "../image/alert.png";
 import { height, width } from "@mui/system";
 
+const Alink=styled.a`
+text-decoration:none;`
+
 const Span = styled.span`
   font-size: 14px;
   margin-left: 6px;
@@ -53,6 +56,7 @@ const Tag = styled.div`
   border: 1.5px solid #cfc781;
   color: white;
   margin-top: 10px;
+  text-align: center;
 `;
 
 const SelectTag = styled.div`
@@ -156,8 +160,7 @@ function IsModal({
       setAlert(true);
     }
   };
-  console.log(currentPosts[index]);
-  console.log(header_name);
+  // console.log(currentPosts[index]);
 
   return (
     <div className='App'>
@@ -402,10 +405,10 @@ export default function ReviewCard({
                 textAlign: "start",
                 height: "140px",
               }}>
-              <a href={`./personal_header/${item.header_id}`}>
+              <Alink href={`./profile/${item.header_id}`}>
                 <Span>團長</Span>
                 <Span>{item.header_name}</Span>
-              </a>
+              </Alink>
 
               <Font fontSize='20px' m='6px 0px 6px 0px'>
                 {item.group_title}
@@ -448,7 +451,6 @@ export default function ReviewCard({
                 }}>
                 {item.status == "進行中" && <LinkOpen>我要加入</LinkOpen>}
 
-                
                 {item.status == "已結束" && (
                   <LinkOpen style={{ cursor: "not-allowed" }}>
                     已結束哭哭

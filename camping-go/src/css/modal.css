@@ -80,9 +80,9 @@
   justify-content: center;
   align-items: center;
   padding-top: 20px;
-  width: 23%;
-  height: 55%;
+  width: 28%;
+  height: 75%;
   border-radius: 40px;
   background-color: transparent;
-  border:2px solid #CFC781;
+  border:2px solid transparent;
 }

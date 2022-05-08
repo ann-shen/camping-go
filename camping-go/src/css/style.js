@@ -38,6 +38,7 @@ export const Display = styled.div`
   border-bottom: ${(props) => props.borderBottom || "none"};
   padding-bottom: ${(props) => props.paddingBottom || "0px"};
   /* height: ${(props) => props.height || "200px"}; */
+  
 `;
 
 export const Wrap = styled.div`
@@ -113,6 +114,8 @@ export const Tag = styled.div`
   border: ${(props) => props.border || "2px solid #CFC781"};
   font-size: ${(props) => props.fontSize || "15px"};
   color: ${(props) => props.color || "#426765"};
+  text-align:center;
+
 `;
 
 export const Cloumn = styled.div`

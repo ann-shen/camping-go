@@ -11,6 +11,7 @@ const AlertWrap = styled.div`
   flex-direction: column;
   align-items: center;
   margin-top: 4px;
+  cursor: pointer;
 `;
 
 const AlertContentWrap = styled.div`
@@ -25,6 +26,7 @@ const AlertContentWrap = styled.div`
   color: #426765;
   background-color: #f4f4ef;
   border-bottom: 1px solid #cfc781;
+  cursor: pointer;
 `;
 
 const fadeIn = keyframes`
