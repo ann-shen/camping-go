@@ -24,7 +24,11 @@ function CampSupplies({ setCampSupplies, campSupplies }) {
   };
 
   return (
-    <Wrap width='auto' direction='column' alignItems='start' m="10px 30px 0px 0px">
+    <Wrap
+      width='auto'
+      direction='column'
+      alignItems='start'
+      m='10px 30px 0px 0px'>
       <Font fontSize='14px' marginLeft='10px'>
         新增物品
       </Font>
@@ -32,11 +36,16 @@ function CampSupplies({ setCampSupplies, campSupplies }) {
         sx={{ marginBottom: "30px", marginTop: "5px" }}
         name='supplies'
         onChange={handleChange}
-        size='small'></TextField>
+        size='small'
+        value={campSupplies.supplies}></TextField>
       <Font fontSize='14px' marginLeft='10px'>
         備註
       </Font>
-      <TextField name='note' onChange={handleChange} size='small'></TextField>
+      <TextField
+        name='note'
+        onChange={handleChange}
+        size='small'
+        value={campSupplies.note}></TextField>
     </Wrap>
   );
 }

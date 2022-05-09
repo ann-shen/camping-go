@@ -7,7 +7,7 @@ import CardActions from "@mui/material/CardActions";
 import Collapse from "@mui/material/Collapse";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Font, Display, Img, Button, Hr, Cloumn, Wrap } from "../css/style";
+import { Font, Display, Img, Button, Hr, Cloumn, Wrap,Tag } from "../css/style";
 import { ExpandMore } from "./ReviewCard_Component/ExpanMore";
 import location from "../image/location.png";
 import { useState, useEffect } from "react";
@@ -44,7 +44,7 @@ const ImgWrap = styled.div`
   overflow: hidden;
 `;
 
-const Tag = styled.div`
+const PrivicyTag = styled.div`
   position: relative;
   bottom: 200px;
   left: 20px;
@@ -398,7 +398,7 @@ export default function ReviewCard({
                 image={item.picture}
                 alt='Paella dish'
               />
-              {item.privacy == "私人" && <Tag>私</Tag>}
+              {item.privacy == "私人" && <PrivicyTag>私</PrivicyTag>}
             </ImgWrap>
             <CardContent
               sx={{
@@ -406,8 +406,15 @@ export default function ReviewCard({
                 height: "140px",
               }}>
               <Alink href={`./profile/${item.header_id}`}>
-                <Span>團長</Span>
-                <Span>{item.header_name}</Span>
+                <Tag
+                  width='90px'
+                  height='18px'
+                  fontSize='13px'
+                  p='0px 0px 1px 0px'
+                  borderRadius="8px"
+                  >
+                  團長｜{item.header_name}
+                </Tag>
               </Alink>
 
               <Font fontSize='20px' m='6px 0px 6px 0px'>

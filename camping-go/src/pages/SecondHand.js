@@ -66,7 +66,13 @@ const ImgCursorWrap = styled.div`
   border: ${(props) => props.border || "none"};
 `;
 
-function SecondHand({ userName, userId, current_userId }) {
+function SecondHand({
+  userName,
+  userId,
+  current_userId,
+  setSendInvite,
+  sendInvite,
+}) {
   const [upload, setUpLoadFile] = useState({
     file: "",
     url: "",
@@ -82,6 +88,7 @@ function SecondHand({ userName, userId, current_userId }) {
     seller_id: userId,
     change_supplies: "",
     change_supplies_picture: "",
+    change_note: "",
     invite: false,
     inviteSupplies_index: "",
     note: "",
@@ -155,6 +162,13 @@ function SecondHand({ userName, userId, current_userId }) {
       const docRef = doc(db, "joinGroup", userId);
       await updateDoc(docRef, { second_hand: arrayUnion(suppliesInfo) });
     }
+
+    setSuppliesInfo((prevState) => ({
+      ...prevState,
+      name: "",
+      hope: "",
+      note: "",
+    }));
   };
 
   const changeInvite = async (index) => {
@@ -175,7 +189,6 @@ function SecondHand({ userName, userId, current_userId }) {
   const choseSuppliesToChange = (index) => {
     setImgBorder("2.5px solid #759D9B");
     setChoseSupplies(buyerArr[index]);
-    console.log(buyerArr[index]);
     allSupplies[inviteIndex].inviteSupplies_index = index;
   };
 
@@ -187,6 +200,7 @@ function SecondHand({ userName, userId, current_userId }) {
     allSupplies[inviteIndex].change_status = false;
     allSupplies[inviteIndex].change_supplies = choseSupplies.name;
     allSupplies[inviteIndex].change_supplies_picture = choseSupplies.picture;
+    allSupplies[inviteIndex].change_note = choseSupplies.note;
     allSupplies[inviteIndex].invite = true;
     // console.log(allSupplies[inviteIndex]);
     console.log(allSupplies);
@@ -200,9 +214,6 @@ function SecondHand({ userName, userId, current_userId }) {
 
   return (
     <>
-      <Font letterSpacing='3px' m='0px 0px 30px 0px'>
-        二手交換物品
-      </Font>
       <Display>
         {allSupplies && (
           <Display>
@@ -224,6 +235,11 @@ function SecondHand({ userName, userId, current_userId }) {
                 <Cloumn>
                   {item.change_status == true && (
                     <Tag fontSize='14px'>已交換</Tag>
+                  )}
+                  {item.change_status == false && (
+                    <Tag bgc='#426765' color='white' fontSize='14px'>
+                      可交換
+                    </Tag>
                   )}
                   <ImgWrap width='230px' height='200px' m='10px 0px 0px 0px'>
                     <Img src={item.picture} width='120%' />

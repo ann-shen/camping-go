@@ -614,6 +614,8 @@ function SecondHandInvitation({
   userId,
 }) {
   console.log(inviteInfo[inviteInfoIndex]);
+  const [open, setOpen] = useState(false);
+
 
   const rejectInvite = async () => {
     inviteInfo[inviteInfoIndex].buyer_name = "";
@@ -631,7 +633,6 @@ function SecondHandInvitation({
   const acceptInvite = async () => {
     inviteInfo[inviteInfoIndex].invite = false;
     inviteInfo[inviteInfoIndex].change_status = true;
-    alert("交換成功");
 
     const docRef = doc(db, "joinGroup", userId);
     await updateDoc(docRef, { second_hand: inviteInfo });
@@ -655,6 +656,7 @@ function SecondHandInvitation({
         second_hand: data,
       });
     }
+    setOpen(true);
   };
   return (
     <>
@@ -698,7 +700,7 @@ function SecondHandInvitation({
                       {inviteInfo[inviteInfoIndex].change_supplies}
                     </Font>
                     <Font fontSize='14px'>
-                      {inviteInfo[inviteInfoIndex].note}
+                      {inviteInfo[inviteInfoIndex].change_note}
                     </Font>
                   </Wrap>
                   <Cloumn>
@@ -720,6 +722,23 @@ function SecondHandInvitation({
                     </Font>
                   </Wrap>
                 </Wrap>
+                <Collapse in={open}>
+                  <Alert
+                    action={
+                      <IconButton
+                        aria-label='close'
+                        color='inherit'
+                        size='small'
+                        onClick={() => {
+                          setOpen(false);
+                        }}>
+                        <CloseIcon fontSize='inherit' />
+                      </IconButton>
+                    }
+                    sx={{ mb: 2 }}>
+                    交換成功!
+                  </Alert>
+                </Collapse>
                 <Display>
                   <Button onClick={acceptInvite} width='150px'>
                     確認交換
@@ -751,6 +770,7 @@ export default function Profile({ userName, userId, getLogout }) {
   const [inviteIsOpen, setInviteIsOpen] = useState(false);
   const [inviteInfo, setInviteInfo] = useState("");
   const [inviteInfoIndex, setInviteInfoIndex] = useState("");
+  const [sendInvite, setSendInvite] = useState("");
 
   const navigate = useNavigate();
   const auth = getAuth();
@@ -842,6 +862,12 @@ export default function Profile({ userName, userId, getLogout }) {
   }, [withDrawGrop]);
 
   // console.log(yourParticipateGroup);
+
+  useEffect(() => {
+    if (sendInvite !== "") {
+      console.log(`這邊 ${sendInvite}`);
+    }
+  }, [sendInvite]);
 
   useEffect(() => {
     const q = query(
@@ -950,7 +976,8 @@ export default function Profile({ userName, userId, getLogout }) {
               inviteIsOpen={inviteIsOpen}
               inviteInfo={inviteInfo}
               inviteInfoIndex={inviteInfoIndex}
-              userId={userId}></SecondHandInvitation>
+              userId={userId}
+              sendInvite={sendInvite}></SecondHandInvitation>
           )}
           <Wrap
             maxWidth='1440px'
@@ -1247,6 +1274,8 @@ export default function Profile({ userName, userId, getLogout }) {
                     userId={userId}
                     userName={userName}
                     current_userId={params.id}
+                    setSendInvite={setSendInvite}
+                    sendInvite={sendInvite}
                   />
                 </TabPanel>
               </SwipeableViews>
@@ -1420,6 +1449,8 @@ export default function Profile({ userName, userId, getLogout }) {
                     userId={params.id}
                     current_userId={userId}
                     userName={userName}
+                    sendInvite={sendInvite}
+                    setSendInvite={setSendInvite}
                     // userName={yourCreateGroup[0].header_name}
                   />
                 </TabPanel>

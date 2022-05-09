@@ -114,8 +114,11 @@ export const Tag = styled.div`
   border: ${(props) => props.border || "2px solid #CFC781"};
   font-size: ${(props) => props.fontSize || "15px"};
   color: ${(props) => props.color || "#426765"};
-  text-align:center;
-
+  text-align: center;
+  &:hover {
+    color: ${(props) => props.color || ""};
+    background-color: ${(props) => props.bgc || ""};
+  }
 `;
 
 export const Cloumn = styled.div`

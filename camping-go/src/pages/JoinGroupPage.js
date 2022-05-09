@@ -46,7 +46,8 @@ import CampSupplies from "../component/CampSupplies";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 
 const Alink = styled.a`
-text-decoration:none;`
+  text-decoration: none;
+`;
 
 const TargetContainer = {
   display: "flex",
@@ -553,7 +554,9 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
       let tentsArr = [];
       const citiesRef = collection(db, "CreateCampingGroup", params.id, "tent");
       const q = query(citiesRef, orderBy("create_time", "desc"));
-      const querySnapshot = await getDocs(q);
+      const querySnapshot = await getDocs(
+        collection(db, "CreateCampingGroup", params.id, "tent")
+      );
       querySnapshot.forEach((doc) => {
         console.log(doc.id, " => ", doc.data());
         tentsArr.push(doc.data());
@@ -565,7 +568,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   };
 
   const addSupplies = async () => {
-    // setSuppliesArr((prev) => [...prev, 1]);
     const ondocRefNewSupplies = doc(
       collection(db, "CreateCampingGroup", params.id, "supplies")
     );
@@ -582,6 +584,8 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
         supplies_id: ondocRefNewSupplies.id,
       }
     );
+
+    setCampSupplies((prevState) => ({ ...prevState, note: "", supplies: "" }));
   };
 
   //------------------------FIX ME ------------------------//
