@@ -49,7 +49,7 @@ export default function MultipleSelectChip({ userId, path, groupId }) {
   const theme = useTheme();
   const [personName, setPersonName] = useState([]);
   // const [chosenTag, setChosenTag] = useState([]);
-console.log(groupId);
+// console.log(groupId);
   useEffect(async () => {
     if (path == "/create_group") {
       console.log("create");
@@ -59,7 +59,7 @@ console.log(groupId);
     }
   }, [personName]);
 
-  console.log(personName);
+  // console.log(personName);
 
   useEffect(async () => {
     if (path !== "/create_group") {

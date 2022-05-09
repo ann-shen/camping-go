@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import CityCamping from "./pages/CityCamping";
 import { UserContext } from "./utils/userContext";
 import FindGroup from "./pages/FindGroup";
+import SecondHand from "./pages/SecondHand";
 
 
 function App() {
@@ -101,6 +102,11 @@ function App() {
             <Route
               path='find_group'
               element={<FindGroup userId={userId} />}></Route>
+            <Route
+              path='second_hand'
+              element={
+                <SecondHand userName={userName} userId={userId} />
+              }></Route>
           </Routes>
         </BrowserRouter>
       </UserContext.Provider>

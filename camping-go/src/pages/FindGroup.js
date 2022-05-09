@@ -236,6 +236,7 @@ function FindGroup({ userId, userName, setGroupId }) {
   return (
     <div>
       {findIndex !== "" && <div>{findIndex}</div>}
+      {/* <Font color="white" m="100px 0px 0px 0px" marginLeft="44%" letterSpacing="3px">- 最佳推薦 -</Font> */}
       {allGroupInfo.length !== 0 && (
         <GroupWrap>
           <Card
@@ -287,7 +288,7 @@ function FindGroup({ userId, userName, setGroupId }) {
               </Font>
               <Display justifyContent='space-between'>
                 <Display>
-                  <Img src={location} width='26px'></Img>{" "}
+                  <Img src={location} width='26px'></Img>
                   <Span>{allGroupInfo[findIndex].city}</Span>
                 </Display>
                 <Display>

@@ -10,7 +10,7 @@ import {
   doc,
   arrayUnion,
 } from "firebase/firestore";
-import { Font, Display, Img, Button } from "../css/style";
+import { Font, Display, Img, Button, Wrap, Hr } from "../css/style";
 import location from "../image/location.png";
 import { db } from "../utils/firebase";
 import { Link, useNavigate } from "react-router-dom";
@@ -27,6 +27,7 @@ import Modal from "react-modal";
 import { TextField, Alert, AlertTitle, Stack } from "@mui/material";
 import Collapse from "@mui/material/Collapse";
 import Typography from "@mui/material/Typography";
+import location_big from "../image/location_big.png";
 
 const Span = styled.span`
   font-size: 16px;
@@ -155,7 +156,6 @@ function IsModal({ modalIsOpen, setIsOpen, groupId, groupPassword }) {
   );
 }
 
-
 function Expanded({ expanded, targetCityArr, targetIndex }) {
   // console.log(targetIndex);
   // console.log(currentPosts[targetIndex]);
@@ -179,7 +179,7 @@ function Expanded({ expanded, targetCityArr, targetIndex }) {
   );
 }
 
-function CityCamping({ userName ,groupId}) {
+function CityCamping({ userName, groupId }) {
   const [targetCity, setTargetCity] = useState("");
   const [targetCityArr, setTargetCityArr] = useState([]);
   const ContextByUserId = useContext(UserContext);
@@ -386,6 +386,8 @@ function CityCamping({ userName ,groupId}) {
     },
   ];
 
+  console.log(targetCity);
+
   useEffect(() => {
     let result = place_data.filter((obj) => {
       return obj.tag == params.city;
@@ -410,7 +412,7 @@ function CityCamping({ userName ,groupId}) {
     }
   }, [targetCity]);
 
-  const addCurrentMember = async (group_id, index,password) => {
+  const addCurrentMember = async (group_id, index, password) => {
     console.log(group_id);
     await updateDoc(doc(db, "CreateCampingGroup", group_id), {
       current_number: increment(1),
@@ -428,188 +430,132 @@ function CityCamping({ userName ,groupId}) {
   return (
     <div>
       <Header ContextByUserId={ContextByUserId} />
-      <Display alignItems="start">
-        {targetCityArr.map((item, index) => (
-          <Card
-            sx={{
-              width: "24%",
-              height: "auto",
-              boxShadow:
-                "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-              borderRadius: 7.5,
-              padding: 1,
-              margin: 5,
-              backgroundColor: "#F4F4EE",
-            }}>
-            <ImgWrap>
-              <CardMedia
-                sx={{
-                  width: "100%",
-                  height: "230px",
-                }}
-                component='img'
-                height='194'
-                image={item.picture}
-                alt='Paella dish'
-              />
-              {item.privacy == "私人" && <Tag>私</Tag>}
-            </ImgWrap>
-            <CardContent
+      <Wrap width='100%' direction='column' justifyContent='start'>
+        <Wrap width='300px' alignItems='center' m='50px 0px 0px -20%'>
+          <Img src={location_big} width='25px'></Img>
+          <Font fontSize='20px' m='0px 0px 0px 20px' marginLeft='10px'>
+            {targetCity}
+          </Font>
+        </Wrap>
+        <Wrap alignItems='start' justifyContent='center' width='80%'>
+          {targetCityArr.map((item, index) => (
+            <Card
               sx={{
-                textAlign: "start",
-                height: "160px",
+                width: "24%",
+                height: "auto",
+                boxShadow:
+                  "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+                borderRadius: 7.5,
+                padding: 1,
+                margin: 4,
+                marginTop: 2,
+                backgroundColor: "#F4F4EE",
               }}>
-              <Span>團長</Span>
-              <Span>{item.header_name}</Span>
-              <Font fontSize='25px' m='6px 0px 6px 0px'>
-                {item.group_title}
-              </Font>
-              <Font fontSize='16px' m='0px 0px 16px 0px'>
-                {
-                  new Date(item.start_date.seconds * 1000)
-                    .toLocaleString()
-                    .split(" ")[0]
-                }
-                ~
-                {
-                  new Date(item.end_date.seconds * 1000)
-                    .toLocaleString()
-                    .split(" ")[0]
-                }
-              </Font>
-              <Display justifyContent='space-between'>
-                <Display>
-                  <Img src={location} width='26px'></Img>{" "}
-                  <Span>{item.city}</Span>
-                </Display>
-                <Display>
-                  <Font>
-                    {item.current_number}/{item.max_member_number}
-                  </Font>
-                  <Span>人</Span>
-                </Display>
-              </Display>
-            </CardContent>
-
-            <ButtonWrap>
-              <Button
-                width='90%'
-                margin='auto'
-                group_id={item.group_id}
-                variant='outlined'
-                onClick={(e) => {
-                  addCurrentMember(item.group_id, index, item.password);
+              <ImgWrap>
+                <CardMedia
+                  sx={{
+                    width: "100%",
+                    height: "230px",
+                  }}
+                  component='img'
+                  height='194'
+                  image={item.picture}
+                  alt='Paella dish'
+                />
+                {item.privacy == "私人" && <Tag>私</Tag>}
+              </ImgWrap>
+              <CardContent
+                sx={{
+                  textAlign: "start",
+                  height: "160px",
                 }}>
-                {item.privacy == "公開" && item.header_name !== userName && (
-                  <LinkPrivate to={`joinGroup/${item.group_id}`}>
-                    我要加入
-                  </LinkPrivate>
-                )}
-                {item.privacy == "私人" && item.header_name !== userName && (
-                  <LinkOpen>我要加入</LinkOpen>
-                )}
-                {item.header_name == userName && <LinkOpen>我要加入</LinkOpen>}
-              </Button>
-            </ButtonWrap>
-            <IsModal
-            modalIsOpen={modalIsOpen}
-            setIsOpen={setIsOpen}
-            groupId={groupId}
-            groupPassword={groupPassword}
-          />
-            <CardActions disableSpacing>
-              {item.select_tag
-                .map((obj) => <SelectTag>{obj}</SelectTag>)
-                .slice(0, 3)}
-              <ExpandMore
-              sx={{ zIndex: "10" }}
-              name='gogo'
-              expand={expandedArr[index]}
-              onClick={(e) => {
-                handleExpandClick(index, e);
-              }}
-              aria-expanded={expandedArr[index]}
-              aria-label='show more'>
-              <ExpandMoreIcon
-                sx={{ pointerEvents: "none", cursor: "not-allowed" }}
-              />
-            </ExpandMore>
-            </CardActions>
-            <Expanded
-            expanded={expandedArr[index]}
-            targetCityArr={targetCityArr}
-            targetIndex={targetIndex}
-          />
-          </Card>
-        ))}
-      </Display>
-
-      {/* {targetCityArr.map((item, index) => (
-        <Box
-          sx={{
-            width: 1000,
-            height: 300,
-            "&:hover": {
-              border: 1,
-              opacity: [0.9, 0.8, 0.7],
-            },
-            boxShadow: 3,
-            borderRadius: 6,
-            padding: 3,
-            margin: 3,
-          }}
-          key={index}>
-          <Grid item xs={4} md={8}>
-            <div>
-              <span>團長{item.header_name}</span>
-            </div>
-            <Font fontSize='24px' color='#797659' marginLeft='0px' margin='8px'>
-              {item.group_title}
-            </Font>
-            <div>
-              <Label ml='8px'>
-                {
-                  new Date(item.start_date.seconds * 1000)
-                    .toLocaleString()
-                    .split(" ")[0]
-                }
-                ~
-              </Label>
-              <Label>
-                {
-                  new Date(item.end_date.seconds * 1000)
-                    .toLocaleString()
-                    .split(" ")[0]
-                }
-              </Label>
-            </div>
-            <div>
-              <Display justifyContent='space-between'>
-                <Display>
-                  <Img src={location} width='26px'></Img>
-                  <Font fontSize='16px' marginLeft='10px'>
-                    {item.city}{" "}
-                  </Font>
-                </Display>
-                <div>
+                <Span>團長</Span>
+                <Span>{item.header_name}</Span>
+                <Font fontSize='25px' m='6px 0px 6px 0px'>
+                  {item.group_title}
+                </Font>
+                <Font fontSize='16px' m='0px 0px 16px 0px'>
+                  {
+                    new Date(item.start_date.seconds * 1000)
+                      .toLocaleString()
+                      .split(" ")[0]
+                  }
+                  ~
+                  {
+                    new Date(item.end_date.seconds * 1000)
+                      .toLocaleString()
+                      .split(" ")[0]
+                  }
+                </Font>
+                <Display justifyContent='space-between'>
                   <Display>
-                    <Font fontSize='35px'>
-                      {item.current_number}/{item.max_member_number}人
-                    </Font>
+                    <Img src={location} width='26px'></Img>{" "}
+                    <Span>{item.city}</Span>
                   </Display>
-                </div>
-              </Display>
-            </div>
-            <Button
-              variant='outlined'
-              onClick={(e) => {
-                addCurrentMember(item.group_id, index);
-              }}>
-              我要加入
-            </Button>
-          </Grid>
-        </Box>
-      ))} */}
+                  <Display>
+                    <Font>
+                      {item.current_number}/{item.max_member_number}
+                    </Font>
+                    <Span>人</Span>
+                  </Display>
+                </Display>
+              </CardContent>
+
+              <ButtonWrap>
+                <Button
+                  width='90%'
+                  margin='auto'
+                  group_id={item.group_id}
+                  variant='outlined'
+                  onClick={(e) => {
+                    addCurrentMember(item.group_id, index, item.password);
+                  }}>
+                  {item.privacy == "公開" && item.header_name !== userName && (
+                    <LinkPrivate to={`joinGroup/${item.group_id}`}>
+                      我要加入
+                    </LinkPrivate>
+                  )}
+                  {item.privacy == "私人" && item.header_name !== userName && (
+                    <LinkOpen>我要加入</LinkOpen>
+                  )}
+                  {item.header_name == userName && (
+                    <LinkOpen>我要加入</LinkOpen>
+                  )}
+                </Button>
+              </ButtonWrap>
+              <IsModal
+                modalIsOpen={modalIsOpen}
+                setIsOpen={setIsOpen}
+                groupId={groupId}
+                groupPassword={groupPassword}
+              />
+              <CardActions disableSpacing>
+                {item.select_tag
+                  .map((obj) => <SelectTag>{obj}</SelectTag>)
+                  .slice(0, 3)}
+                <ExpandMore
+                  sx={{ zIndex: "10" }}
+                  name='gogo'
+                  expand={expandedArr[index]}
+                  onClick={(e) => {
+                    handleExpandClick(index, e);
+                  }}
+                  aria-expanded={expandedArr[index]}
+                  aria-label='show more'>
+                  <ExpandMoreIcon
+                    sx={{ pointerEvents: "none", cursor: "not-allowed" }}
+                  />
+                </ExpandMore>
+              </CardActions>
+              <Expanded
+                expanded={expandedArr[index]}
+                targetCityArr={targetCityArr}
+                targetIndex={targetIndex}
+              />
+            </Card>
+          ))}
+        </Wrap>
+      </Wrap>
     </div>
   );
 }
