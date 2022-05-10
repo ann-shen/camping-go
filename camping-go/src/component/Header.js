@@ -10,6 +10,11 @@ const Nav = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: fixed;
+  top:15px;
+  z-index: 99;
+  margin-top: -20px;
+  margin-bottom: 40px;
 `;
 const LogoImg = styled.img`
   width: 270px;
@@ -27,7 +32,6 @@ const ALink = styled(Link)`
 //sf
 function Header({ ContextByUserId }) {
   return (
-    <div>
       <Nav>
         <ALink to={"/"}>
           <LogoImg src={logo}></LogoImg>
@@ -39,7 +43,6 @@ function Header({ ContextByUserId }) {
           {/* <ALink to={`/personal_header/${ContextByUserId}`}>開團歷史紀錄</ALink> */}
         </Display>
       </Nav>
-    </div>
   );
 }
 

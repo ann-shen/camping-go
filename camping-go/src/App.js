@@ -23,8 +23,8 @@ function App() {
   const [userId, setUserId] = useState("");
   const [allMemberArr, setAllMemberArr] = useState([]);
   const auth = getAuth();
+  
   console.log(userName);
-
   
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
