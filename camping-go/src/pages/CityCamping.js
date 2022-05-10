@@ -430,7 +430,7 @@ function CityCamping({ userName, groupId }) {
   return (
     <div>
       <Header ContextByUserId={ContextByUserId} />
-      <Wrap width='100%' direction='column' justifyContent='start'>
+      <Wrap width='100%' direction='column' justifyContent='start' m="100px 0px 0px 0px">
         <Wrap width='300px' alignItems='center' m='50px 0px 0px -20%'>
           <Img src={location_big} width='25px'></Img>
           <Font fontSize='20px' m='0px 0px 0px 20px' marginLeft='10px'>

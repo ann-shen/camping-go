@@ -9,7 +9,7 @@ import {
   arrayUnion,
   setDoc,
 } from "firebase/firestore";
-import { useState, useEffect, } from "react";
+import { useState, useEffect } from "react";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
@@ -24,7 +24,6 @@ import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
 import { TextField, Alert, AlertTitle, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
-
 
 const Span = styled.span`
   font-size: 16px;
@@ -228,6 +227,13 @@ function FindGroup({ userId, userName, setGroupId }) {
     console.log(allGroupInfo[index].group_id);
     updateDoc(docRefJoinGroup, {
       group: arrayUnion(allGroupInfo[index].group_id),
+    });
+    
+    updateDoc(doc(db, "joinGroup", allGroupInfo[index].header_id), {
+      alert: arrayUnion({
+        alert_content: `${userName}已加入「${allGroupInfo[index].group_title}」`,
+        is_read: false,
+      }),
     });
   };
 

@@ -386,6 +386,12 @@ export default function ReviewCard({
               margin: 4,
               marginTop: 0,
               backgroundColor: "#F4F4EE",
+              "&:hover": {
+                width: "25%",
+                height: "470px",
+                transition: "1s",
+                transitionTimingFunction: "ease-in-out",
+              },
             }}>
             <ImgWrap>
               <CardMedia
@@ -411,8 +417,7 @@ export default function ReviewCard({
                   height='18px'
                   fontSize='13px'
                   p='0px 0px 1px 0px'
-                  borderRadius="8px"
-                  >
+                  borderRadius='8px'>
                   團長｜{item.header_name}
                 </Tag>
               </Alink>

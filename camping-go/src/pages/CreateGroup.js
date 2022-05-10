@@ -402,16 +402,16 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       ...prevState,
       [name]: value,
     }));
+    if (value == "notice") {
+      setAddNotice((prev) => [...prev, groupInfo.notice]);
+    }
   };
 
-
-  
   console.log(addNotice);
 
   const AddNotice = (e) => {
     setAddNotice((prev) => [...prev, groupInfo.notice]);
   };
-  console.log(addNotice);
 
   const addNewGroup = async (event) => {
     event.preventDefault();
@@ -484,11 +484,25 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     });
 
     alert("已成功建立");
-    navigate("/");
+    // navigate("/");
   };
 
   useEffect(() => {
-    console.log(state.city);
+    const test = {
+      group_id: groupId,
+      header_id: userId,
+      header_name: userName,
+      start_date: startDate,
+      end_date: endDate,
+      meeting_time: time,
+      position: state.address,
+      city: state.city,
+      picture: upload.url,
+      detail_picture: upload.detail_picture,
+      privacy: privacyValue,
+      notice: addNotice,
+    };
+    console.log(test);
     if (groupId) {
       updateDoc(doc(db, "CreateCampingGroup", groupId), {
         group_id: groupId,
@@ -542,8 +556,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       }
     );
   };
-
-  
 
   // console.log(alertItemsArr);
 

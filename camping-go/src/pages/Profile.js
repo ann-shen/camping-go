@@ -333,7 +333,7 @@ function CheckCommentFromMember({ groupId }) {
       let totalScoreNumber = scoreArr.reduce(function (total, e) {
         return total + e;
       }, 0);
-      setTotalScore(totalScoreNumber / comment.length);
+      setTotalScore((totalScoreNumber / comment.length).toFixed(1));
     } else {
       return;
     }
@@ -530,7 +530,7 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
                 width: "500px",
                 height: "auto",
                 borderBottom: " 1.4px solid #EAE5BE",
-                padding: 3,
+                padding: 1,
                 margin: 1,
                 display: "flex",
                 justifyContent: "space-between",
@@ -550,7 +550,10 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
               </Display>
               {item.role == "member" && (
                 <Button
-                  width='150px'
+                  width='100px'
+                  height='30px'
+                  borderRadius='8px'
+                  fontSize='14px'
                   mt='10px'
                   ml='20px'
                   boxShadow='none'
@@ -982,7 +985,7 @@ export default function Profile({ userName, userId, getLogout }) {
           <Wrap
             maxWidth='1440px'
             width='75%'
-            m='20px 40px 0px 12%'
+            m='100px 40px 0px 12%'
             alignItems='center'
             justifyContent='space-between'
             boxShadow='none'>

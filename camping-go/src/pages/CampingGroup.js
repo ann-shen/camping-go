@@ -65,14 +65,14 @@ const LandingImgWrap = styled.div`
 const Section = styled.div`
   width: 90%;
   height: auto;
-  margin: 100px auto;
+  margin: 50px auto;
   justify-content: center;
 `;
 
 const ImgGroupPeopleWrap = styled.div`
   display: flex;
   justify-content: start;
-  margin: 60px 0px 0px 9%;
+  margin: 0px 0px 0px 9%;
 `;
 
 const TitleWrap = styled.div`
