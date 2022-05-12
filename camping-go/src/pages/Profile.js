@@ -336,7 +336,7 @@ function CheckCommentFromMember({ groupId }) {
       let totalScoreNumber = scoreArr.reduce(function (total, e) {
         return total + e;
       }, 0);
-      setTotalScore(totalScoreNumber / comment.length);
+      setTotalScore((totalScoreNumber / comment.length).toFixed(1));
     } else {
       return;
     }
@@ -582,6 +582,7 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
               </Box>
             ))}
           </ScrollWrap>
+
         </CheckCommentWrap>
       </Modal>
     </div>

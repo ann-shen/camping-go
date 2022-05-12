@@ -12,6 +12,7 @@ const Nav = styled.div`
   align-items: center;
   position: fixed;
   top: 15px;
+
   z-index: 99;
   margin-top: -20px;
   margin-bottom: 40px;
@@ -43,6 +44,7 @@ function Header({ ContextByUserId }) {
         {/* <ALink to={`/personal_header/${ContextByUserId}`}>開團歷史紀錄</ALink> */}
       </Display>
     </Nav>
+
   );
 }
 

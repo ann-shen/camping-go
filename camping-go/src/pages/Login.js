@@ -159,6 +159,7 @@ function Login({setUserId, setUserName, userName}) {
           profile_img: `https://joeschmoe.io/api/v1/${user.uid}`,
           select_tag: [],
           group: [],
+
           second_hand: [],
           alert: [],
         });

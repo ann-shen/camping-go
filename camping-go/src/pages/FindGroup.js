@@ -224,6 +224,13 @@ function FindGroup({ userId, userName, setGroupId }) {
     updateDoc(docRefJoinGroup, {
       group: arrayUnion(allGroupInfo[index].group_id),
     });
+    
+    updateDoc(doc(db, "joinGroup", allGroupInfo[index].header_id), {
+      alert: arrayUnion({
+        alert_content: `${userName}已加入「${allGroupInfo[index].group_title}」`,
+        is_read: false,
+      }),
+    });
   };
 
   // console.log(findIndex);

@@ -373,6 +373,12 @@ export default function ReviewCard({
               margin: 4,
               marginTop: 0,
               backgroundColor: "#F4F4EE",
+              "&:hover": {
+                width: "25%",
+                height: "470px",
+                transition: "1s",
+                transitionTimingFunction: "ease-in-out",
+              },
             }}>
             <ImgWrap>
               <CardMedia

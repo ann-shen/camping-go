@@ -121,6 +121,7 @@ export const Tag = styled.div`
   }
 `;
 
+
 export const Cloumn = styled.div`
   display: flex;
   flex-direction: column;

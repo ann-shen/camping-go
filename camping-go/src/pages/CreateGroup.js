@@ -413,12 +413,16 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       ...prevState,
       [name]: value,
     }));
+    if (value == "notice") {
+      setAddNotice((prev) => [...prev, groupInfo.notice]);
+    }
   };
 
   const addGroupNotice = (e) => {
     e.preventDefault();
     setAddNotice((prev) => [...prev, groupInfo.notice]);
   };
+
 
   console.log(groupInfo);
 
@@ -555,6 +559,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     console.log(upload.url);
     if (thisGroupId) {
       updateDoc(doc(db, "CreateCampingGroup", thisGroupId), {
+
         picture: upload.url,
       });
     }
@@ -595,6 +600,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     //   }
     // );
   };
+
 
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
