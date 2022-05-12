@@ -5,6 +5,9 @@ import { Img } from "../css/style";
 import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import logoColor from "../image/logoColor2.png";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@mui/material";
 
 const LinkRoute = styled(Link)`
   text-decoration: none;
@@ -43,12 +46,14 @@ function NavBar({ userId }) {
   const [navFontColor, setnavFontColor] = useState("gray");
   const [navColor, setnavColor] = useState("transparent");
   const [navSize, setnavSize] = useState("6rem");
+  const navigate = useNavigate();
 
   const listenScrollEvent = () => {
     window.scrollY > 10 ? setnavColor("#426765") : setnavColor("transparent");
     window.scrollY > 10 ? setnavSize("5.5rem") : setnavSize("7rem");
     window.scrollY > 10 ? setnavFontColor("#F4F4EE") : setnavFontColor("gray");
   };
+
   useEffect(() => {
     window.addEventListener("scroll", listenScrollEvent);
     return () => {
@@ -56,6 +61,24 @@ function NavBar({ userId }) {
     };
   }, []);
   console.log(userId);
+
+  const swalAlert = () => {
+    console.log("123");
+    Swal.fire({
+      title: "尚未登入",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#426765",
+      cancelButtonColor: "#EAE5BE",
+      confirmButtonText: "前往登入",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate("/login");
+        // Swal.fire("Deleted!", "Your file has been deleted.", "success");
+      }
+    });
+  };
 
   return (
     <nav
@@ -69,15 +92,36 @@ function NavBar({ userId }) {
       }}>
       <LogoImgWrap>
         <a href='/'>
-          <Img src={logoColor} width='240px' height='50px' mb="20px" m="-10px 0px 0px 0px"></Img>
+          <Img
+            src={logoColor}
+            width='240px'
+            height='50px'
+            mb='20px'
+            m='-10px 0px 0px 0px'></Img>
         </a>
-        <LinkRoute to={`/create_group`} ml='45%'>
-          <AddIcon sx={{ marginBottom: "-10px" }}></AddIcon>
-          <NavFont style={{ color: navFontColor }}>建立露營團</NavFont>
-        </LinkRoute>
-        <LinkRoute to={`/profile/${userId}`} ml='5%'>
-          <NavFont style={{ color: navFontColor }}>我的露營團</NavFont>
-        </LinkRoute>
+
+        {userId ? (
+          <>
+            <LinkRoute to={`/create_group`} ml='45%'>
+              <AddIcon sx={{ marginBottom: "-10px" }}></AddIcon>
+              <NavFont style={{ color: navFontColor }}>建立露營團</NavFont>
+            </LinkRoute>
+            <LinkRoute to={`/profile/${userId}`} ml='5%'>
+              <NavFont style={{ color: navFontColor }}>我的露營團</NavFont>
+            </LinkRoute>
+          </>
+        ) : (
+          <>
+            <LinkRoute to={`/`} ml='45%' onClick={swalAlert}>
+              <AddIcon sx={{ marginBottom: "-10px" }}></AddIcon>
+              <NavFont style={{ color: navFontColor }}>建立露營團</NavFont>
+            </LinkRoute>
+            <LinkRoute to={`/`} ml='5%' onClick={swalAlert}>
+              <NavFont style={{ color: navFontColor }}>我的露營團</NavFont>
+            </LinkRoute>
+          </>
+        )}
+
         <Alert userId={userId}></Alert>
         {!userId && (
           <LinkRoute to={`/login`} ml='1%'>

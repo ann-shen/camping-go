@@ -9,22 +9,16 @@ import {
   arrayUnion,
   setDoc,
 } from "firebase/firestore";
-import { useState, useEffect, } from "react";
+import { useState, useEffect } from "react";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
-import Collapse from "@mui/material/Collapse";
-import Typography from "@mui/material/Typography";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Font, Display, Img, Button } from "../css/style";
-import { ExpandMore } from "../component/ReviewCard_Component/ExpanMore";
 import location from "../image/location.png";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
-import { TextField, Alert, AlertTitle, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
-
 
 const Span = styled.span`
   font-size: 16px;
@@ -72,14 +66,37 @@ const SelectTag = styled.div`
   color: #797659;
 `;
 
+const breatheAnimation = keyframes`
+0% { opacity: 0;
+  transform: scale(0.3)    }
+40% { opacity: 0.5;
+  transform: scale(1.1)   }
+  70% { opacity: 0.5;
+  transform: scale(0.9)   }
+100% { opacity: 1;
+  transform: scale(1)    }
+`;
+
+const fadeIn = keyframes`
+from {
+  opacity: 0;
+  transform: scale(0.3)   translateX(1.5rem)  ;
+}
+to {
+  opacity: 1;
+  transform: scale(1)  translateX(1) ;
+}
+`;
+
 const GroupWrap = styled.div`
   display: flex;
   /* flex-direction: column; */
-  width: 1200px;
+  width: 450px;
   display: flex;
   justify-content: center;
   margin: 50px auto;
   align-items: start;
+  animation: ${breatheAnimation} 700ms ease-in-out;
 `;
 
 const LinkPrivate = styled(Link)`
@@ -96,33 +113,11 @@ const LinkOpen = styled.a`
   color: gray;
 `;
 
-function Expanded({ expanded, findIndex, allGroupInfo }) {
-  // console.log(targetIndex);
-  // console.log(currentPosts[targetIndex]);
-  return (
-    <Collapse in={expanded} timeout='auto' unmountOnExit>
-      <CardContent>
-        <>
-          <Typography paragraph>注意事項:</Typography>
-          <Typography paragraph>
-            {findIndex ? (
-              <p>{allGroupInfo[findIndex].announcement}</p>
-            ) : (
-              <p>{allGroupInfo[findIndex].announcement}</p>
-            )}
-          </Typography>
-        </>
-      </CardContent>
-    </Collapse>
-  );
-}
-
 function FindGroup({ userId, userName, setGroupId }) {
   const [userTag, setUserTag] = useState([]);
   const [allGroupInfo, setAllGroupInfo] = useState([]);
   const [allGroupSelectArr, setAllGroupSelectArr] = useState([]);
   const [findIndex, setFindIndex] = useState("");
-  const [IsExpended, setIsExpended] = useState(false);
   const [groupPassword, setGroupPassword] = useState("");
 
   useEffect(async () => {
@@ -235,14 +230,13 @@ function FindGroup({ userId, userName, setGroupId }) {
 
   return (
     <div>
-      {findIndex !== "" && <div>{findIndex}</div>}
       {/* <Font color="white" m="100px 0px 0px 0px" marginLeft="44%" letterSpacing="3px">- 最佳推薦 -</Font> */}
       {allGroupInfo.length !== 0 && (
         <GroupWrap>
           <Card
             sx={{
-              width: "35%",
               height: "auto",
+              width: "100%",
               boxShadow:
                 "0.2rem 0.2rem 0.2rem #CFC781 , -0.3rem -0.3rem 0.4rem #ffffff",
               borderRadius: 7.5,
@@ -330,35 +324,12 @@ function FindGroup({ userId, userName, setGroupId }) {
                 )}
               </Button>
             </ButtonWrap>
-            {/* <IsModal
-              modalIsOpen={modalIsOpen}
-              setIsOpen={setIsOpen}
-              groupId={groupId}
-              groupPassword={groupPassword}
-            /> */}
+
             <CardActions disableSpacing>
               {allGroupInfo[findIndex].select_tag
                 .map((obj) => <SelectTag>{obj}</SelectTag>)
                 .slice(0, 3)}
-              <ExpandMore
-                sx={{ zIndex: "10" }}
-                name='gogo'
-                expand={IsExpended}
-                onClick={() => {
-                  setIsExpended(!IsExpended);
-                }}
-                aria-expanded={IsExpended}
-                aria-label='show more'>
-                <ExpandMoreIcon
-                  sx={{ pointerEvents: "none", cursor: "not-allowed" }}
-                />
-              </ExpandMore>
             </CardActions>
-            <Expanded
-              expanded={IsExpended}
-              allGroupInfo={allGroupInfo}
-              findIndex={findIndex}
-            />
           </Card>
         </GroupWrap>
       )}

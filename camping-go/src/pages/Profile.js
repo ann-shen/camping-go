@@ -48,6 +48,8 @@ import { useNavigate } from "react-router-dom";
 import SecondHand from "./SecondHand";
 import { async } from "@firebase/util";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+
 Modal.setAppElement("#root");
 
 const LinkRoute = styled(Link)`
@@ -65,7 +67,6 @@ const CheckCommentWrap = styled.div`
   align-items: center;
   position: relative;
   padding: 40px 10px;
-  margin-right: 40px;
 `;
 
 const ScrollWrap = styled.div`
@@ -105,15 +106,17 @@ const DeleteModalButton = styled.button`
   width: 30px;
   height: 30px;
   position: absolute;
-  top: 30px;
-  left: 30px;
+  top: 0px;
+  right: 10px;
   border: none;
-  color: #426765;
-  background-color: #eae5be;
-  border-radius: 10px;
+  color: white;
+  background-color: #dedab4;
+  border-radius: 50%;
   cursor: pointer;
   &:hover {
     color: #cfc781;
+    transform: scale(1.2);
+    transition: 500ms;
   }
 `;
 
@@ -450,7 +453,7 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
 
     const memberData = await getDocs(docRef);
     memberData.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
+      // console.log(doc.id, " => ", doc.data());
       memberArr.push(doc.data());
     });
     setMember(memberArr);
@@ -458,41 +461,57 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
 
   const removeMember = async (index, role, member_id) => {
     console.log(groupId);
+    Swal.fire({
+      title: "確定移除？",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#426765",
+      cancelButtonColor: "#EAE5BE",
+      confirmButtonText: "移除",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await deleteDoc(
+          doc(
+            db,
+            "CreateCampingGroup",
+            groupId,
+            "member",
+            member[index].member_id
+          )
+        ).then(async () => {
+          let afterDeleteMemberArr = [];
+          const commentRef = collection(
+            db,
+            "CreateCampingGroup",
+            groupId,
+            "member"
+          );
+          const querySnapshot = await getDocs(commentRef);
+          querySnapshot.forEach((doc) => {
+            console.log(doc.id, " => ", doc.data());
+            afterDeleteMemberArr.push(doc.data());
+          });
+          setMember(afterDeleteMemberArr);
+        });
+        const docRefJoinGroup = doc(db, "joinGroup", member_id);
+        updateDoc(docRefJoinGroup, {
+          group: arrayRemove(groupId),
+        });
 
-    await deleteDoc(
-      doc(db, "CreateCampingGroup", groupId, "member", member[index].member_id)
-    ).then(async () => {
-      let afterDeleteMemberArr = [];
-      const commentRef = collection(
-        db,
-        "CreateCampingGroup",
-        groupId,
-        "member"
-      );
-      const querySnapshot = await getDocs(commentRef);
-      querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
-        afterDeleteMemberArr.push(doc.data());
-      });
-      setMember(afterDeleteMemberArr);
-    });
-    const docRefJoinGroup = doc(db, "joinGroup", member_id);
-    updateDoc(docRefJoinGroup, {
-      group: arrayRemove(groupId),
-    });
+        const docRefCreateGroup = doc(db, "CreateCampingGroup", groupId);
+        updateDoc(docRefCreateGroup, {
+          current_number: increment(-1),
+        });
 
-    const docRefCreateGroup = doc(db, "CreateCampingGroup", groupId);
-    updateDoc(docRefCreateGroup, {
-      current_number: increment(-1),
+        // updateDoc(doc(db, "joinGroup", member_id), {
+        //   alert: arrayUnion({
+        //     alert_content: `移除成功`,
+        //     is_read: false,
+        //   }),
+        // });
+        setRenderParticipateArr(true);
+      }
     });
-
-    updateDoc(doc(db, "joinGroup", member_id), {
-      alert: arrayUnion({
-        alert_content: `哭哭，你已被移除「${group_title}」。`,
-        is_read: false,
-      }),
-    });
-    setRenderParticipateArr(true);
   };
 
   return (
@@ -523,86 +542,49 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
           </DeleteModalButton>
           <Font fontSize='20px'>你的團員</Font>
           <Hr width='60%'></Hr>
-
-          {member.map((item, index) => (
-            <Box
-              sx={{
-                width: "500px",
-                height: "auto",
-                borderBottom: " 1.4px solid #EAE5BE",
-                padding: 3,
-                margin: 1,
-                display: "flex",
-                justifyContent: "space-between",
-              }}>
-              <Display>
-                {item.role == "header" && (
-                  <Tag
-                    width='35px'
-                    p='3px 0px 0px 5px'
-                    fontSize='14px'
-                    height='25px'
-                    m='0px 10px 0px 0px'>
-                    團長
-                  </Tag>
+          <ScrollWrap>
+            {member.map((item, index) => (
+              <Box
+                sx={{
+                  width: "500px",
+                  height: "50px",
+                  borderBottom: " 1.4px solid #EAE5BE",
+                  padding: 1,
+                  margin: 1,
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}>
+                <Display>
+                  {item.role == "header" && (
+                    <Tag
+                      width='40px'
+                      p='3px 0px 0px 1px'
+                      fontSize='14px'
+                      height='25px'
+                      m='0px 10px 0px 0px'>
+                      團長
+                    </Tag>
+                  )}
+                  <Font>{item.member_name}</Font>
+                </Display>
+                {item.role == "member" && (
+                  <Button
+                    width='150px'
+                    mt='0px'
+                    ml='20px'
+                    boxShadow='none'
+                    onClick={() => {
+                      removeMember(index, item.role, item.member_id);
+                    }}>
+                    移除成員
+                  </Button>
                 )}
-                <Font>{item.member_name}</Font>
-              </Display>
-              {item.role == "member" && (
-                <Button
-                  width='150px'
-                  mt='10px'
-                  ml='20px'
-                  boxShadow='none'
-                  onClick={() => {
-                    removeMember(index, item.role, item.member_id);
-                  }}>
-                  移除成員
-                </Button>
-              )}
-            </Box>
-          ))}
+              </Box>
+            ))}
+          </ScrollWrap>
         </CheckCommentWrap>
       </Modal>
     </div>
-
-    /* <Modal
-        isOpen={memberIsOpen}
-        onRequestClose={() => setMemberIsOpen(false)}
-        overlayClassName={{
-          base: "overlay-base",
-          afterOpen: "overlay-after",
-          beforeClose: "overlay-before",
-        }}
-        className={{
-          base: "content-base",
-          afterOpen: "content-after",
-          beforeClose: "content-before",
-        }}
-        closeTimeoutMS={500}>
-        <Display direction='column'>
-          <Font onClick={() => setMemberIsOpen(false)}>X</Font>
-          <Font>你的團員</Font>
-          <div className='setScroll'>
-            {member.map((item, index) => (
-              <Display>
-                <Font>{item.member_name}</Font>
-                <Button
-                  width='150px'
-                  mt='10px'
-                  ml='20px'
-                  bgc='white'
-                  boxShadow='none'
-                  onClick={() => {
-                    removeMember(index);
-                  }}>
-                  移除成員
-                </Button>
-              </Display>
-            ))}
-          </div>
-        </Display>
-      </Modal> */
   );
 }
 
@@ -615,7 +597,6 @@ function SecondHandInvitation({
 }) {
   console.log(inviteInfo[inviteInfoIndex]);
   const [open, setOpen] = useState(false);
-
 
   const rejectInvite = async () => {
     inviteInfo[inviteInfoIndex].buyer_name = "";
@@ -771,6 +752,7 @@ export default function Profile({ userName, userId, getLogout }) {
   const [inviteInfo, setInviteInfo] = useState("");
   const [inviteInfoIndex, setInviteInfoIndex] = useState("");
   const [sendInvite, setSendInvite] = useState("");
+  const [personName, setPersonName] = useState([]);
 
   const navigate = useNavigate();
   const auth = getAuth();
@@ -794,7 +776,6 @@ export default function Profile({ userName, userId, getLogout }) {
     }
   }, []);
 
-  console.log(inviteIsOpen);
 
   useEffect(async () => {
     const q = query(
@@ -827,6 +808,8 @@ export default function Profile({ userName, userId, getLogout }) {
 
     if (participateGroupArr.length === 0) {
       setYourParticipateGroup([]);
+    }else if (participateGroupArr[0].group_id ==""){
+      return
     }
 
     let showGroupArr = [];
@@ -840,25 +823,6 @@ export default function Profile({ userName, userId, getLogout }) {
         showGroupArr.push(docRef.data());
       }
     });
-
-    //拿這些groupID去跟createCampingGroup比對 抓相對應的資料
-    // if (participateGroupArr.length == 0) {
-    //   setYourParticipateGroup([]);
-    // } else {
-    //   participateGroupArr.map((item) => {
-    //     const q = query(
-    //       collection(db, "CreateCampingGroup"),
-    //       where("group_id", "==", item)
-    //     );
-    //     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-    //       querySnapshot.forEach((item) => {
-    //         // console.log(item.data());
-    //         groups.push(item.data());
-    //       });
-    //       setYourParticipateGroup(groups);
-    //     });
-    //   });
-    // }
   }, [withDrawGrop]);
 
   // console.log(yourParticipateGroup);
@@ -901,47 +865,60 @@ export default function Profile({ userName, userId, getLogout }) {
   }, []);
 
   const memberWithdrawGroup = async (id, userId, index) => {
-    await updateDoc(doc(db, "joinGroup", userId), {
-      group: arrayRemove(id),
+    Swal.fire({
+      title: "確定要退團？",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#426765",
+      cancelButtonColor: "#EAE5BE",
+      confirmButtonText: "確定退團",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await updateDoc(doc(db, "joinGroup", userId), {
+          group: arrayRemove(id),
+        });
+        await updateDoc(doc(db, "CreateCampingGroup", id), {
+          current_number: increment(-1),
+        });
+        await deleteDoc(doc(db, "CreateCampingGroup", id, "member", userId));
+        updateDoc(doc(db, "joinGroup", yourParticipateGroup[index].header_id), {
+          alert: arrayUnion({
+            alert_content: `${userName}已退出「${yourParticipateGroup[index].group_title}」`,
+            is_read: false,
+          }),
+        });
+        const q = query(
+          collection(db, "CreateCampingGroup", id, "tent"),
+          where("member", "array-contains", userName)
+        );
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((item) => {
+          console.log(item.id, " => ", item.data());
+          updateDoc(doc(db, "CreateCampingGroup", id, "tent", item.id), {
+            current_number: increment(-1),
+            member: arrayRemove(userName),
+          });
+        });
+        const getSupplies = query(
+          collection(db, "CreateCampingGroup", id, "supplies"),
+          where("bring_person", "==", userName)
+        );
+        const querySupplies = await getDocs(getSupplies);
+        querySupplies.forEach((item) => {
+          console.log(item.id, " => ", item.data());
+          updateDoc(doc(db, "CreateCampingGroup", id, "supplies", item.id), {
+            bring_person: "",
+          });
+        });
+        setWithDrawGrop(true);
+        Swal.fire({
+          icon: "success",
+          confirmButtonColor: "#426765",
+          title: `成功退出${yourParticipateGroup[index].group_title}`,
+          // footer: '<a href="/">繼續尋找你的露營團</a>',
+        });
+      }
     });
-    await updateDoc(doc(db, "CreateCampingGroup", id), {
-      current_number: increment(-1),
-    });
-    await deleteDoc(doc(db, "CreateCampingGroup", id, "member", userId));
-
-    updateDoc(doc(db, "joinGroup", yourParticipateGroup[index].header_id), {
-      alert: arrayUnion({
-        alert_content: `${userName}已退出「${yourParticipateGroup[index].group_title}」`,
-        is_read: false,
-      }),
-    });
-
-    const q = query(
-      collection(db, "CreateCampingGroup", id, "tent"),
-      where("member", "array-contains", userName)
-    );
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((item) => {
-      console.log(item.id, " => ", item.data());
-      updateDoc(doc(db, "CreateCampingGroup", id, "tent", item.id), {
-        current_number: increment(-1),
-        member: arrayRemove(userName),
-      });
-    });
-
-    const getSupplies = query(
-      collection(db, "CreateCampingGroup", id, "supplies"),
-      where("bring_person", "==", userName)
-    );
-    const querySupplies = await getDocs(getSupplies);
-    querySupplies.forEach((item) => {
-      console.log(item.id, " => ", item.data());
-      updateDoc(doc(db, "CreateCampingGroup", id, "supplies", item.id), {
-        bring_person: "",
-      });
-    });
-
-    setWithDrawGrop(true);
   };
 
   const handleChange = (event, newValue) => {
@@ -954,7 +931,24 @@ export default function Profile({ userName, userId, getLogout }) {
 
   const deleteThisGroup = async (id) => {
     console.log(id);
-    await deleteDoc(doc(db, "CreateCampingGroup", id));
+    Swal.fire({
+      title: "確定要刪除此團？",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#426765",
+      cancelButtonColor: "#EAE5BE",
+      confirmButtonText: "刪除",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await deleteDoc(doc(db, "CreateCampingGroup", id));
+        Swal.fire({
+          icon: "success",
+          confirmButtonColor: "#426765",
+          title: `成功刪除`,
+          // footer: '<a href="/">繼續尋找你的露營團</a>',
+        });
+      }
+    });
   };
 
   function getLogout() {
@@ -982,7 +976,7 @@ export default function Profile({ userName, userId, getLogout }) {
           <Wrap
             maxWidth='1440px'
             width='75%'
-            m='20px 40px 0px 12%'
+            m='100px 40px 0px 12%'
             alignItems='center'
             justifyContent='space-between'
             boxShadow='none'>
@@ -1002,7 +996,11 @@ export default function Profile({ userName, userId, getLogout }) {
                   {userName}
                 </Font>
                 <Display>
-                  <MultipleSelectChip userId={userId} />
+                  <MultipleSelectChip
+                    userId={userId}
+                    setPersonName={setPersonName}
+                    personName={personName}
+                  />
                 </Display>
               </Wrap>
             </Display>

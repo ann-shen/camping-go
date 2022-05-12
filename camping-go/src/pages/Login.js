@@ -10,16 +10,16 @@ import {
   updateProfile,
 } from "firebase/auth";
 import login from "../css/login.css";
-import { Display,Font,Wrap } from "../css/style";
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import SwipeableViews from 'react-swipeable-views';
-import { useTheme } from '@mui/material/styles';
-import AppBar from '@mui/material/AppBar';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import { Display, Font, Wrap } from "../css/style";
+import * as React from "react";
+import PropTypes from "prop-types";
+import SwipeableViews from "react-swipeable-views";
+import { useTheme } from "@mui/material/styles";
+import AppBar from "@mui/material/AppBar";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 
 const Title = styled.div`
   color: #333;
@@ -52,19 +52,16 @@ const LoginWrap = styled.div`
   width: 30%;
 `;
 
-
-
 function TabPanel(props) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, setUserName, ...other } = props;
 
   return (
     <div
-      role="tabpanel"
+      role='tabpanel'
       hidden={value !== index}
       id={`full-width-tabpanel-${index}`}
       aria-labelledby={`full-width-tab-${index}`}
-      {...other}
-    >
+      {...other}>
       {value === index && (
         <Box sx={{ p: 3 }}>
           <Typography>{children}</Typography>
@@ -83,18 +80,17 @@ TabPanel.propTypes = {
 function a11yProps(index) {
   return {
     id: `full-width-tab-${index}`,
-    'aria-controls': `full-width-tabpanel-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`,
   };
 }
 
-function FullWidthTabs(setUserId, setUserName, userName) {
+function Login({setUserId, setUserName, userName}) {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("shen@gmail.com");
+  const [password, setPassword] = useState("shenshen");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const [loginStatus, setLoginStatus] = useState(true);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -107,15 +103,15 @@ function FullWidthTabs(setUserId, setUserName, userName) {
   function handellogin() {
     const auth = getAuth();
     signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed in
-      navigate("/");
-      const user = userCredential.user;
-      console.log(user.displayName);
-      updateProfile(auth.currentUser, {
-        displayName: user.displayName,
-      });
-      setUserName(user.displayName);
+      .then((userCredential) => {
+        // Signed in
+        navigate("/");
+        const user = userCredential.user;
+        console.log(user.displayName);
+        updateProfile(auth.currentUser, {
+          displayName: user.displayName,
+        });
+        setUserName(user.displayName);
         // ...
       })
       .catch((error) => {
@@ -139,12 +135,17 @@ function FullWidthTabs(setUserId, setUserName, userName) {
       });
   }
 
-  function register() {
+  const register = () => {
     const auth = getAuth();
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
         const user = userCredential.user;
-        setUserId(user.uid);
+        console.log(user);
+        console.log(user.uid);
+        console.log(userName);
+
+        // setUserId(user.uid);
+
         updateProfile(auth.currentUser, {
           displayName: userName,
         });
@@ -153,18 +154,19 @@ function FullWidthTabs(setUserId, setUserName, userName) {
           info: {
             email: user.email,
             user_name: userName,
+            user_id: user.uid,
           },
+          profile_img: `https://joeschmoe.io/api/v1/${user.uid}`,
           select_tag: [],
-          group: [
-            {
-              group_id: "",
-            },
-          ],
+          group: [],
+          second_hand: [],
+          alert: [],
         });
         navigate("/");
         // console.log(user.email);
       })
       .catch((error) => {
+        console.log(error);
         const errorCode = error.code;
         const errorMessage = error.message;
         switch (error.code) {
@@ -183,7 +185,9 @@ function FullWidthTabs(setUserId, setUserName, userName) {
           default:
         }
       });
-  }
+  };
+
+  console.log(userName);
 
   return (
     <Box
@@ -223,33 +227,38 @@ function FullWidthTabs(setUserId, setUserName, userName) {
         <TabPanel value={value} index={0} dir={theme.direction}>
           <div className='orderListWrapn'>
             <div className='top_wrap'></div>
-            <Font >歡迎來到 camping go</Font>
-            <Font fontSize="16px">請登入您的帳號</Font>
-            <Wrap width="auto" m="40px 0px 0px 0px" direction="column">
-
-            <label htmlFor=''>UserEmail</label>
-            <input
-              type='text'
-              onChange={(e) => {
-                setEmail(e.target.value);
-              }}
-            />
-            <label htmlFor=''>Password</label>
-            <input
-              type='password'
-              name='password'
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-            />
-            <div className='btnWrap'>
-              <button onClick={handellogin}>Login In</button>
-              <br />
-            </div>
+            <Font>歡迎來到 camping go</Font>
+            <Font fontSize='16px'>請登入您的帳號</Font>
+            <Wrap width='auto' m='40px 0px 0px 0px' direction='column'>
+              <label htmlFor=''>UserEmail</label>
+              <input
+                type='text'
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
+              />
+              <label htmlFor=''>Password</label>
+              <input
+                value={password}
+                type='password'
+                name='password'
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
+              />
+              <div className='btnWrap'>
+                <button onClick={handellogin}>Login In</button>
+                <br />
+              </div>
             </Wrap>
           </div>
         </TabPanel>
-        <TabPanel value={value} index={1} dir={theme.direction}>
+        <TabPanel
+          value={value}
+          index={1}
+          dir={theme.direction}
+          setUserName={setUserName}
+          setUserId={setUserId}>
           <div className='orderListWrapn' id='signup'>
             <Font>歡迎來到 camping go</Font>
             <Font>註冊成為會員</Font>
@@ -257,6 +266,7 @@ function FullWidthTabs(setUserId, setUserName, userName) {
             <input
               type='text'
               onChange={(e) => {
+                console.log(e.target.value);
                 setUserName(e.target.value);
               }}
             />
@@ -276,14 +286,14 @@ function FullWidthTabs(setUserId, setUserName, userName) {
                 setPassword(e.target.value);
               }}
             />
-            <label htmlFor=''>Confirm Password</label>
+            {/* <label htmlFor=''>Confirm Password</label>
             <input
               type='password'
               name='password'
               onChange={(e) => {
                 setPassword(e.target.value);
               }}
-            />
+            /> */}
             <div className='btnWrap'>
               <button onClick={register}>Sign up</button>
             </div>
@@ -294,182 +304,181 @@ function FullWidthTabs(setUserId, setUserName, userName) {
   );
 }
 
-function Login({ setUserId, setUserName, userName }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate();
-  const [loginStatus, setLoginStatus] = useState(true);
+// function Login({ setUserId, setUserName, userName }) {
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [errorMessage, setErrorMessage] = useState("");
+//   const navigate = useNavigate();
+//   const [loginStatus, setLoginStatus] = useState(true);
 
-  // useEffect(() => {
-  //   setPathName(window.location.pathname);
-  // }, []);
+//   // useEffect(() => {
+//   //   setPathName(window.location.pathname);
+//   // }, []);
 
-  function handellogin() {
-    const auth = getAuth();
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        console.log(user.displayName);
-        updateProfile(auth.currentUser, {
-          displayName: user.displayName,
-        });
-        setUserName(user.displayName);
-        navigate("/");
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        switch (error.code) {
-          case "auth/invalid-email":
-            setErrorMessage("信箱格式不正確");
-            alert("信箱格式不正確");
-            break;
-          case "auth/user-not-found":
-            setErrorMessage("信箱不存在");
-            alert("信箱不存在");
-            break;
-          case "auth/wrong-password":
-            setErrorMessage("密碼錯誤");
-            alert("密碼錯誤");
-            break;
-          default:
-        }
-      });
-  }
+//   function handellogin() {
+//     const auth = getAuth();
+//     signInWithEmailAndPassword(auth, email, password)
+//       .then((userCredential) => {
+//         // Signed in
+//         const user = userCredential.user;
+//         console.log(user.displayName);
+//         updateProfile(auth.currentUser, {
+//           displayName: user.displayName,
+//         });
+//         setUserName(user.displayName);
+//         navigate("/");
+//         // ...
+//       })
+//       .catch((error) => {
+//         const errorCode = error.code;
+//         const errorMessage = error.message;
+//         switch (error.code) {
+//           case "auth/invalid-email":
+//             setErrorMessage("信箱格式不正確");
+//             alert("信箱格式不正確");
+//             break;
+//           case "auth/user-not-found":
+//             setErrorMessage("信箱不存在");
+//             alert("信箱不存在");
+//             break;
+//           case "auth/wrong-password":
+//             setErrorMessage("密碼錯誤");
+//             alert("密碼錯誤");
+//             break;
+//           default:
+//         }
+//       });
+//   }
 
-  function register() {
-    const auth = getAuth();
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
-        const user = userCredential.user;
-        setUserId(user.uid);
-        updateProfile(auth.currentUser, {
-          displayName: userName,
-        });
-        const newUserRef = doc(db, "joinGroup", user.uid);
-        await setDoc(newUserRef, {
-          info: {
-            email: user.email,
-            user_name: userName,
-          },
-          select_tag: [],
-          group: [
-            {
-              group_id: "",
-            },
-          ],
-        });
-        navigate("/");
-        // console.log(user.email);
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        switch (error.code) {
-          case "auth/email-already-in-use":
-            setErrorMessage("信箱已存在");
-            alert("信箱已存在");
-            break;
-          case "auth/invalid-email":
-            setErrorMessage("信箱格式不正確");
-            alert("信箱格式不正確");
-            break;
-          case "auth/weak-password":
-            setErrorMessage("密碼強度不足");
-            alert("密碼強度不足");
-            break;
-          default:
-        }
-      });
-  }
+//   function register() {
+//     const auth = getAuth();
+//     createUserWithEmailAndPassword(auth, email, password)
+//       .then(async (userCredential) => {
+//         const user = userCredential.user;
+//         setUserId(user.uid);
+//         updateProfile(auth.currentUser, {
+//           displayName: userName,
+//         });
+//         const newUserRef = doc(db, "joinGroup", user.uid);
+//         await setDoc(newUserRef, {
+//           info: {
+//             email: user.email,
+//             user_name: userName,
+//           },
+//           select_tag: [],
+//           group: [
+//             {
+//               group_id: "",
+//             },
+//           ],
+//         });
+//         navigate("/");
+//         // console.log(user.email);
+//       })
+//       .catch((error) => {
+//         const errorCode = error.code;
+//         const errorMessage = error.message;
+//         switch (error.code) {
+//           case "auth/email-already-in-use":
+//             setErrorMessage("信箱已存在");
+//             alert("信箱已存在");
+//             break;
+//           case "auth/invalid-email":
+//             setErrorMessage("信箱格式不正確");
+//             alert("信箱格式不正確");
+//             break;
+//           case "auth/weak-password":
+//             setErrorMessage("密碼強度不足");
+//             alert("密碼強度不足");
+//             break;
+//           default:
+//         }
+//       });
+//   }
 
-  return (
-    <>
-      <FullWidthTabs />
-      <div className='login_wrap'>
-        <section id='login'></section>
-        <br />
-        <section className='orderListWrapn'>
-          <div className='top_wrap'>
-            <p>Don't you have an account?</p>
-            {/* <a href='#signup'>
-              <button onClick={()=>{setLoginStatus(false)}}>Sign Up</button>
-            </a> */}
-          </div>
-          <h1>歡迎來到 camping go</h1>
-          <h5>請登入您的帳號</h5>
-          <label htmlFor=''>UserEmail</label>
-          <input
-            type='text'
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
-          />
-          <label htmlFor=''>Password</label>
-          <input
-            type='password'
-            name='password'
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
-          />
-          <div className='btnWrap'>
-            <button onClick={handellogin}>Login In</button>
-            <br />
-          </div>
-        </section>
-        {loginStatus && (
-          <section className='orderListWrapn' id='signup'>
-            <div className='top_wrap'>
-              <p>already have an account?</p>
-              <a href='#login'>
-                <button>Sign In</button>
-              </a>
-            </div>
-            <h1>歡迎來到 camping go</h1>
-            <h5>註冊成為會員</h5>
-            <label htmlFor=''>Username</label>
-            <input
-              type='text'
-              onChange={(e) => {
-                setUserName(e.target.value);
-              }}
-            />
-            <label htmlFor=''>Email</label>
-            <input
-              type='text'
-              onChange={(e) => {
-                setEmail(e.target.value);
-              }}
-            />
-            <label htmlFor=''>Password</label>
-            <input
-              type='password'
-              name='password'
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-            />
-            <label htmlFor=''>Confirm Password</label>
-            <input
-              type='password'
-              name='password'
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-            />
-            <div className='btnWrap'>
-              <button onClick={register}>Sign up</button>
-            </div>
-          </section>
-        )}
-      </div>
-    </>
-  );
-}
+//   return (
+//     <>
+//       <div className='login_wrap'>
+//         <section id='login'></section>
+//         <br />
+//         <section className='orderListWrapn'>
+//           <div className='top_wrap'>
+//             <p>Don't you have an account?</p>
+//             {/* <a href='#signup'>
+//               <button onClick={()=>{setLoginStatus(false)}}>Sign Up</button>
+//             </a> */}
+//           </div>
+//           <h1>歡迎來到 camping go</h1>
+//           <h5>請登入您的帳號</h5>
+//           <label htmlFor=''>UserEmail</label>
+//           <input
+//             type='text'
+//             onChange={(e) => {
+//               setEmail(e.target.value);
+//             }}
+//           />
+//           <label htmlFor=''>Password</label>
+//           <input
+//             type='password'
+//             name='password'
+//             onChange={(e) => {
+//               setPassword(e.target.value);
+//             }}
+//           />
+//           <div className='btnWrap'>
+//             <button onClick={handellogin}>Login In</button>
+//             <br />
+//           </div>
+//         </section>
+//         {loginStatus && (
+//           <section className='orderListWrapn' id='signup'>
+//             <div className='top_wrap'>
+//               <p>already have an account?</p>
+//               <a href='#login'>
+//                 <button>Sign In</button>
+//               </a>
+//             </div>
+//             <h1>歡迎來到 camping go</h1>
+//             <h5>註冊成為會員</h5>
+//             <label htmlFor=''>Username</label>
+//             <input
+//               type='text'
+//               onChange={(e) => {
+//                 setUserName(e.target.value);
+//               }}
+//             />
+//             <label htmlFor=''>Email</label>
+//             <input
+//               type='text'
+//               onChange={(e) => {
+//                 setEmail(e.target.value);
+//               }}
+//             />
+//             <label htmlFor=''>Password</label>
+//             <input
+//               type='password'
+//               name='password'
+//               value={password}
+//               onChange={(e) => {
+//                 setPassword(e.target.value);
+//               }}
+//             />
+//             <label htmlFor=''>Confirm Password</label>
+//             <input
+//               type='password'
+//               name='password'
+//               onChange={(e) => {
+//                 setPassword(e.target.value);
+//               }}
+//             />
+//             <div className='btnWrap'>
+//               <button onClick={register}>Sign up</button>
+//             </div>
+//           </section>
+//         )}
+//       </div>
+//     </>
+//   );
+// }
 
-export default FullWidthTabs;
+export default Login;

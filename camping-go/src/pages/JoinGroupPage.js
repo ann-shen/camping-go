@@ -44,6 +44,8 @@ import { UserContext } from "../utils/userContext";
 import { useNavigate } from "react-router-dom";
 import CampSupplies from "../component/CampSupplies";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+
 
 const Alink = styled.a`
   text-decoration: none;
@@ -258,53 +260,44 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
 
   const dragSource = useRef();
   const dropTarget = useRef();
-  const navigate = useNavigate();
 
   let params = useParams();
-
-  // useEffect(async () => {
-  //   if (!userId) {
-  //     navigate("/");
-  //     console.log("return");
-  //     return;
-  //   } else{
-  //     const docRefMember = collection(
-  //       db,
-  //       "CreateCampingGroup",
-  //       params.id,
-  //       "member"
-  //     );
-  //     const querySnapshot = await getDocs(docRefMember);
-  //     let memberArr = [];
-  //     querySnapshot.forEach((doc) => {
-  //       console.log(doc.data().member_id);
-  //       memberArr.push(doc.data().member_id);
-  //     });
-  //     if (memberArr.includes(userId) == false) {
-  //       navigate("/");
-  //     }
-  //   }
-  // }, []);
 
   const dragStart = async (e) => {
     e.dataTransfer.setData("text/plain", e.target.id);
     e.target.style = "drop-shadow(0px 0px 0px white)";
 
     let secondTargetTentId = e.target.getAttribute("data-key");
+    console.log(secondTargetTentId);
     setAlreadyTentId(secondTargetTentId);
     console.log("dragStart");
     console.log("前一頂帳篷", currentTentId);
   };
+
   const drop = async (e) => {
+    let targetTentId = e.target.getAttribute("data-key");
+    //你目標要去的帳篷
+    console.log(targetTentId);
+    console.log(currentTentId);
+    if (currentTentId === targetTentId) {
+      console.log("不能移動至同頂帳篷");
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        title: "不能移動至同頂帳篷",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      return;
+    }
     onDragOver(e);
     console.log("drop");
     //前一頂帳篷
-    console.log(currentTentId);
     let id = e.dataTransfer.getData("text");
     e.target.appendChild(document.querySelector("#" + id));
+
     e.target.style = "backgroundColor:white ; border:4px solid #f5f4e8;";
-    let targetTentId = e.target.getAttribute("data-key");
-    console.log(targetTentId);
+
     await updateDoc(
       doc(db, "CreateCampingGroup", params.id, "tent", targetTentId),
       {
@@ -391,6 +384,14 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
 
   const onDragEnter = (e) => {
     console.log("enter");
+    let targetTentId = e.target.getAttribute("data-key");
+    //你目標要去的帳篷
+
+    if (targetTentId == alreadyTentId) {
+      console.log("不能移動至同頂帳篷");
+      return;
+    }
+    console.log("continute");
     e.target.style.transform = "scale(1.1)";
     e.target.style.backgroundColor = "#426765";
     e.target.style.transition =
@@ -427,18 +428,14 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
     const querySnapshot = await getDocs(q);
     let thisGroupMemberArr = [];
     querySnapshot.forEach((doc) => {
-      console.log(doc.data().info);
       thisGroupMemberArr.push(doc.data());
     });
 
     const docRef = doc(db, "joinGroup", homePageCampGroup.header_id);
     const getHeaderInfo = await getDoc(docRef);
     if (getHeaderInfo.exists()) {
-      console.log(getHeaderInfo.data());
       thisGroupMemberArr.push(getHeaderInfo.data());
     }
-
-    console.log(thisGroupMemberArr);
     setThisGroupMember(thisGroupMemberArr);
   }, [allTentArr, homePageCampGroup]);
 
@@ -463,7 +460,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
     onSnapshot(eventListenerpage, (snapshot) => {
       let suppliesArr = [];
       snapshot.forEach((doc) => {
-        console.log(doc.data());
         suppliesArr.push(doc.data());
       });
       setAllSupplies(suppliesArr);
@@ -1030,15 +1026,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                         {item.bring_person}
                       </Label>
                     </SuppliesWrap>
-                    {/* <Button
-                      width='180px'
-                      fontSize='16px'
-                      ml='5%'
-                      onClick={() => {
-                        takeAway(item.supplies_id);
-                      }}>
-                      我可以幫忙帶
-                    </Button> */}
+                    
                     {item.bring_person == "" ? (
                       <Button
                         width='180px'
@@ -1058,9 +1046,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                         border='1px solid #EBEBEB'
                         ml='5%'
                         cursor='not-allowed'
-                        onClick={() => {
-                          takeAway(item.supplies_id);
-                        }}>
+                        >
                         已認領
                       </SuppliesNotAllowedButton>
                     )}
