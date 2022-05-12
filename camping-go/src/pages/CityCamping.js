@@ -28,6 +28,7 @@ import { TextField, Alert, AlertTitle, Stack } from "@mui/material";
 import Collapse from "@mui/material/Collapse";
 import Typography from "@mui/material/Typography";
 import location_big from "../image/location_big.png";
+import Swal from "sweetalert2/dist/sweetalert2.js";
 
 const Span = styled.span`
   font-size: 16px;
@@ -156,28 +157,7 @@ function IsModal({ modalIsOpen, setIsOpen, groupId, groupPassword }) {
   );
 }
 
-function Expanded({ expanded, targetCityArr, targetIndex }) {
-  // console.log(targetIndex);
-  // console.log(currentPosts[targetIndex]);
-  return (
-    <Collapse in={expanded} timeout='auto' unmountOnExit>
-      <CardContent>
-        {targetIndex !== "" && (
-          <>
-            <Typography paragraph>注意事項:</Typography>
-            <Typography paragraph>
-              {targetIndex ? (
-                <p>{targetCityArr[targetIndex].announcement}</p>
-              ) : (
-                <p>{targetCityArr[targetIndex].announcement}</p>
-              )}
-            </Typography>
-          </>
-        )}
-      </CardContent>
-    </Collapse>
-  );
-}
+
 
 function CityCamping({ userName, groupId }) {
   const [targetCity, setTargetCity] = useState("");
@@ -190,20 +170,7 @@ function CityCamping({ userName, groupId }) {
   );
   const [targetIndex, setTargetIndex] = useState("");
 
-  // console.log(currentPosts);
-  // console.log(Array(currentPosts.length).fill(false));
 
-  const handleExpandClick = (index, e) => {
-    // console.log(index);
-    setTargetIndex(index);
-    let cloneExpandedArr = [...expandedArr];
-    cloneExpandedArr[index] = !cloneExpandedArr[index];
-    let prev = cloneExpandedArr.slice(0, index).fill(false);
-    let after = cloneExpandedArr
-      .slice(index + 1, cloneExpandedArr.length)
-      .fill(false);
-    setExpandedArr([...prev, cloneExpandedArr[index], ...after]);
-  };
 
   let params = useParams();
   let navigate = useNavigate();
@@ -413,6 +380,23 @@ function CityCamping({ userName, groupId }) {
   }, [targetCity]);
 
   const addCurrentMember = async (group_id, index, password) => {
+    if (!userName) {
+      Swal.fire({
+        title: "尚未登入",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#426765",
+        cancelButtonColor: "#EAE5BE",
+        confirmButtonText: "前往登入",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          navigate("/login");
+          // Swal.fire("Deleted!", "Your file has been deleted.", "success");
+        }
+      });
+      return;
+    }
+
     console.log(group_id);
     await updateDoc(doc(db, "CreateCampingGroup", group_id), {
       current_number: increment(1),
@@ -430,130 +414,122 @@ function CityCamping({ userName, groupId }) {
   return (
     <div>
       <Header ContextByUserId={ContextByUserId} />
-      <Wrap width='100%' direction='column' justifyContent='start' m="100px 0px 0px 0px">
-        <Wrap width='300px' alignItems='center' m='50px 0px 0px -20%'>
+      <Wrap width='100%' direction='column' justifyContent='start'>
+        <Wrap width='300px' alignItems='center' m='150px 0px 0px -20%'>
+
           <Img src={location_big} width='25px'></Img>
           <Font fontSize='20px' m='0px 0px 0px 20px' marginLeft='10px'>
             {targetCity}
           </Font>
         </Wrap>
         <Wrap alignItems='start' justifyContent='center' width='80%'>
-          {targetCityArr.map((item, index) => (
-            <Card
-              sx={{
-                width: "24%",
-                height: "auto",
-                boxShadow:
-                  "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-                borderRadius: 7.5,
-                padding: 1,
-                margin: 4,
-                marginTop: 2,
-                backgroundColor: "#F4F4EE",
-              }}>
-              <ImgWrap>
-                <CardMedia
-                  sx={{
-                    width: "100%",
-                    height: "230px",
-                  }}
-                  component='img'
-                  height='194'
-                  image={item.picture}
-                  alt='Paella dish'
-                />
-                {item.privacy == "私人" && <Tag>私</Tag>}
-              </ImgWrap>
-              <CardContent
+          {targetCityArr.length !== 0 ? (
+            targetCityArr.map((item, index) => (
+              <Card
                 sx={{
-                  textAlign: "start",
-                  height: "160px",
+                  width: "24%",
+                  height: "auto",
+                  boxShadow:
+                    "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+                  borderRadius: 7.5,
+                  padding: 1,
+                  margin: 4,
+                  marginTop: 2,
+                  backgroundColor: "#F4F4EE",
                 }}>
-                <Span>團長</Span>
-                <Span>{item.header_name}</Span>
-                <Font fontSize='25px' m='6px 0px 6px 0px'>
-                  {item.group_title}
-                </Font>
-                <Font fontSize='16px' m='0px 0px 16px 0px'>
-                  {
-                    new Date(item.start_date.seconds * 1000)
-                      .toLocaleString()
-                      .split(" ")[0]
-                  }
-                  ~
-                  {
-                    new Date(item.end_date.seconds * 1000)
-                      .toLocaleString()
-                      .split(" ")[0]
-                  }
-                </Font>
-                <Display justifyContent='space-between'>
-                  <Display>
-                    <Img src={location} width='26px'></Img>{" "}
-                    <Span>{item.city}</Span>
-                  </Display>
-                  <Display>
-                    <Font>
-                      {item.current_number}/{item.max_member_number}
-                    </Font>
-                    <Span>人</Span>
-                  </Display>
-                </Display>
-              </CardContent>
-
-              <ButtonWrap>
-                <Button
-                  width='90%'
-                  margin='auto'
-                  group_id={item.group_id}
-                  variant='outlined'
-                  onClick={(e) => {
-                    addCurrentMember(item.group_id, index, item.password);
-                  }}>
-                  {item.privacy == "公開" && item.header_name !== userName && (
-                    <LinkPrivate to={`joinGroup/${item.group_id}`}>
-                      我要加入
-                    </LinkPrivate>
-                  )}
-                  {item.privacy == "私人" && item.header_name !== userName && (
-                    <LinkOpen>我要加入</LinkOpen>
-                  )}
-                  {item.header_name == userName && (
-                    <LinkOpen>我要加入</LinkOpen>
-                  )}
-                </Button>
-              </ButtonWrap>
-              <IsModal
-                modalIsOpen={modalIsOpen}
-                setIsOpen={setIsOpen}
-                groupId={groupId}
-                groupPassword={groupPassword}
-              />
-              <CardActions disableSpacing>
-                {item.select_tag
-                  .map((obj) => <SelectTag>{obj}</SelectTag>)
-                  .slice(0, 3)}
-                <ExpandMore
-                  sx={{ zIndex: "10" }}
-                  name='gogo'
-                  expand={expandedArr[index]}
-                  onClick={(e) => {
-                    handleExpandClick(index, e);
-                  }}
-                  aria-expanded={expandedArr[index]}
-                  aria-label='show more'>
-                  <ExpandMoreIcon
-                    sx={{ pointerEvents: "none", cursor: "not-allowed" }}
+                <ImgWrap>
+                  <CardMedia
+                    sx={{
+                      width: "100%",
+                      height: "230px",
+                    }}
+                    component='img'
+                    height='194'
+                    image={item.picture}
+                    alt='Paella dish'
                   />
-                </ExpandMore>
-              </CardActions>
-              <Expanded
-                expanded={expandedArr[index]}
-                targetCityArr={targetCityArr}
-                targetIndex={targetIndex}
-              />
-            </Card>
-          ))}
+                  {item.privacy == "私人" && <Tag>私</Tag>}
+                </ImgWrap>
+                <CardContent
+                  sx={{
+                    textAlign: "start",
+                    height: "160px",
+                  }}>
+                  <Span>團長</Span>
+                  <Span>{item.header_name}</Span>
+                  <Font fontSize='25px' m='6px 0px 6px 0px'>
+                    {item.group_title}
+                  </Font>
+                  <Font fontSize='16px' m='0px 0px 16px 0px'>
+                    {
+                      new Date(item.start_date.seconds * 1000)
+                        .toLocaleString()
+                        .split(" ")[0]
+                    }
+                    ~
+                    {
+                      new Date(item.end_date.seconds * 1000)
+                        .toLocaleString()
+                        .split(" ")[0]
+                    }
+                  </Font>
+                  <Display justifyContent='space-between'>
+                    <Display>
+                      <Img src={location} width='26px'></Img>{" "}
+                      <Span>{item.city}</Span>
+                    </Display>
+                    <Display>
+                      <Font>
+                        {item.current_number}/{item.max_member_number}
+                      </Font>
+                      <Span>人</Span>
+                    </Display>
+                  </Display>
+                </CardContent>
+
+                <ButtonWrap>
+                  <Button
+                    width='90%'
+                    margin='auto'
+                    group_id={item.group_id}
+                    variant='outlined'
+                    onClick={(e) => {
+                      addCurrentMember(item.group_id, index, item.password);
+                    }}>
+                    {item.privacy == "公開" &&
+                      item.header_name !== userName && (
+                        <LinkPrivate to={`joinGroup/${item.group_id}`}>
+                          我要加入
+                        </LinkPrivate>
+                      )}
+                    {item.privacy == "私人" &&
+                      item.header_name !== userName && (
+                        <LinkOpen>我要加入</LinkOpen>
+                      )}
+                    {item.header_name == userName && (
+                      <LinkOpen>我要加入</LinkOpen>
+                    )}
+                  </Button>
+                </ButtonWrap>
+                <IsModal
+                  modalIsOpen={modalIsOpen}
+                  setIsOpen={setIsOpen}
+                  groupId={groupId}
+                  groupPassword={groupPassword}
+                />
+                <CardActions disableSpacing>
+                  {item.select_tag
+                    .map((obj) => <SelectTag>{obj}</SelectTag>)
+                    .slice(0, 3)}
+                </CardActions>
+                
+              </Card>
+            ))
+          ) : (
+            <Font
+              m='100px 0px 0px 0px'
+              fontSize='16px'>{`此縣市尚無露營團，就等你來${targetCity}創建！`}</Font>
+          )}
         </Wrap>
       </Wrap>
     </div>

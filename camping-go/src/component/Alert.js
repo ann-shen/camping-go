@@ -71,7 +71,6 @@ function Alert({ userId }) {
     }
   }, [userId]);
 
-  console.log(isAlert);
 
   const readAlert = async () => {
     setIsOpen(!isOpen);

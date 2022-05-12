@@ -11,7 +11,8 @@ const Nav = styled.div`
   justify-content: space-between;
   align-items: center;
   position: fixed;
-  top:15px;
+  top: 15px;
+
   z-index: 99;
   margin-top: -20px;
   margin-bottom: 40px;
@@ -32,17 +33,18 @@ const ALink = styled(Link)`
 //sf
 function Header({ ContextByUserId }) {
   return (
-      <Nav>
-        <ALink to={"/"}>
-          <LogoImg src={logo}></LogoImg>
-        </ALink>
-        <Display>
-          <ALink to={`/create_group`}>建立露營團</ALink>
-          {!ContextByUserId && <ALink to={`/login`}>登入</ALink>}
-          <ALink to={`/profile/${ContextByUserId}`}>我的露營團</ALink>
-          {/* <ALink to={`/personal_header/${ContextByUserId}`}>開團歷史紀錄</ALink> */}
-        </Display>
-      </Nav>
+    <Nav>
+      <ALink to={"/"}>
+        <LogoImg src={logo}></LogoImg>
+      </ALink>
+      <Display>
+        <ALink to={`/create_group`}>建立露營團</ALink>
+        {!ContextByUserId && <ALink to={`/login`}>登入</ALink>}
+        <ALink to={`/profile/${ContextByUserId}`}>我的露營團</ALink>
+        {/* <ALink to={`/personal_header/${ContextByUserId}`}>開團歷史紀錄</ALink> */}
+      </Display>
+    </Nav>
+
   );
 }
 

@@ -11,13 +11,11 @@ import {
   updateDoc,
   orderBy,
   arrayUnion,
-  onSnapshot,
 } from "firebase/firestore";
-import { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Taiwan from "../component/Taiwan";
-import { Font, Display, Img, Button, Cloumn, Hr, Wrap } from "../css/style";
+import { Font, Display, Img, Button, Hr } from "../css/style";
 import location_big from "../image/location_big.png";
 import group_people from "../image/group_people.png";
 import landingpage from "../image/landingpage.png";
@@ -26,9 +24,9 @@ import { UserContext } from "../utils/userContext";
 import PaginationBar from "../component/Pagination";
 import ReviewCard from "../component/ReviewCard";
 import NavBar from "../component/NavBar";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+
 Modal.setAppElement("#root");
-
-
 
 const HeaderSection = styled.div`
   margin: 0px;
@@ -61,7 +59,6 @@ const LandingImgWrap = styled.div`
   /* margin-top: -180px; */
 `;
 
-
 const Section = styled.div`
   width: 90%;
   height: auto;
@@ -82,7 +79,6 @@ const TitleWrap = styled.div`
   margin-left: 15px;
 `;
 
-
 function CampingGroup({ setGroupId, userId, userName, groupId }) {
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -94,6 +90,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     posts_per_page: 3,
   });
   const navigate = useNavigate();
+  const immediatelyRef = useRef(null);
 
   const indexOfLastPost = pagination.currentPage * pagination.posts_per_page;
   const indexOfFirstPost = indexOfLastPost - pagination.posts_per_page;
@@ -160,13 +157,37 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     }
   }, [currentMemberAmount]);
 
-  const joinThisGroup = async (index, header_name) => {
-    console.log(index);
+  const joinThisGroup = async (
+    index,
+    header_name,
+    max_member_number,
+    current_number
+  ) => {
+    console.log(current_number);
+
     if (header_name == userName) {
-      alert("你是此團團長，不能加入唷！顆顆");
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        text: "你是此團團長，不能加入唷！請至我的露營團-開團，查看頁面",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+      navigate("/");
       return;
     }
-    // setIsOpen(true);
+
+    if (current_number + 1 > max_member_number) {
+      console.log(current_number + 1);
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        text:"已滿團",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      return;
+    }
 
     setGroupId(currentPosts[index].group_id.toString());
 
@@ -185,8 +206,10 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     );
 
     let userSelect;
+
     const docRefJoinGroup = doc(db, "joinGroup", userId);
     const docMemberInfo = await getDoc(docRefJoinGroup);
+
     if (docMemberInfo.exists()) {
       console.log(docMemberInfo.data().select_tag);
       userSelect = docMemberInfo.data().select_tag;
@@ -227,43 +250,28 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       });
     });
 
-    // console.log(currentPosts[index].group_id);
+    console.log(currentPosts[index].group_id);
 
     navigate(`/joinGroup/${currentPosts[index].group_id}`);
   };
 
+  const toTaiwanMap = () => {
+    console.log("smooth");
+    console.log(immediatelyRef.current);
+    if (immediatelyRef.current) {
+      window.scrollTo({
+        top: immediatelyRef.current.scrollHeight,
+        top: 1000,
+        behavior: "smooth",
+      });
+    } else {
+      return;
+    }
+  };
   return (
     <>
       <HeaderSection>
         <NavBar userId={userId} />
-        {/* <nav
-          style={{
-            backgroundColor: navColor,
-            height: navSize,
-            transition: "all 1s",
-            position: "fixed",
-            zIndex: "99",
-            width: "100%",
-          }}>
-          <LogoImgWrap>
-            <Img src={logoColor} width='240px' height='100%'></Img>
-            <LinkRoute to={`/create_group`} ml='45%'>
-              <AddIcon sx={{ marginBottom: "-10px" }}></AddIcon>
-              <NavFont style={{ color: navFontColor }}>建立露營團</NavFont>
-            </LinkRoute>
-            <LinkRoute to={`/profile/${userId}`} ml='5%'>
-              <NavFont style={{ color: navFontColor }}>我的露營團</NavFont>
-            </LinkRoute>
-            <Alert userId={userId}></Alert>
-            {!userId && (
-              <LinkRoute to={`/login`} ml='10%'>
-                <NavFontSetGroup style={{ color: navFontColor }}>
-                  登入
-                </NavFontSetGroup>
-              </LinkRoute>
-            )}
-          </LogoImgWrap>
-        </nav> */}
 
         <LandingSubTitleWrap>
           <Font fontSize='14px'>揪團去露營。</Font>
@@ -271,7 +279,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
           <Font fontSize='14px'>
             讓大自然調劑你緊湊的生活步伐，來場「森」呼吸。
           </Font>
-          <Button mt='70px' width='150px'>
+          <Button mt='70px' width='150px' onClick={toTaiwanMap}>
             立即探索
           </Button>
         </LandingSubTitleWrap>
@@ -339,7 +347,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
             </TitleWrap>
           </Display>
         </Display>
-        <Hr width='80%' m='20px 0px 0px 8%'></Hr>
+        <Hr width='80%' m='20px 0px 0px 8%' ref={immediatelyRef}></Hr>
         <Taiwan />
       </Section>
     </>

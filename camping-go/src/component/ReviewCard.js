@@ -4,25 +4,31 @@ import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
-import Collapse from "@mui/material/Collapse";
-import Typography from "@mui/material/Typography";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Font, Display, Img, Button, Hr, Cloumn, Wrap,Tag } from "../css/style";
-import { ExpandMore } from "./ReviewCard_Component/ExpanMore";
+import {
+  Font,
+  Display,
+  Img,
+  Button,
+  Hr,
+  Cloumn,
+  Wrap,
+  Tag,
+} from "../css/style";
 import location from "../image/location.png";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
-import { TextField, Alert, AlertTitle, Stack } from "@mui/material";
+import { TextField, Alert, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 import FindGroup from "../pages/FindGroup";
 import landingpage04 from "../image/landingpage-04.png";
 import landingpage03 from "../image/landingpage-03.png";
 import alertIcon from "../image/alert.png";
-import { height, width } from "@mui/system";
+import Swal from "sweetalert2/dist/sweetalert2.js";
 
-const Alink=styled.a`
-text-decoration:none;`
+const Alink = styled.a`
+  text-decoration: none;
+`;
 
 const Span = styled.span`
   font-size: 14px;
@@ -61,14 +67,14 @@ const PrivicyTag = styled.div`
 
 const SelectTag = styled.div`
   width: auto;
-  height: 25px;
-  padding: 4px 7px 0px 7px;
+  height: 20px;
+  padding: 1px 7px 0px 7px;
   border-radius: 10px;
-  margin: 0px 4px;
+  margin: 10px 4px;
   border: 1.5px solid #cfc781;
-  background-color: #ebebeb;
+  background-color: transparent;
   color: #797659;
-  font-size: 14px;
+  font-size: 13px;
 `;
 
 const GroupWrap = styled.div`
@@ -154,8 +160,12 @@ function IsModal({
 
   const checkPassword = (e) => {
     if (value == currentPosts[index].password) {
-      joinThisGroup(index, currentPosts[index].header_name);
-      navigate(`/joinGroup/${currentPosts[index].group_id}`);
+      joinThisGroup(
+        index,
+        currentPosts[index].header_name,
+        currentPosts[index].max_member_number,
+        currentPosts[index].current_number
+      );
     } else {
       setAlert(true);
     }
@@ -215,7 +225,12 @@ function IsModal({
                     mt='30px'
                     ml='20px'
                     onClick={() => {
-                      joinThisGroup(index, currentPosts[index].header_name);
+                      joinThisGroup(
+                        index,
+                        currentPosts[index].header_name,
+                        currentPosts[index].max_member_number,
+                        currentPosts[index].current_number
+                      );
                     }}>
                     確認加入
                   </Button>
@@ -235,8 +250,8 @@ function IsModal({
                     sx={{ marginTop: "40px", width: "200px" }}
                   />
                   {alert && (
-                    <Stack sx={{ width: "60%"}} spacing={0}>
-                      <Alert severity='error' variant='outlined' >
+                    <Stack sx={{ width: "60%" }} spacing={0}>
+                      <Alert severity='error' variant='outlined'>
                         密碼錯誤 <strong>請再輸入一次!</strong>
                       </Alert>
                     </Stack>
@@ -281,59 +296,32 @@ function Recommend({
   userId,
   setGroupId,
 }) {
-  // const navigate = useNavigate();
   return (
-    <div className='App'>
-      <Modal
-        isOpen={recommendIsOpen}
-        onRequestClose={() => setRecommendIsOpen(false)}
-        overlayClassName={{
-          base: "overlay-base",
-          afterOpen: "overlay-after",
-          beforeClose: "overlay-before",
-        }}
-        className={{
-          base: "content-base",
-          afterOpen: "recommend-after",
-          beforeClose: "content-before",
-        }}
-        closeTimeoutMS={500}>
-        <Display direction='column'>
-          <FindGroup
-            joinThisGroup={joinThisGroup}
-            userName={userName}
-            Expanded={Expanded}
-            userId={userId}
-            setGroupId={setGroupId}
-          />
-        </Display>
-      </Modal>
-    </div>
+    <Modal
+      isOpen={recommendIsOpen}
+      onRequestClose={() => setRecommendIsOpen(false)}
+      overlayClassName={{
+        base: "overlay-base",
+        afterOpen: "overlay-after",
+        beforeClose: "overlay-before",
+      }}
+      className={{
+        base: "content-base",
+        afterOpen: "recommend-after",
+        beforeClose: "content-before",
+      }}
+      closeTimeoutMS={500}>
+      <Display direction='column'>
+        <FindGroup
+          joinThisGroup={joinThisGroup}
+          userName={userName}
+          userId={userId}
+          setGroupId={setGroupId}
+        />
+      </Display>
+    </Modal>
   );
 }
-
-// function Expanded({ expanded, currentPosts, targetIndex }) {
-//   // console.log(targetIndex);
-//   // console.log(currentPosts[targetIndex]);
-//   return (
-//     <Collapse in={expanded} timeout='auto' unmountOnExit>
-//       <CardContent>
-//         {targetIndex !== "" && (
-//           <>
-//             <Typography paragraph>注意事項:</Typography>
-//             <Typography paragraph>
-//               {targetIndex ? (
-//                 <p>{currentPosts[targetIndex].announcement}</p>
-//               ) : (
-//                 <p>{currentPosts[targetIndex].announcement}</p>
-//               )}
-//             </Typography>
-//           </>
-//         )}
-//       </CardContent>
-//     </Collapse>
-//   );
-// }
 
 export default function ReviewCard({
   currentPosts,
@@ -344,28 +332,27 @@ export default function ReviewCard({
   userId,
   setGroupId,
 }) {
-  const [expandedArr, setExpandedArr] = useState(
-    Array(currentPosts.length).fill(false)
-  );
   const [recommendIsOpen, setRecommendIsOpen] = useState(false);
   const [targetIndex, setTargetIndex] = useState("");
 
-  // console.log(currentPosts);
-  // console.log(Array(currentPosts.length).fill(false));
-
-  const handleExpandClick = (index, e) => {
-    // console.log(index);
-    setTargetIndex(index);
-    let cloneExpandedArr = [...expandedArr];
-    cloneExpandedArr[index] = !cloneExpandedArr[index];
-    let prev = cloneExpandedArr.slice(0, index).fill(false);
-    let after = cloneExpandedArr
-      .slice(index + 1, cloneExpandedArr.length)
-      .fill(false);
-    setExpandedArr([...prev, cloneExpandedArr[index], ...after]);
-  };
-
+  const navigate = useNavigate();
   const confirmJoinThisGroup = (index) => {
+    if (!userId) {
+      Swal.fire({
+        title: "尚未登入",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#426765",
+        cancelButtonColor: "#EAE5BE",
+        confirmButtonText: "前往登入",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/login");
+          // Swal.fire("Deleted!", "Your file has been deleted.", "success");
+        }
+      });
+      return;
+    }
     console.log(index);
     setTargetIndex(index);
     setIsOpen(true);
@@ -453,22 +440,39 @@ export default function ReviewCard({
             </CardContent>
 
             <ButtonWrap>
-              <Button
-                width='90%'
-                margin='auto'
-                group_id={item.group_id}
-                variant='outlined'
-                onClick={() => {
-                  confirmJoinThisGroup(index);
-                }}>
-                {item.status == "進行中" && <LinkOpen>我要加入</LinkOpen>}
-
-                {item.status == "已結束" && (
-                  <LinkOpen style={{ cursor: "not-allowed" }}>
-                    已結束哭哭
-                  </LinkOpen>
-                )}
-              </Button>
+              {item.status == "進行中" || "" && (
+                <Button
+                  width='90%'
+                  margin='auto'
+                  group_id={item.group_id}
+                  variant='outlined'
+                  onClick={() => {
+                    confirmJoinThisGroup(index);
+                  }}>
+                  <LinkOpen>我要加入</LinkOpen>
+                </Button>
+              )}
+              {/* {item.status == "" && (
+                <Button
+                  width='90%'
+                  margin='auto'
+                  group_id={item.group_id}
+                  variant='outlined'
+                  onClick={() => {
+                    confirmJoinThisGroup(index);
+                  }}>
+                  <LinkOpen>我要加入</LinkOpen>
+                </Button>
+              )} */}
+              {item.status == "已結束" && (
+                <Button
+                  width='90%'
+                  margin='auto'
+                  variant='outlined'
+                  style={{ cursor: "not-allowed" }}>
+                  <LinkOpen>已結束</LinkOpen>
+                </Button>
+              )}
             </ButtonWrap>
             <IsModal
               currentPosts={currentPosts}
@@ -482,25 +486,7 @@ export default function ReviewCard({
               {item.select_tag
                 .map((obj) => <SelectTag>{obj}</SelectTag>)
                 .slice(0, 3)}
-              {/* <ExpandMore
-                sx={{ zIndex: "10" }}
-                name='gogo'
-                expand={expandedArr[index]}
-                onClick={(e) => {
-                  handleExpandClick(index, e);
-                }}
-                aria-expanded={expandedArr[index]}
-                aria-label='show more'>
-                <ExpandMoreIcon
-                  sx={{ pointerEvents: "none", cursor: "not-allowed" }}
-                />
-              </ExpandMore> */}
             </CardActions>
-            {/* <Expanded
-              expanded={expandedArr[index]}
-              currentPosts={currentPosts}
-              targetIndex={targetIndex}
-            /> */}
           </Card>
         ))}
       </GroupWrap>
@@ -513,9 +499,28 @@ export default function ReviewCard({
         <Hr width='90%' m='0px'></Hr>
       </Wrap>
 
-      <Font letterSpacing='3px'>找不到喜愛的？一鍵找尋你的最佳推薦露營團</Font>
+      <Font letterSpacing='3px' fontSize='16px'>
+        找不到喜愛的？一鍵找尋你的最佳推薦露營團
+      </Font>
       <FindGroupButton
         onClick={() => {
+          if (!userId) {
+            Swal.fire({
+              title: "尚未登入",
+              text: "",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#426765",
+              cancelButtonColor: "#EAE5BE",
+              confirmButtonText: "前往登入",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                navigate("/login");
+                // Swal.fire("Deleted!", "Your file has been deleted.", "success");
+              }
+            });
+            return;
+          }
           setRecommendIsOpen(true);
         }}>
         最佳推薦

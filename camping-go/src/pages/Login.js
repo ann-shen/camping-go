@@ -154,13 +154,12 @@ function Login({setUserId, setUserName, userName}) {
           info: {
             email: user.email,
             user_name: userName,
+            user_id: user.uid,
           },
+          profile_img: `https://joeschmoe.io/api/v1/${user.uid}`,
           select_tag: [],
-          group: [
-            {
-              group_id: "",
-            },
-          ],
+          group: [],
+
           second_hand: [],
           alert: [],
         });

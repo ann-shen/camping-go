@@ -5,6 +5,8 @@ import "../pages/reuite.css";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import { Display, Font, Wrap } from "../css/style";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+
 
 const Label = styled.label`
   font-size: 16px;
@@ -17,6 +19,9 @@ const Input = styled.input`
   height: 30px;
   margin: 20px;
 `;
+
+const min = 0;
+const max = 5;
 
 function FormPropsTextFields({ tentInfo, setTentInfo, setSeat, seat }) {
   return (
@@ -36,18 +41,47 @@ function FormPropsTextFields({ tentInfo, setTentInfo, setSeat, seat }) {
             id='standard-number'
             label=''
             type='number'
+            inputProps={{ min, max }}
             InputLabelProps={{
               shrink: true,
             }}
             onChange={(e) => {
               console.log(e.target.value);
-              setTentInfo((prevState) => ({
-                ...prevState,
-                max_number: Number(e.target.value),
-                current_number: 0,
-                seat: Number(e.target.value) - 0,
-              }));
-              setSeat(e.target.value);
+              if (e.target.value === "") {
+                return;
+              }
+              const value = +e.target.value;
+              if (value > max) {
+                Swal.fire({
+                  position: "center",
+                  icon: "warning",
+                  title: "最大容納數量為5人",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+                return;
+              
+              } else if (value < min) {
+
+                Swal.fire({
+                  position: "center",
+                  icon: "warning",
+                  title: "人數不能為負的唷～",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+
+                return;
+                
+              } else {
+                setTentInfo((prevState) => ({
+                  ...prevState,
+                  max_number: Number(e.target.value),
+                  current_number: 0,
+                  seat: Number(e.target.value) - 0,
+                }));
+                setSeat(e.target.value);
+              }
             }}
           />
         </div>
@@ -118,10 +152,14 @@ function Tent({ tentInfo, setTentInfo, setAllMemberArr, allMemberArr }) {
 
   return (
     <div>
-      <Wrap direction="column" m=" 0px 30px 0px 0px" width="auto" alignItems="start">
-          <Font fontSize='14px' marginLeft='10px'>
-            帳篷可容納人數
-          </Font>
+      <Wrap
+        direction='column'
+        m=' 0px 30px 0px 0px'
+        width='auto'
+        alignItems='start'>
+        <Font fontSize='14px' marginLeft='10px'>
+          帳篷可容納人數
+        </Font>
         <FormPropsTextFields
           setTentInfo={setTentInfo}
           tentInfo={tentInfo}
@@ -129,15 +167,6 @@ function Tent({ tentInfo, setTentInfo, setAllMemberArr, allMemberArr }) {
           seat={seat}
         />
       </Wrap>
-      {/* <Label>已有</Label> */}
-      {/* <FormPropsTextFieldsStorage
-        setTentInfo={setTentInfo}
-        tentInfo={tentInfo}
-        seat={seat}
-      /> */}
-      <br />
-      {/* <Label>入住團友</Label> */}
-      {/* <Member setAllMemberArr={setAllMemberArr} allMemberArr={allMemberArr} /> */}
     </div>
   );
 }

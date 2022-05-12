@@ -37,7 +37,7 @@ function CampSupplies({ setCampSupplies, campSupplies }) {
         name='supplies'
         onChange={handleChange}
         size='small'
-        value={campSupplies.supplies}></TextField>
+        ></TextField>
       <Font fontSize='14px' marginLeft='10px'>
         備註
       </Font>

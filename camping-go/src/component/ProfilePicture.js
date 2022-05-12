@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { Font, Display, Img, Button } from "../css/style";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db } from "../utils/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import FileUploadRoundedIcon from "@mui/icons-material/FileUploadRounded";
 const ProfileWrap = styled.div`
   position: relative;
@@ -59,22 +59,14 @@ export const ProfilePicture = ({ userId }) => {
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState("");
 
-  // create a preview as a side effect, whenever selected file is changed
-  useEffect(async() => {
-    console.log(userId);
-    await updateDoc(doc(db, "joinGroup", userId), {
-      profile_img: `https://joeschmoe.io/api/v1/${userId}`,
-    });
-
-    if (!selectedFile) {
-      setPreview(
-        "https://firebasestorage.googleapis.com/v0/b/camping-go-14942.appspot.com/o/person%2Bprofile%2Buser%2Bicon-1320184051308863170.png?alt=media&token=91bccd8a-3fea-4515-8211-c10dfffb1285"
-      );
-      return;
+  useEffect(async () => {
+    const getInfo = await getDoc(doc(db, "joinGroup", userId));
+    if (getInfo.exists()) {
+      console.log(getInfo.data().profile_img);
+      setPreview(getInfo.data().profile_img);
+    } else {
+      console.log("no such pic");
     }
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreview(objectUrl);
-    return () => URL.revokeObjectURL(objectUrl);
   }, [selectedFile]);
 
   const onSelectFile = (e) => {
@@ -82,9 +74,6 @@ export const ProfilePicture = ({ userId }) => {
       setSelectedFile(undefined);
       return;
     }
-
-    setSelectedFile(e.target.files[0]);
-
     const storage = getStorage();
     const imageRef = ref(storage, e.target.files[0].name);
     uploadBytes(imageRef, e.target.files[0])
@@ -92,9 +81,11 @@ export const ProfilePicture = ({ userId }) => {
         getDownloadURL(imageRef)
           .then((url) => {
             console.log(url);
+            setPreview(url);
             updateDoc(doc(db, "joinGroup", userId), {
               profile_img: url,
             });
+            setSelectedFile(e.target.files[0]);
           })
           .catch((error) => {
             console.log(error.message, "error getting the img url");
@@ -104,6 +95,7 @@ export const ProfilePicture = ({ userId }) => {
         console.log(error.message);
       });
   };
+  console.log(preview);
 
   return (
     <InfoWrap>
@@ -111,11 +103,7 @@ export const ProfilePicture = ({ userId }) => {
         <ProfileWrap>
           {preview && (
             <ImgWrap>
-              <Img
-                src={`https://joeschmoe.io/api/v1/${userId}`}
-                width='auto'
-                height='115%'
-              />
+              <Img src={preview} width='auto' height='115%' />
             </ImgWrap>
           )}
           <Label>

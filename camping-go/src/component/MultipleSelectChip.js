@@ -46,18 +46,19 @@ function getStyles(name, personName, theme) {
   };
 }
 
-export default function MultipleSelectChip({ userId, path, groupId }) {
+export default function MultipleSelectChip({ userId, path, groupId, personName,setPersonName }) {
   const theme = useTheme();
-  const [personName, setPersonName] = useState([]);
+  // const [personName, setPersonName] = useState([]);
   // const [chosenTag, setChosenTag] = useState([]);
-// console.log(groupId);
+  // console.log(groupId);
   useEffect(async () => {
-    if (path == "/create_group") {
-      console.log("create");
-      await updateDoc(doc(db, "CreateCampingGroup", groupId), {
-        select_tag: personName,
-      });
-    }
+    console.log(personName);
+    // if (path == "/create_group") {
+    //   console.log("create");
+    //   await updateDoc(doc(db, "CreateCampingGroup", groupId), {
+    //     select_tag: personName,
+    //   });
+    // }
   }, [personName]);
 
   // console.log(personName);
@@ -88,7 +89,7 @@ export default function MultipleSelectChip({ userId, path, groupId }) {
   };
 
   return (
-    <FormControl sx={{ ml: 0, mt: 0, width: "100%" }} size='small'>
+    <FormControl sx={{ ml: 2, mt: 1, width: "400px" }} size='small'>
       <InputLabel id='demo-multiple-chip-label'>喜愛</InputLabel>
       <Select
         labelId='demo-multiple-chip-label'
@@ -98,7 +99,12 @@ export default function MultipleSelectChip({ userId, path, groupId }) {
         onChange={handleChange}
         input={<OutlinedInput id='select-multiple-chip' label='Chip' />}
         renderValue={(selected) => (
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 0.7,
+            }}>
             {selected.map((value) => (
               <Chip
                 sx={{
