@@ -22,7 +22,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "../utils/firebase";
-import { Alert, Collapse, IconButton } from "@mui/material";
+import { Alert, Collapse, IconButton, Skeleton, Stack } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 const CreateLabel = styled.label`
@@ -64,6 +64,29 @@ const ImgCursorWrap = styled.div`
   cursor: pointer;
   overflow: hidden;
   border: ${(props) => props.border || "none"};
+`;
+
+const PriviewImg = styled.img`
+  width: 100%;
+`;
+
+const PriviewImgWrap = styled.div`
+  width: 250px;
+  height: 180px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  margin-right: 20px;
+`;
+
+const DefaultPriviewImgWrap = styled.div`
+  width: 250px;
+  height: 180px;
+  background-color: #f4f4ef;
+  border: 2px dashed #e3e3e3;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
 `;
 
 function SecondHand({
@@ -144,6 +167,8 @@ function SecondHand({
       });
   }, [upload]);
 
+  console.log(suppliesInfo.picture);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     console.log(e.target.value);
@@ -189,6 +214,7 @@ function SecondHand({
   const choseSuppliesToChange = (index) => {
     setImgBorder("2.5px solid #759D9B");
     setChoseSupplies(buyerArr[index]);
+    console.log(index);
     allSupplies[inviteIndex].inviteSupplies_index = index;
   };
 
@@ -234,7 +260,7 @@ function SecondHand({
                 }}>
                 <Cloumn>
                   {item.change_status == true && (
-                    <Tag fontSize='14px'>已交換</Tag>
+                      <Tag fontSize='14px'>已交換</Tag>
                   )}
                   {item.change_status == false && (
                     <Tag bgc='#426765' color='white' fontSize='14px'>
@@ -246,10 +272,19 @@ function SecondHand({
                   </ImgWrap>
                   <Font m=' 10px 0px 0px 0px'> {item.name}</Font>
                   <Hr width='100%'></Hr>
-                  <Font fontSize='16px' color='#CFC781'>
-                    希望交換的物品
-                  </Font>
-                  <Font fontSize='16px'> {item.hope}</Font>
+                  {item.change_status == false ? (
+                    <>
+                      <Font fontSize='16px' color='#CFC781'>
+                        希望交換的物品
+                      </Font>
+                      <Font fontSize='16px'> {item.hope}</Font>
+                    </>
+                  ) : (
+                    <Font fontSize='14px'>
+                      已和{item.buyer_name}交換{item.change_supplies}
+                    </Font>
+                  )}
+
                   {item.seller_id !== current_userId ? (
                     <Button
                       width='200px'
@@ -339,8 +374,6 @@ function SecondHand({
           </>
         )}
       </Display>
-      {console.log(userId)}
-      {console.log(current_userId)}
 
       {userId === current_userId && (
         <Box
@@ -356,8 +389,12 @@ function SecondHand({
             border: "1px solid #CFC781 ",
             justifyContent: "space-around",
           }}>
-          <Wrap alignItems='center' direction='column' width='100%'>
-            <Display justifyContent='center' alignItems='center'>
+          <Wrap justifyContent='space-around' alignItems='start' width='100%'>
+            <Wrap
+              direction='column'
+              width='100%'
+              alignItems='center'
+              justifyContent='center'>
               <FileLabel>
                 上傳照片
                 <FileInput
@@ -366,40 +403,45 @@ function SecondHand({
                   accept='image/*'
                   onChange={handleFiles}></FileInput>
               </FileLabel>
-              {upload.file && upload.file.name}
-            </Display>
-            {/* <PriviewImgWrap>
-              {upload.url && <PriviewImg src={upload.url}></PriviewImg>}
-            </PriviewImgWrap> */}
+              {!upload.file && <DefaultPriviewImgWrap></DefaultPriviewImgWrap>}
+
+              {upload.file && (
+                <PriviewImgWrap>
+                  <PriviewImg src={suppliesInfo.picture}></PriviewImg>
+                </PriviewImgWrap>
+              )}
+            </Wrap>
+            <Wrap alignItems='center' direction='column' width='100%'>
+              <br />
+              <TextField
+                size='small'
+                sx={{ width: "70%", marginBottom: "30px" }}
+                label='交換物品名稱'
+                name='name'
+                required
+                value={suppliesInfo.name}
+                onChange={handleChange}></TextField>
+              <br />
+              <TextField
+                size='small'
+                sx={{ width: "70%", marginBottom: "30px" }}
+                label='希望交換的類型'
+                name='hope'
+                required
+                value={suppliesInfo.hope}
+                onChange={handleChange}></TextField>
+              <br />
+              <TextField
+                size='small'
+                sx={{ width: "70%", marginBottom: "30px" }}
+                label='狀態'
+                name='note'
+                required
+                value={suppliesInfo.note}
+                onChange={handleChange}></TextField>
+              <br />
+            </Wrap>
           </Wrap>
-          <br />
-          <TextField
-            size='small'
-            sx={{ width: "40%", marginBottom: "30px" }}
-            label='交換物品名稱'
-            name='name'
-            required
-            value={suppliesInfo.name}
-            onChange={handleChange}></TextField>
-          <br />
-          <TextField
-            size='small'
-            sx={{ width: "40%", marginBottom: "30px" }}
-            label='希望交換的類型'
-            name='hope'
-            required
-            value={suppliesInfo.hope}
-            onChange={handleChange}></TextField>
-          <br />
-          <TextField
-            size='small'
-            sx={{ width: "40%", marginBottom: "30px" }}
-            label='狀態'
-            name='note'
-            required
-            value={suppliesInfo.note}
-            onChange={handleChange}></TextField>
-          <br />
           <Button onClick={addNewSecondHandSupplies} width='150px'>
             上架二手用品
           </Button>

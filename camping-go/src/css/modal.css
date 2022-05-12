@@ -66,8 +66,8 @@
   width: 50%;
   height: 450px;
   background-color: #FFFEF4;
-  border: 2px solid #CFC781 ;
-  border-radius: 40px;
+  /* border: 2px solid #CFC781 ; */
+  border-radius: 30px;
 }
 
 .content-before {
@@ -83,7 +83,7 @@
   padding-top: 20px;
   width: 450px;
   height: 75%;
-  border-radius: 40px;
+  border-radius: 30px;
   background-color: transparent;
   border:2px solid transparent;
 }

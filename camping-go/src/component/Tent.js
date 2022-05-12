@@ -39,8 +39,9 @@ function FormPropsTextFields({ tentInfo, setTentInfo, setSeat, seat }) {
             name='max_number'
             // value={tentInfo.max_number}
             id='standard-number'
-            label=''
+            label='帳篷可容納人數'
             type='number'
+            helperText='輸入完請按新增帳篷'
             inputProps={{ min, max }}
             InputLabelProps={{
               shrink: true,
@@ -60,9 +61,7 @@ function FormPropsTextFields({ tentInfo, setTentInfo, setSeat, seat }) {
                   timer: 1500,
                 });
                 return;
-              
               } else if (value < min) {
-
                 Swal.fire({
                   position: "center",
                   icon: "warning",
@@ -70,9 +69,7 @@ function FormPropsTextFields({ tentInfo, setTentInfo, setSeat, seat }) {
                   showConfirmButton: false,
                   timer: 1500,
                 });
-
                 return;
-                
               } else {
                 setTentInfo((prevState) => ({
                   ...prevState,
@@ -157,9 +154,9 @@ function Tent({ tentInfo, setTentInfo, setAllMemberArr, allMemberArr }) {
         m=' 0px 30px 0px 0px'
         width='auto'
         alignItems='start'>
-        <Font fontSize='14px' marginLeft='10px'>
+        {/* <Font fontSize='14px' marginLeft='10px'>
           帳篷可容納人數
-        </Font>
+        </Font> */}
         <FormPropsTextFields
           setTentInfo={setTentInfo}
           tentInfo={tentInfo}

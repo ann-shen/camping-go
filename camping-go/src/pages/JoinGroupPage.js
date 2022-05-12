@@ -36,16 +36,17 @@ import Tent from "../component/Tent";
 import Header from "../component/Header";
 import { Box } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import location from "../image/location.png";
 import alert from "../image/alert.png";
 import tentColor from "../image/tentColor.png";
 import { v4 as uuidv4 } from "uuid";
 import { UserContext } from "../utils/userContext";
-import { useNavigate } from "react-router-dom";
 import CampSupplies from "../component/CampSupplies";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import Swal from "sweetalert2/dist/sweetalert2.js";
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
+import Footer from "../component/Footer";
+
 
 
 
@@ -169,14 +170,16 @@ const MemberWrap = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px;
+  padding: 5px;
   flex-direction: column;
-  margin: 20px;
+  margin: 10px;
+  width: 180px;
 `;
 
 const AllMemberWrap = styled.div`
-  width: 90%;
+  width: 100%;
   display: flex;
+  flex-wrap: wrap;
   justify-content: start;
   align-items: center;
   padding: 10px;
@@ -459,7 +462,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
       second_hand_Arr.map((item) => {
         item.map((obj, index) => {
           if (obj.change_status == true) {
-            if (obj.buyer_id !== "") {
+            if (obj.inviteSupplies_index !== "") {
               // console.log(obj);
               objArr.push(obj);
             }
@@ -1002,10 +1005,10 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
               }}>
               <Box>
                 <Display justifyContent='start'>
-                  <Font color='#F4F4EE' marginLeft='10%'>
+                  <Font color='#F4F4EE' marginLeft='7%'>
                     項目
                   </Font>
-                  <Font color='#F4F4EE' marginLeft='20%'>
+                  <Font color='#F4F4EE' marginLeft='22%'>
                     備註
                   </Font>
                   <Font color='#F4F4EE' marginLeft='20%'>
@@ -1211,6 +1214,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
           )}
         </Box>
       </div>
+      <Footer />
     </div>
   );
 }

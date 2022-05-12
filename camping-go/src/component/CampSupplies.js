@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import React from "react";
 import { Font, Cloumn, Wrap } from "../css/style";
-import { TextField} from "@mui/material";
+import { TextField } from "@mui/material";
 
 const Label = styled.label`
   font-size: 16px;
@@ -29,22 +29,18 @@ function CampSupplies({ setCampSupplies, campSupplies }) {
       direction='column'
       alignItems='start'
       m='10px 30px 0px 0px'>
-      <Font fontSize='14px' marginLeft='10px'>
-        新增物品
-      </Font>
       <TextField
         sx={{ marginBottom: "30px", marginTop: "5px" }}
         name='supplies'
+        label='新增露營用品'
         onChange={handleChange}
-        size='small'
-        ></TextField>
-      <Font fontSize='14px' marginLeft='10px'>
-        備註
-      </Font>
+        size='small'></TextField>
       <TextField
         name='note'
+        label='備註'
         onChange={handleChange}
         size='small'
+        helperText='輸入完請按新增物品'
         value={campSupplies.note}></TextField>
     </Wrap>
   );

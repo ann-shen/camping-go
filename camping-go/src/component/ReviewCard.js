@@ -18,7 +18,7 @@ import location from "../image/location.png";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
-import { TextField, Alert, Stack } from "@mui/material";
+import { TextField, Alert, Stack, Skeleton } from "@mui/material";
 import { Link } from "react-router-dom";
 import FindGroup from "../pages/FindGroup";
 import landingpage04 from "../image/landingpage-04.png";
@@ -46,7 +46,7 @@ const ImgWrap = styled.div`
   position: relative;
   width: 100%;
   height: 200px;
-  border-radius: 30px;
+  border-radius: 15px;
   overflow: hidden;
 `;
 
@@ -69,7 +69,7 @@ const SelectTag = styled.div`
   width: auto;
   height: 20px;
   padding: 1px 7px 0px 7px;
-  border-radius: 10px;
+  border-radius: 8px;
   margin: 10px 4px;
   border: 1.5px solid #cfc781;
   background-color: transparent;
@@ -123,7 +123,7 @@ const FindGroupButton = styled.button`
   padding: 3px;
   margin-top: 40px;
   box-shadow: 0.2rem 0.2rem 0.7rem #eae5be, -0.2rem -0.2rem 0.2rem #fffef4;
-  border-radius: 30px;
+  border-radius: 10px;
   color: #797659;
   animation: ${fadeIn} 2.5s infinite linear;
   cursor: pointer;
@@ -152,6 +152,7 @@ function IsModal({
 }) {
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState(false);
+
   const navigate = useNavigate();
 
   const handleChange = (event) => {
@@ -200,18 +201,19 @@ function IsModal({
                 注意事項
               </Font>
               <Hr width='80%' m='10px 0px 20px 0px'></Hr>
-              <Display mb='15px'>
-                <Img src={alertIcon} width='30px'></Img>
-                <Font fontSize='14px' marginLeft='10px'>
-                  位於花蓮縣壽豐鄉的布萊頓霍夫莊園
-                </Font>
-              </Display>
-              <Display>
-                <Img src={alertIcon} width='30px'></Img>
-                <Font fontSize='14px' marginLeft='10px'>
-                  位於花蓮縣壽豐鄉的布萊頓霍夫莊園
-                </Font>
-              </Display>
+              <div>
+                {currentPosts[index].notice.length !== 0 &&
+                  currentPosts[index].notice.map((item) => (
+                    <Display mb='15px'>
+                      {console.log(item)}
+                      <Img src={alertIcon} width='30px'></Img>
+                      <Font fontSize='14px' marginLeft='10px'>
+                        {item}
+                      </Font>
+                    </Display>
+                  ))}
+              </div>
+
               {currentPosts[index].privacy == "公開" && (
                 <Display>
                   <Button
@@ -358,9 +360,42 @@ export default function ReviewCard({
     setIsOpen(true);
   };
 
+  if (window.location.pathname !== "/") {
+    console.log("ohya");
+  }
+
+  let loadingArr = [1, 2, 3];
+
   return (
     <>
       <GroupWrap>
+        {currentPosts.length == 0 && (
+          <Wrap width='80%' justifyContent='space-between'>
+            {loadingArr.map((load) => (
+              <Stack spacing={2} style={{ marginRight: 30 }}>
+                <Skeleton
+                  variant='rectangular'
+                  width={290}
+                  height={188}
+                  style={{ marginTop: 10 }}
+                />
+                <Skeleton
+                  variant='text'
+                  height={30}
+                  style={{ marginTop: 20 }}
+                />
+                <Skeleton variant='text' width='60%' height={30} />
+                <Skeleton
+                  variant='text'
+                  width='60%'
+                  height={30}
+                  style={{ marginBottom: 20 }}
+                />
+                <Skeleton variant='text' height={80} />
+              </Stack>
+            ))}
+          </Wrap>
+        )}
         {currentPosts.map((item, index) => (
           <Card
             sx={{
@@ -368,16 +403,14 @@ export default function ReviewCard({
               height: "auto",
               boxShadow:
                 "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-              borderRadius: 7.5,
+              borderRadius: 5,
               padding: 1,
               margin: 4,
               marginTop: 0,
               backgroundColor: "#F4F4EE",
               "&:hover": {
-                width: "25%",
-                height: "470px",
-                transition: "1s",
-                transitionTimingFunction: "ease-in-out",
+                transition: "0.7s",
+                opacity: "0.7",
               },
             }}>
             <ImgWrap>
@@ -440,7 +473,7 @@ export default function ReviewCard({
             </CardContent>
 
             <ButtonWrap>
-              {item.status == "進行中" || "" && (
+              {item.status == ("進行中" || "") && (
                 <Button
                   width='90%'
                   margin='auto'

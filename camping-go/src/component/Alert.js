@@ -29,6 +29,21 @@ const AlertContentWrap = styled.div`
   cursor: pointer;
 `;
 
+const AlertContentIsReadWrap = styled.div`
+  width: 120px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 2;
+  color: #f4f4ef;
+  background-color: #426765;
+  border-bottom: 1px solid #cfc781;
+  cursor: pointer;
+`;
+
 const fadeIn = keyframes`
 from {
   opacity: 0;
@@ -71,7 +86,6 @@ function Alert({ userId }) {
     }
   }, [userId]);
 
-
   const readAlert = async () => {
     setIsOpen(!isOpen);
     setIsRedDot(false);
@@ -83,18 +97,16 @@ function Alert({ userId }) {
         Arr.push(item);
       });
 
-      Arr.map(item=>{
-        item.is_read = true
-      })
-      // Arr[0].is_read = true;
-      updateDoc(doc(db, "joinGroup", userId), {
-        alert: Arr,
-      });
+      setTimeout(() => {
+        Arr.map((item) => {
+          item.is_read = true;
+        });
+        // Arr[0].is_read = true;
+        updateDoc(doc(db, "joinGroup", userId), {
+          alert: Arr,
+        });
+      }, 3000);
 
-
-      
-      
-      
     }
   };
   return (
@@ -108,15 +120,34 @@ function Alert({ userId }) {
         }}></NotificationsActiveIcon>
       {isRedDot && <RedDot>你有新通知</RedDot>}
       {isOpen && (
-        <div>
-          {isAlert.reverse().map((item, index) => (
-            <>
-              <AlertContentWrap key={index}>
-                <Font fontSize='13px'> {item.alert_content}</Font>
-              </AlertContentWrap>
-            </>
-          ))}
-        </div>
+        <>
+          {isAlert.length !== 0 ? (
+            <div>
+              {isAlert
+                .reverse()
+                .slice(0, 6)
+                .map((item, index) => (
+                  <>
+                    {item.is_read == true ? (
+                      <AlertContentWrap key={index}>
+                        <Font fontSize='13px'> {item.alert_content}</Font>
+                      </AlertContentWrap>
+                    ) : (
+                      <AlertContentIsReadWrap key={index}>
+                        <Font fontSize='13px' color='#F4F4EF'>
+                          {item.alert_content}
+                        </Font>
+                      </AlertContentIsReadWrap>
+                    )}
+                  </>
+                ))}
+            </div>
+          ) : (
+            <AlertContentWrap>
+              <Font fontSize='13px'>尚未有通知</Font>
+            </AlertContentWrap>
+          )}
+        </>
       )}
     </AlertWrap>
   );

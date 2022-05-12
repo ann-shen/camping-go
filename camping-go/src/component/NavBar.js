@@ -60,7 +60,7 @@ function NavBar({ userId }) {
       window.removeEventListener("scroll", listenScrollEvent);
     };
   }, []);
-  console.log(userId);
+  
 
   const swalAlert = () => {
     console.log("123");

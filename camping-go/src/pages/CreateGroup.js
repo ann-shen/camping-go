@@ -1,32 +1,33 @@
 import styled from "styled-components";
 import { db } from "../utils/firebase";
+import React, { useState, useEffect, useContext } from "react";
 import {
   setDoc,
   doc,
   collection,
   updateDoc,
-  getDoc,
   serverTimestamp,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { DateRange } from "react-date-range";
-import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Tent from "../component/Tent";
 import CampSupplies from "../component/CampSupplies";
-import Stack from "@mui/material/Stack";
-import { TextField, Box, Autocomplete } from "@mui/material";
+import { TextField, Box, Autocomplete, Stack} from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import GoogleMapBasic from "../component/GoogleMapBasic";
 import MultipleSelectChip from "../component/MultipleSelectChip";
-import { Display, Cloumn, Button, Wrap } from "../css/style";
+import Header from "../component/Header";
+import Footer from "../component/Footer";
+import { Display, Cloumn, Button, Wrap, Img, Font } from "../css/style";
 import landingPage04 from "../image/landingpage-04.png";
 import { v4 as uuidv4 } from "uuid";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import Header from "../component/Header";
 import { UserContext } from "../utils/userContext";
+import tentColor from "../image/tentColor.png";
+import supplies from "../image/supplies.png";
 
 const RockImg = styled.img`
   width: 150px;
@@ -189,7 +190,7 @@ const SuppliesWrap = styled.div`
 `;
 
 const AddAlertItems = styled.button`
-  width: 150px;
+  width: 130px;
   margin: 0px;
   &:hover {
     color: #797659;
@@ -423,7 +424,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     setAddNotice((prev) => [...prev, groupInfo.notice]);
   };
 
-
   console.log(groupInfo);
 
   const setUpGroup = async () => {
@@ -552,30 +552,38 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       member_id: userId,
     });
 
-      navigate("/");
+    navigate("/");
   };
 
   useEffect(async () => {
     console.log(upload.url);
     if (thisGroupId) {
       updateDoc(doc(db, "CreateCampingGroup", thisGroupId), {
-
         picture: upload.url,
       });
     }
   }, [upload.url]);
 
+  console.log(tentInfo);
   const addNewTent = (e) => {
     e.preventDefault();
 
-    setAllMemberArr("");
-    // setTentArr((prev) => [...prev, 1]);
+    if (tentInfo.max_number == "") {
+      return;
+    }
+
     setGetAllTent((prev) => [...prev, tentInfo]);
+    setTentInfo((prevState) => ({
+      ...prevState,
+      max_number: "",
+      current_number: 0,
+      seat: "",
+    }));
   };
   console.log(getAllTent);
 
   const [getAllSupplies, setGetAllSupplies] = useState([]);
-  console.log(getAllSupplies);
+  // console.log(getAllSupplies);
 
   const addSupplies = (e) => {
     e.preventDefault();
@@ -600,7 +608,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     //   }
     // );
   };
-
 
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
@@ -717,42 +724,45 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
                 name='announcement'
                 value={groupInfo.announcement}
                 onChange={handleChange}></TextField>
-              <Display>
-                <TextField
-                  sx={{
-                    width: "100%",
-                    marginRight: "20px",
-                    marginBottom: "0px",
-                    marginTop: "20px",
-                  }}
-                  required
-                  label='注意事項'
-                  size='small'
-                  name='notice'
-                  helperText='輸入完請按新增事項'
-                  // value={groupInfo.notice}
-                  onChange={handleChange}></TextField>
-
-                <AddAlertItems onClick={addGroupNotice}>新增事項</AddAlertItems>
-              </Display>
+              <Wrap justifyContent='space-between' width='100%'>
+                <Wrap width='80%' m="0px 20px 0px 0px">
+                  <TextField
+                    sx={{
+                      width: "100%",
+                      marginRight: "20px",
+                      marginBottom: "0px",
+                      marginTop: "20px",
+                    }}
+                    required
+                    label='注意事項'
+                    size='small'
+                    name='notice'
+                    helperText='輸入完請按新增事項'
+                    // value={groupInfo.notice}
+                    onChange={handleChange}></TextField>
+                  <AddAlertItems onClick={addGroupNotice}>
+                    新增事項
+                  </AddAlertItems>
+                </Wrap>
+                <Wrap width='60%' direction='column' alignItems='start'>
+                  {addNotice.map((item, index) => (
+                    <Font fontSize="14px">{`${index + 1}. ${item}`}</Font>
+                  ))}
+                </Wrap>
+              </Wrap>
               <br />
-              {addNotice.map((item, index) => (
-                <div>{`${index + 1}. ${item}`}</div>
-              ))}
+              <br />
               <br />
 
-              <CreateLabel>添加露營團標籤</CreateLabel>
               <MultipleSelectChip
                 path={path}
                 thisGroupId={thisGroupId}
                 setPersonName={setPersonName}
                 personName={personName}
               />
-              {/* <CreateLabel>營區網站</CreateLabel>
-              <Input
-                name='site'
-                value={groupInfo.site}
-                onChange={handleChange}></Input> */}
+              <br></br>
+              <br></br>
+
               <TimeWrap>
                 <Cloumn>
                   <CreateLabel>時間</CreateLabel>
@@ -771,63 +781,69 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
               <CreateLabel>地點</CreateLabel>
               <GoogleMapBasic setState={setState} state={state} />
               <TentWrap>
-                <CreateLabel>新增帳篷</CreateLabel>
-                <Display justifyContent='start' m=' 30px 0px 30px 0px'>
-                  <Tent
-                    setTentInfo={setTentInfo}
-                    tentInfo={tentInfo}
-                    setAllMemberArr={setAllMemberArr}
-                    allMemberArr={allMemberArr}
-                  />
-                  {tentArr.map((_, index) => (
-                    <div key={index}>
-                      <Tent
-                        setTentInfo={setTentInfo}
-                        tentInfo={tentInfo}
-                        setAllMemberArr={setAllMemberArr}
-                        allMemberArr={allMemberArr}
-                      />
-                    </div>
-                  ))}
+                <Cloumn>
+                  <CreateLabel>新增帳篷</CreateLabel>
+                </Cloumn>
+                <Display justifyContent='space-between'>
+                  <Display
+                    justifyContent='end'
+                    alignItems='end'
+                    m=' 30px 0px 30px 0px'>
+                    <Tent
+                      setTentInfo={setTentInfo}
+                      tentInfo={tentInfo}
+                      setAllMemberArr={setAllMemberArr}
+                      allMemberArr={allMemberArr}
+                    />
+                    <AddButton onClick={addNewTent}>新增帳篷</AddButton>
+                  </Display>
+                  <Cloumn>
+                    {getAllTent.map((item, index) => (
+                      <Display mb='10px'>
+                        <Img src={tentColor}></Img>
+                        <Cloumn>
+                          <Font fontSize='14px'>{`第${index + 1}頂帳篷`}</Font>
+                          <Font fontSize='14px'>
+                            可容納人數 {item.max_number}
+                          </Font>
+                        </Cloumn>
+                      </Display>
+                    ))}
+                  </Cloumn>
                 </Display>
-                <AddButton onClick={addNewTent}>新增</AddButton>
-                {getAllTent.map((item, index) => (
-                  <div>
-                    <div>{`第${index + 1}帳篷`}</div>
-                    <div>容納人數{item.max_number}</div>
-                  </div>
-                ))}
               </TentWrap>
               <SuppliesWrap>
-                <CreateLabel>新增需要團員們認領的物品</CreateLabel>
                 <Cloumn>
-                  <Display>
+                  <CreateLabel>新增需要團員們認領的物品</CreateLabel>
+                </Cloumn>
+                <Display justifyContent='space-between'>
+                  <Display
+                    justifyContent='end'
+                    alignItems='end'
+                    m=' 30px 0px 30px 0px'>
                     <CampSupplies
                       setCampSupplies={setCampSupplies}
                       campSupplies={campSupplies}
                     />
-                    {suppliesArr.map((_, index) => (
-                      <div key={index + 1}>
-                        <CampSupplies
-                          setCampSupplies={setCampSupplies}
-                          campSupplies={campSupplies}
-                        />
-                      </div>
-                    ))}
+                    <AddButton onClick={addSupplies}>新增物品</AddButton>
                   </Display>
-                  <AddButton onClick={addSupplies}>新增</AddButton>
-                  {getAllSupplies.map((item, index) => (
-                    <div>
-                      <div>{`第${index + 1}個物品`}</div>
-                      <div>{item.supplies}</div>
-                      <div>{item.note}</div>
-                    </div>
-                  ))}
-                </Cloumn>
+                  <Cloumn>
+                    {getAllSupplies.map((item, index) => (
+                      <Display mb='10px'>
+                        <Img src={supplies} m='0px 20px 0px 0px'></Img>
+                        <Cloumn>
+                          <Font fontSize='14px'>{`第${index + 1}個物品`}</Font>
+                          <Font fontSize='14px'>{item.supplies}</Font>
+                          <Font fontSize='14px'>{item.note}</Font>
+                        </Cloumn>
+                      </Display>
+                    ))}
+                  </Cloumn>
+                </Display>
               </SuppliesWrap>
-              <Display>
+              {/* <Display>
                 <Multiple setUpLoadFile={setUpLoadFile} />
-              </Display>
+              </Display> */}
               <Button width='100%' mt='60px' onClick={setUpGroup}>
                 建立露營團
               </Button>
@@ -838,6 +854,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
           Validate
         </Button> */}
       </Form>
+      <Footer />
     </>
   );
 }
