@@ -434,7 +434,7 @@ export default function ReviewCard({
             </CardContent>
 
             <ButtonWrap>
-              {item.status == "進行中" && (
+              {item.status == "進行中" || "" && (
                 <Button
                   width='90%'
                   margin='auto'
@@ -446,7 +446,7 @@ export default function ReviewCard({
                   <LinkOpen>我要加入</LinkOpen>
                 </Button>
               )}
-              {item.status == "" && (
+              {/* {item.status == "" && (
                 <Button
                   width='90%'
                   margin='auto'
@@ -457,7 +457,7 @@ export default function ReviewCard({
                   }}>
                   <LinkOpen>我要加入</LinkOpen>
                 </Button>
-              )}
+              )} */}
               {item.status == "已結束" && (
                 <Button
                   width='90%'
