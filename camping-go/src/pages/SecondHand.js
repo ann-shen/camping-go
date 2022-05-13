@@ -64,6 +64,7 @@ const ImgCursorWrap = styled.div`
   cursor: pointer;
   overflow: hidden;
   border: ${(props) => props.border || "none"};
+  margin-bottom: 10px;
 `;
 
 const PriviewImg = styled.img`
@@ -194,6 +195,12 @@ function SecondHand({
       hope: "",
       note: "",
     }));
+
+    setUpLoadFile((prevState) => ({
+      ...prevState,
+      file: "",
+      url: "",
+    }));
   };
 
   const changeInvite = async (index) => {
@@ -208,11 +215,20 @@ function SecondHand({
       setBuyerArr(buyerArr);
     }
     setShowBuyerSection(true);
+    console.log(showBuyerSection);
     setInviteIndex(index);
   };
 
-  const choseSuppliesToChange = (index) => {
-    setImgBorder("2.5px solid #759D9B");
+  const choseSuppliesToChange = (e, index) => {
+    buyerArr.map((item) => {
+      {
+        item.border = "none";
+      }
+    });
+    buyerArr[index].border = "3px solid #CFC781";
+    console.log(buyerArr);
+
+    // setImgBorder("2.5px solid #759D9B");
     setChoseSupplies(buyerArr[index]);
     console.log(index);
     allSupplies[inviteIndex].inviteSupplies_index = index;
@@ -260,7 +276,7 @@ function SecondHand({
                 }}>
                 <Cloumn>
                   {item.change_status == true && (
-                      <Tag fontSize='14px'>已交換</Tag>
+                    <Tag fontSize='14px'>已交換</Tag>
                   )}
                   {item.change_status == false && (
                     <Tag bgc='#426765' color='white' fontSize='14px'>
@@ -332,19 +348,18 @@ function SecondHand({
               <Display>
                 {buyerArr.map((item, index) => (
                   <Wrap width='180px' direction='column' m='0px 10px 10px 0px'>
-                    <ImgCursorWrap
-                      width='150px'
-                      height='120px'
-                      style={{ border: imgBorder }}>
+                    <ImgCursorWrap style={{ border: item.border }}>
                       <Img
                         width='100%'
                         src={item.picture}
-                        onClick={() => {
-                          choseSuppliesToChange(index);
+                        onClick={(e) => {
+                          choseSuppliesToChange(e, index);
                         }}
                       />
                     </ImgCursorWrap>
-                    <Font fontSize='14px'>{item.name}</Font>
+                    <Font fontSize='14px' m='10px 0px 0px'>
+                      {item.name}
+                    </Font>
                   </Wrap>
                 ))}
               </Display>

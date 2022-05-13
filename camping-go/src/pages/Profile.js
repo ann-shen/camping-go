@@ -461,13 +461,21 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
       "member"
     );
     let memberArr = [];
-
     const memberData = await getDocs(docRef);
     memberData.forEach((doc) => {
       // console.log(doc.id, " => ", doc.data());
       memberArr.push(doc.data());
     });
-    setMember(memberArr);
+
+    const removeHeaderArr = memberArr.filter((e, index) => { return e.role !== "header"} );
+    const getHeaderArr = memberArr.filter((e, index) => {
+      return e.role == "header";
+    });
+    removeHeaderArr.unshift(getHeaderArr[0]);
+
+    console.log(removeHeaderArr);
+
+    setMember(removeHeaderArr);
   };
 
   const removeMember = async (index, role, member_id) => {
@@ -605,9 +613,9 @@ function SecondHandInvitation({
   inviteInfo,
   inviteInfoIndex,
   userId,
+  setShowBuyerSection,
 }) {
   console.log(inviteInfo[inviteInfoIndex]);
-  const [open, setOpen] = useState(false);
 
   const rejectInvite = async () => {
     inviteInfo[inviteInfoIndex].buyer_name = "";
@@ -637,14 +645,13 @@ function SecondHandInvitation({
     const getInviteDocRef = await getDoc(inviteDocRef);
     if (getInviteDocRef.exists()) {
       console.log(getInviteDocRef.data().second_hand);
-      
-      const getBuyerSpuuliesIndex =
-      getInviteDocRef
+
+      const getBuyerSpuuliesIndex = getInviteDocRef
         .data()
         .second_hand.filter(
           (e, index) => e.name == inviteInfo[inviteInfoIndex].change_supplies
         );
-        console.log(getBuyerSpuuliesIndex);
+      console.log(getBuyerSpuuliesIndex);
 
       //更新主動邀請交換的人
       let data = getInviteDocRef.data().second_hand;
@@ -659,7 +666,15 @@ function SecondHandInvitation({
         second_hand: data,
       });
     }
-    setOpen(true);
+    Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "成功交換",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+    setInviteIsOpen(false);
+    setShowBuyerSection(false);
   };
   return (
     <>
@@ -725,23 +740,6 @@ function SecondHandInvitation({
                     </Font>
                   </Wrap>
                 </Wrap>
-                <Collapse in={open}>
-                  <Alert
-                    action={
-                      <IconButton
-                        aria-label='close'
-                        color='inherit'
-                        size='small'
-                        onClick={() => {
-                          setOpen(false);
-                        }}>
-                        <CloseIcon fontSize='inherit' />
-                      </IconButton>
-                    }
-                    sx={{ mb: 2 }}>
-                    交換成功!
-                  </Alert>
-                </Collapse>
                 <Display>
                   <Button onClick={acceptInvite} width='150px'>
                     確認交換
@@ -775,6 +773,7 @@ export default function Profile({ userName, userId, getLogout }) {
   const [inviteInfoIndex, setInviteInfoIndex] = useState("");
   const [sendInvite, setSendInvite] = useState("");
   const [personName, setPersonName] = useState([]);
+  const [showBuyerSection, setShowBuyerSection] = useState(false);
 
   const navigate = useNavigate();
   const auth = getAuth();
@@ -988,6 +987,8 @@ export default function Profile({ userName, userId, getLogout }) {
           {inviteIsOpen && (
             <SecondHandInvitation
               setInviteIsOpen={setInviteIsOpen}
+              setShowBuyerSection={setShowBuyerSection}
+              showBuyerSection={showBuyerSection}
               inviteIsOpen={inviteIsOpen}
               inviteInfo={inviteInfo}
               inviteInfoIndex={inviteInfoIndex}
@@ -1295,12 +1296,14 @@ export default function Profile({ userName, userId, getLogout }) {
                     current_userId={params.id}
                     setSendInvite={setSendInvite}
                     sendInvite={sendInvite}
+                    setShowBuyerSection={setShowBuyerSection}
+                    showBuyerSection={showBuyerSection}
                   />
                 </TabPanel>
               </SwipeableViews>
             </Box>
           ) : (
-            <div>123</div>
+            <div>載入中</div>
           )}
         </div>
       )}
@@ -1310,7 +1313,7 @@ export default function Profile({ userName, userId, getLogout }) {
           <Wrap
             maxWidth='1440px'
             width='75%'
-            m='20px 40px 0px 12%'
+            m='100px 40px 0px 12%'
             alignItems='center'
             justifyContent='space-between'
             boxShadow='none'>
@@ -1318,7 +1321,6 @@ export default function Profile({ userName, userId, getLogout }) {
               {yourCreateGroup.length !== 0 && (
                 <ProfilePicture userId={yourCreateGroup[0].header_id} />
               )}
-
               <Wrap
                 width='500px'
                 direction='column'

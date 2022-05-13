@@ -15,7 +15,7 @@ import {
 import { useState, useEffect, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Taiwan from "../component/Taiwan";
-import { Font, Display, Img, Button, Hr, Cloumn } from "../css/style";
+import { Font, Display, Img, Button, Hr } from "../css/style";
 import location_big from "../image/location_big.png";
 import group_people from "../image/group_people.png";
 import landingpage from "../image/landingpage.png";
@@ -24,10 +24,7 @@ import { UserContext } from "../utils/userContext";
 import PaginationBar from "../component/Pagination";
 import ReviewCard from "../component/ReviewCard";
 import NavBar from "../component/NavBar";
-import Footer from "../component/Footer";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import Backdrop from "@mui/material/Backdrop";
-import loading from "../image/loading.gif";
 
 Modal.setAppElement("#root");
 
@@ -94,7 +91,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
   });
   const navigate = useNavigate();
   const immediatelyRef = useRef(null);
-  const [backdropOpen, setBackdropOpen] = useState(false);
+
   const indexOfLastPost = pagination.currentPage * pagination.posts_per_page;
   const indexOfFirstPost = indexOfLastPost - pagination.posts_per_page;
   const currentPosts = homePageCampGroup.slice(
@@ -167,7 +164,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     current_number
   ) => {
     console.log(current_number);
-    
+
     if (header_name == userName) {
       Swal.fire({
         position: "center",
@@ -179,14 +176,13 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       navigate("/");
       return;
     }
-    
-    setBackdropOpen(true);
+
     if (current_number + 1 > max_member_number) {
       console.log(current_number + 1);
       Swal.fire({
         position: "center",
         icon: "warning",
-        text: "已滿團",
+        text:"已滿團",
         showConfirmButton: false,
         timer: 1500,
       });
@@ -255,9 +251,8 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     });
 
     console.log(currentPosts[index].group_id);
-    setTimeout(() => {
-      navigate(`/joinGroup/${currentPosts[index].group_id}`);
-    }, 700);
+
+    navigate(`/joinGroup/${currentPosts[index].group_id}`);
   };
 
   const toTaiwanMap = () => {
@@ -273,20 +268,9 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       return;
     }
   };
-  const handleClose = () => {
-    setBackdropOpen(false);
-  };
   return (
     <>
       <HeaderSection>
-        <Backdrop
-          sx={{ color: "#333", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={backdropOpen}
-          onClick={handleClose}>
-          <Cloumn>
-            <Img src={loading} width='80px'></Img>
-          </Cloumn>
-        </Backdrop>
         <NavBar userId={userId} />
 
         <LandingSubTitleWrap>
@@ -366,7 +350,6 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
         <Hr width='80%' m='20px 0px 0px 8%' ref={immediatelyRef}></Hr>
         <Taiwan />
       </Section>
-      <Footer />
     </>
   );
 }

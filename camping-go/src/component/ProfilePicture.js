@@ -6,6 +6,7 @@ import { db } from "../utils/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import FileUploadRoundedIcon from "@mui/icons-material/FileUploadRounded";
 import { Skeleton, Stack } from "@mui/material";
+import { useParams } from "react-router-dom";
 
 const ProfileWrap = styled.div`
   position: relative;
@@ -60,8 +61,9 @@ const InfoWrap = styled.div`
 export const ProfilePicture = ({ userId }) => {
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState(null);
+  let params = useParams();
 
-  console.log(preview);
+  console.log(params.id);
 
   useEffect(async () => {
     const getInfo = await getDoc(doc(db, "joinGroup", userId));
@@ -120,17 +122,19 @@ export const ProfilePicture = ({ userId }) => {
               <Img src={preview} width='auto' height='115%' />
             </ImgWrap>
           )} */}
-          <Label>
-            <FileUploadRoundedIcon
-              sx={{
-                pointerEvents: "none",
-                cursor: "not-allowed",
-                stroke: "#ffffff",
-                strokeWidth: 1,
-              }}
-            />
-            <Input type='file' onChange={onSelectFile} />
-          </Label>
+          {params.id !== userId && (
+            <Label>
+              <FileUploadRoundedIcon
+                sx={{
+                  pointerEvents: "none",
+                  cursor: "not-allowed",
+                  stroke: "#ffffff",
+                  strokeWidth: 1,
+                }}
+              />
+              <Input type='file' onChange={onSelectFile} />
+            </Label>
+          )} 
         </ProfileWrap>
       </Display>
     </InfoWrap>
