@@ -63,17 +63,21 @@ export const ProfilePicture = ({ userId }) => {
   const [preview, setPreview] = useState(null);
   let params = useParams();
 
-  console.log(params.id);
-
+  
   useEffect(async () => {
-    const getInfo = await getDoc(doc(db, "joinGroup", userId));
-    if (getInfo.exists()) {
-      console.log(getInfo.data().profile_img);
-      setPreview(getInfo.data().profile_img);
-    } else {
-      console.log("no such pic");
+    console.log(userId);
+    console.log("123");
+    if (userId) {
+      const getInfo = await getDoc(doc(db, "joinGroup", userId));
+      if (getInfo.exists()) {
+        console.log(getInfo.data().profile_img);
+        setPreview(getInfo.data().profile_img);
+      } else {
+        console.log("no such pic");
+      }
     }
-  }, [selectedFile]);
+  }, [selectedFile, userId]);
+
 
   const onSelectFile = (e) => {
     if (!e.target.files || e.target.files.length === 0) {
@@ -134,7 +138,7 @@ export const ProfilePicture = ({ userId }) => {
               />
               <Input type='file' onChange={onSelectFile} />
             </Label>
-          )} 
+          )}
         </ProfileWrap>
       </Display>
     </InfoWrap>

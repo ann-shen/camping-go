@@ -15,6 +15,7 @@ import {
   increment,
   where,
   getDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { useState, useEffect, useRef, useContext } from "react";
 import { useParams } from "react-router-dom";
@@ -46,9 +47,7 @@ import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import Footer from "../component/Footer";
-
-
-
+import { async } from "@firebase/util";
 
 const Alink = styled.a`
   text-decoration: none;
@@ -142,7 +141,7 @@ const HeaderName = styled.div`
 const ImagesWrap = styled.div`
   width: 100%;
   height: 400px;
-  border-radius: 20px;
+  border-radius: 50px;
   margin: 40px 0px;
   overflow: hidden;
   display: flex;
@@ -192,11 +191,11 @@ const FontDetail = styled.p`
 `;
 
 const TentIndexNumber = styled.p`
-  font-size: 25px;
+  font-size: 16px;
   color: #797659;
   position: absolute;
-  top: 20px;
-  left: 40px;
+  top: 30px;
+  left: 30px;
 `;
 
 const TentSectionWrap = styled.div`
@@ -234,6 +233,25 @@ const SuppliesNotAllowedButton = styled.button`
   margin-left: 5%;
   cursor: not-allowed;
   border-radius: 15px;
+`;
+
+const DeleteTentButton = styled.button`
+  width: 25px;
+  height: 25px;
+  font-size: 16px;
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  border: none;
+  color: white;
+  background-color: #dedab4;
+  border-radius: 50%;
+  cursor: pointer;
+  &:hover {
+    color: #cfc781;
+    transform: scale(1.2);
+    transition: 500ms;
+  }
 `;
 
 function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
@@ -434,7 +452,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
     const querySnapshot = await getDocs(q);
     let thisGroupMemberArr = [];
     querySnapshot.forEach((doc) => {
-
       thisGroupMemberArr.push(doc.data());
     });
 
@@ -468,7 +485,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
             }
           }
         });
-        console.log(objArr);
         setSucessSecondChange(objArr);
       });
     } else {
@@ -477,17 +493,31 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   }, [thisGroupMember]);
 
   //getTentData
-  useEffect(async () => {
-    let tentsArr = [];
-    const querySnapshot = await getDocs(
+
+  // useEffect(async () => {
+  //   let tentsArr = [];
+  //   const querySnapshot = await getDocs(
+  //     collection(db, "CreateCampingGroup", params.id, "tent")
+  //   );
+  //   querySnapshot.forEach((doc) => {
+  //     // console.log(doc.id, " => ", doc.data());
+  //     tentsArr.push(doc.data());
+  //   });
+  //   setAllTentArr(tentsArr);
+  // }, []);
+  useEffect(() => {
+    const eventListenerpage = query(
       collection(db, "CreateCampingGroup", params.id, "tent")
     );
-    querySnapshot.forEach((doc) => {
-      // console.log(doc.id, " => ", doc.data());
-      tentsArr.push(doc.data());
+    onSnapshot(eventListenerpage, (snapshot) => {
+      let tentsArr = [];
+      snapshot.forEach((doc) => {
+        tentsArr.push(doc.data());
+      });
+      setAllTentArr(tentsArr);
     });
-    setAllTentArr(tentsArr);
   }, []);
+
   //getSuppliesData
 
   useEffect(() => {
@@ -544,6 +574,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   };
 
   const addNewTent = async () => {
+    console.log(userName);
     const ondocRefNewTent = doc(
       collection(db, "CreateCampingGroup", params.id, "tent")
     );
@@ -554,6 +585,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
         tent_id: ondocRefNewTent.id,
         member: allMemberArr,
         create_time: serverTimestamp(),
+        who_create: userName,
       }
     ).then(async () => {
       let tentsArr = [];
@@ -597,7 +629,22 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
     setAddNewTentSection(true);
   };
 
-  console.log(sucessSecondChange);
+  const deleteThisTent = async (index) => {
+    console.log(index);
+    console.log(allTentArr[index].tent_id);
+    await deleteDoc(
+      doc(
+        db,
+        "CreateCampingGroup",
+        params.id,
+        "tent",
+        allTentArr[index].tent_id
+      )
+    );
+
+    allTentArr.splice(index, 1);
+    console.log(allTentArr);
+  };
 
   return (
     <div>
@@ -685,9 +732,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                 alignItems: "center",
               }}>
               <Cloumn>
-                <Font fontSize='20px' m='10px 0px' color='#F3EA98'>
-                  詳細地址
-                </Font>
+                <Font fontSize='20px' m='10px 0px' color='#F3EA98'></Font>
                 <Font fontSize='16px' m='0px 0px 25px 0px' color='#F3EA98'>
                   {homePageCampGroup.position}
                 </Font>
@@ -808,7 +853,15 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                   border: "2px solid #CFC781",
                   position: "relative",
                 }}>
-                <TentIndexNumber>{index + 1}</TentIndexNumber>
+                <DeleteTentButton
+                  onClick={() => {
+                    deleteThisTent(index);
+                  }}>
+                  x
+                </DeleteTentButton>
+                  {/* <Font fontSize='18px'>{index + 1}.</Font> */}
+                  <Font fontSize='14px'>{item.who_create}の帳篷</Font>
+                {/* <TentIndexNumber>{index + 1}</TentIndexNumber> */}
                 <Display key={index} direction='column'>
                   <Img src={tentColor} width='200px'></Img>
                   <Label fontSize='35px'>
@@ -1035,7 +1088,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                         {item.bring_person}
                       </Label>
                     </SuppliesWrap>
-                    
+
                     {item.bring_person == "" ? (
                       <Button
                         width='180px'
@@ -1054,8 +1107,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                         color='#EBEBEB'
                         border='1px solid #EBEBEB'
                         ml='5%'
-                        cursor='not-allowed'
-                        >
+                        cursor='not-allowed'>
                         已認領
                       </SuppliesNotAllowedButton>
                     )}

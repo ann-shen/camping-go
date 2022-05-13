@@ -467,7 +467,9 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
       memberArr.push(doc.data());
     });
 
-    const removeHeaderArr = memberArr.filter((e, index) => { return e.role !== "header"} );
+    const removeHeaderArr = memberArr.filter((e, index) => {
+      return e.role !== "header";
+    });
     const getHeaderArr = memberArr.filter((e, index) => {
       return e.role == "header";
     });
@@ -774,17 +776,17 @@ export default function Profile({ userName, userId, getLogout }) {
   const [sendInvite, setSendInvite] = useState("");
   const [personName, setPersonName] = useState([]);
   const [showBuyerSection, setShowBuyerSection] = useState(false);
+  const [paramsInfo, setParamsInfo] = useState("");
 
   const navigate = useNavigate();
   const auth = getAuth();
 
   const ContextByUserId = useContext(UserContext);
 
+  console.log(userId);
   useEffect(() => {
-    console.log(userId);
     if (userId) {
       const unsub = onSnapshot(doc(db, "joinGroup", userId), (doc) => {
-        console.log("Current data: ", doc.data().second_hand);
         setInviteInfo(doc.data().second_hand);
         doc.data().second_hand.map((item, index) => {
           if (item.invite == true) {
@@ -882,6 +884,15 @@ export default function Profile({ userName, userId, getLogout }) {
       });
       setYourCreateGroup(groups);
     });
+  }, []);
+
+  //get param_id profie data
+  useEffect(async () => {
+    const paramIdProfile = await getDoc(doc(db, "joinGroup", params.id));
+    if (paramIdProfile.exists()) {
+      console.log(paramIdProfile.data().info);
+      setParamsInfo(paramIdProfile.data().info);
+    }
   }, []);
 
   const memberWithdrawGroup = async (id, userId, index) => {
@@ -1318,9 +1329,7 @@ export default function Profile({ userName, userId, getLogout }) {
             justifyContent='space-between'
             boxShadow='none'>
             <Display>
-              {yourCreateGroup.length !== 0 && (
-                <ProfilePicture userId={yourCreateGroup[0].header_id} />
-              )}
+              <ProfilePicture userId={paramsInfo.user_id} />
               <Wrap
                 width='500px'
                 direction='column'
@@ -1332,8 +1341,7 @@ export default function Profile({ userName, userId, getLogout }) {
                   margin='0px 0px 10px 20px'
                   marginLeft='20px'
                   color='#426765'>
-                  {yourCreateGroup.length !== 0 &&
-                    yourCreateGroup[0].header_name}
+                  {paramsInfo.user_name}
                 </Font>
               </Wrap>
             </Display>

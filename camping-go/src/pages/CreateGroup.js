@@ -13,7 +13,7 @@ import { DateRange } from "react-date-range";
 import { useNavigate } from "react-router-dom";
 import Tent from "../component/Tent";
 import CampSupplies from "../component/CampSupplies";
-import { TextField, Box, Autocomplete, Stack} from "@mui/material";
+import { TextField, Box, Autocomplete, Stack } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
@@ -398,6 +398,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
   const navigate = useNavigate();
   const [personName, setPersonName] = useState([]);
   const [getAllTent, setGetAllTent] = useState([]);
+  const [getAllSupplies, setGetAllSupplies] = useState([]);
   const ContextByUserId = useContext(UserContext);
 
   let path = window.location.pathname;
@@ -452,23 +453,23 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     // group
     const groupId = uuidv4();
     console.log(groupId);
-    console.log(upload);
-    const storage = getStorage();
-    const imageRef = ref(storage, upload.file.name);
-    uploadBytes(imageRef, upload.file)
-      .then(() => {
-        getDownloadURL(imageRef)
-          .then((url) => {
-            console.log(url);
-            setUpLoadFile((prevState) => ({ ...prevState, url: url }));
-          })
-          .catch((error) => {
-            console.log(error.message, "error getting the img url");
-          });
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
+    // console.log(upload);
+    // const storage = getStorage();
+    // const imageRef = ref(storage, upload.file.name);
+    // uploadBytes(imageRef, upload.file)
+    //   .then(() => {
+    //     getDownloadURL(imageRef)
+    //       .then((url) => {
+    //         console.log(url);
+    //         setUpLoadFile((prevState) => ({ ...prevState, url: url }));
+    //       })
+    //       .catch((error) => {
+    //         console.log(error.message, "error getting the img url");
+    //       });
+    //   })
+    //   .catch((error) => {
+    //     console.log(error.message);
+    //   });
 
     setThisGroupID(groupId);
 
@@ -507,6 +508,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
         {
           tent_id: ondocRefNewTent.id,
           member: allMemberArr,
+          who_create: userName,
         }
       );
     });
@@ -555,63 +557,58 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     navigate("/");
   };
 
-  useEffect(async () => {
-    console.log(upload.url);
-    if (thisGroupId) {
-      updateDoc(doc(db, "CreateCampingGroup", thisGroupId), {
-        picture: upload.url,
-      });
-    }
-  }, [upload.url]);
+  // useEffect(async () => {
+  //   console.log(upload.url);
+  //   if (thisGroupId) {
+  //     updateDoc(doc(db, "CreateCampingGroup", thisGroupId), {
+  //       picture: upload.url,
+  //     });
+  //   }
+  // }, [upload.url]);
 
   console.log(tentInfo);
   const addNewTent = (e) => {
     e.preventDefault();
-
     if (tentInfo.max_number == "") {
       return;
     }
-
     setGetAllTent((prev) => [...prev, tentInfo]);
     setTentInfo((prevState) => ({
       ...prevState,
       max_number: "",
       current_number: 0,
       seat: "",
+      who_create: userName,
     }));
   };
   console.log(getAllTent);
 
-  const [getAllSupplies, setGetAllSupplies] = useState([]);
-  // console.log(getAllSupplies);
-
   const addSupplies = (e) => {
     e.preventDefault();
-
-    // setSuppliesArr((prev) => [...prev, 1]);
     setGetAllSupplies((prev) => [...prev, campSupplies]);
-
-    // const ondocRefNewSupplies = doc(
-    //   collection(db, "CreateCampingGroup", groupId, "supplies")
-    // );
-    // await setDoc(ondocRefNewSupplies, campSupplies);
-    // updateDoc(
-    //   doc(
-    //     db,
-    //     "CreateCampingGroup",
-    //     groupId,
-    //     "supplies",
-    //     ondocRefNewSupplies.id
-    //   ),
-    //   {
-    //     supplies_id: ondocRefNewSupplies.id,
-    //   }
-    // );
   };
 
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
     console.log(e.target.files[0].name);
+
+    console.log(upload);
+    const storage = getStorage();
+    const imageRef = ref(storage, e.target.files[0].name);
+    uploadBytes(imageRef, e.target.files[0])
+      .then(() => {
+        getDownloadURL(imageRef)
+          .then((url) => {
+            console.log(url);
+            setUpLoadFile((prevState) => ({ ...prevState, url: url }));
+          })
+          .catch((error) => {
+            console.log(error.message, "error getting the img url");
+          });
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
   };
 
   const handleSubmit = (e) => {
@@ -725,7 +722,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
                 value={groupInfo.announcement}
                 onChange={handleChange}></TextField>
               <Wrap justifyContent='space-between' width='100%'>
-                <Wrap width='80%' m="0px 20px 0px 0px">
+                <Wrap width='80%' m='0px 20px 0px 0px'>
                   <TextField
                     sx={{
                       width: "100%",
@@ -746,7 +743,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
                 </Wrap>
                 <Wrap width='60%' direction='column' alignItems='start'>
                   {addNotice.map((item, index) => (
-                    <Font fontSize="14px">{`${index + 1}. ${item}`}</Font>
+                    <Font fontSize='14px'>{`${index + 1}. ${item}`}</Font>
                   ))}
                 </Wrap>
               </Wrap>

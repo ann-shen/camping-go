@@ -606,7 +606,7 @@ function CityCamping({ userName, groupId, userId }) {
           alignItems='start'
           justifyContent='start'
           m='150px 0px 30px 4%'>
-          <Img src={location_big} width='25px'></Img>
+          <Img src={location_big} width='26px'></Img>
           <Font fontSize='20px' m='0px 0px 0px 20px' marginLeft='10px'>
             {targetCity}
           </Font>
@@ -673,7 +673,7 @@ function CityCamping({ userName, groupId, userId }) {
                   </Font>
                   <Display justifyContent='space-between'>
                     <Display>
-                      <Img src={location} width='26px'></Img>{" "}
+                      <Img src={location} width='20px'></Img>{" "}
                       <Span>{item.city}</Span>
                     </Display>
                     <Display>
