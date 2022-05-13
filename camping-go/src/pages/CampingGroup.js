@@ -167,8 +167,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     current_number
   ) => {
     console.log(current_number);
-    setBackdropOpen(true);
-
+    
     if (header_name == userName) {
       Swal.fire({
         position: "center",
@@ -180,7 +179,8 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       navigate("/");
       return;
     }
-
+    
+    setBackdropOpen(true);
     if (current_number + 1 > max_member_number) {
       console.log(current_number + 1);
       Swal.fire({
