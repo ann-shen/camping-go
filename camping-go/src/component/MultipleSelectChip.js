@@ -46,7 +46,13 @@ function getStyles(name, personName, theme) {
   };
 }
 
-export default function MultipleSelectChip({ userId, path, groupId, personName,setPersonName }) {
+export default function MultipleSelectChip({
+  userId,
+  path,
+  groupId,
+  personName,
+  setPersonName,
+}) {
   const theme = useTheme();
   // const [personName, setPersonName] = useState([]);
   // const [chosenTag, setChosenTag] = useState([]);
@@ -88,9 +94,23 @@ export default function MultipleSelectChip({ userId, path, groupId, personName,s
     }
   };
 
+
+  let formControlStyle;
+
+  if (window.location.pathname !== "/create_group") {
+    formControlStyle = { ml: 2, mt: 1, width: "400px" };
+  }else{
+    formControlStyle = { ml: 0, mt: 0, width: "400px" };
+  }
+
   return (
-    <FormControl sx={{ ml: 2, mt: 1, width: "400px" }} size='small'>
-      <InputLabel id='demo-multiple-chip-label'>喜愛</InputLabel>
+    <FormControl sx={formControlStyle} size='small'>
+      {path !== "/create_group" ? (
+        <InputLabel id='demo-multiple-chip-label'>喜愛</InputLabel>
+      ) : (
+        <InputLabel id='demo-multiple-chip-label'>添加露營團標籤</InputLabel>
+      )}
+
       <Select
         labelId='demo-multiple-chip-label'
         id='demo-multiple-chip'

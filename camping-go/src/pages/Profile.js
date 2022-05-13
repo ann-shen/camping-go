@@ -1,7 +1,6 @@
 import * as React from "react";
 import SwipeableViews from "react-swipeable-views";
 import { useTheme } from "@mui/material/styles";
-import { AppBar, Tabs, Tab, Typography, Box } from "@mui/material";
 import { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../utils/firebase";
@@ -33,22 +32,32 @@ import {
 } from "../css/style";
 import Modal from "react-modal";
 import "../css/modal.css";
-import { TextField, Alert, Collapse, IconButton } from "@mui/material";
+import {
+  TextField,
+  Alert,
+  Collapse,
+  IconButton,
+  Rating,
+  AppBar,
+  Tabs,
+  Tab,
+  Typography,
+  Box,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import { UserContext } from "../utils/userContext";
-import Rating from "@mui/material/Rating";
 import Header from "../component/Header";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { ProfilePicture } from "../component/ProfilePicture";
-import location from "../image/location.png";
 import MultipleSelectChip from "../component/MultipleSelectChip";
+import location from "../image/location.png";
 import { signOut, getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import SecondHand from "./SecondHand";
-import { async } from "@firebase/util";
-import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import Swal from "sweetalert2/dist/sweetalert2.js";
+import Footer from "../component/Footer";
 
 Modal.setAppElement("#root");
 
@@ -253,21 +262,23 @@ function SentCommentToHeader({ groupId, userName, userId }) {
           <Font>評論</Font>
           <Hr width='60%'></Hr>
           <TextField
-            sx={{ width: "60%" }}
-            id='filled-multiline-static'
+            sx={{ width: "60%", backgroundColor: "#EAE5BE" }}
             label=''
             multiline
             rows={4}
-            defaultValue=''
             variant='filled'
             onChange={handleChange}
+            color='action'
           />
+          <Font fontSize='16px' m='20px 20px 10px 0px' marginLeft='20px'>
+            給這次的體驗星星數吧~
+          </Font>
           <Rating
             name='size-large'
             defaultValue={2}
             size='large'
             value={startValue}
-            sx={{ margin: "30px" }}
+            sx={{ marginBottom: "50px", color: "#FFE588", fontSize: "40px" }}
             onChange={(event, newValue) => {
               console.log(newValue);
               setStartValue(newValue);
@@ -582,7 +593,6 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
               </Box>
             ))}
           </ScrollWrap>
-
         </CheckCommentWrap>
       </Modal>
     </div>
@@ -626,14 +636,25 @@ function SecondHandInvitation({
     );
     const getInviteDocRef = await getDoc(inviteDocRef);
     if (getInviteDocRef.exists()) {
-      // console.log(getInviteDocRef.data().second_hand);
+      console.log(getInviteDocRef.data().second_hand);
+      
+      const getBuyerSpuuliesIndex =
+      getInviteDocRef
+        .data()
+        .second_hand.filter(
+          (e, index) => e.name == inviteInfo[inviteInfoIndex].change_supplies
+        );
+        console.log(getBuyerSpuuliesIndex);
 
-      //全部資料
+      //更新主動邀請交換的人
       let data = getInviteDocRef.data().second_hand;
-      let thisIndex = inviteInfo[inviteInfoIndex].inviteSupplies_index; //0
-      let targetChangeStatus = data[thisIndex];
-      console.log(targetChangeStatus.change_status);
-      targetChangeStatus.change_status = true;
+      getBuyerSpuuliesIndex.change_status = true;
+      getBuyerSpuuliesIndex.buyer_name =
+        inviteInfo[inviteInfoIndex].seller_name;
+      getBuyerSpuuliesIndex.buyer_id = inviteInfo[inviteInfoIndex].seller_id;
+      getBuyerSpuuliesIndex.change_supplies = inviteInfo[inviteInfoIndex].name;
+      console.log(getBuyerSpuuliesIndex);
+
       updateDoc(inviteDocRef, {
         second_hand: data,
       });
@@ -777,7 +798,6 @@ export default function Profile({ userName, userId, getLogout }) {
     }
   }, []);
 
-
   useEffect(async () => {
     const q = query(
       collection(db, "CreateCampingGroup"),
@@ -809,8 +829,8 @@ export default function Profile({ userName, userId, getLogout }) {
 
     if (participateGroupArr.length === 0) {
       setYourParticipateGroup([]);
-    }else if (participateGroupArr[0].group_id ==""){
-      return
+    } else if (participateGroupArr[0].group_id == "") {
+      return;
     }
 
     let showGroupArr = [];
@@ -1020,7 +1040,7 @@ export default function Profile({ userName, userId, getLogout }) {
                 height: "auto",
                 boxShadow:
                   "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-                borderRadius: 10,
+                borderRadius: 5,
                 paddingTop: 8,
                 margin: "auto",
                 marginBottom: "100px",
@@ -1460,6 +1480,7 @@ export default function Profile({ userName, userId, getLogout }) {
           )}
         </div>
       )}
+      <Footer />
     </>
   );
 }

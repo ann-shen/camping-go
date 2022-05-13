@@ -94,7 +94,11 @@ function App() {
             <Route
               path='/:city'
               element={
-                <CityCamping userName={userName} groupId={groupId} />
+                <CityCamping
+                  userName={userName}
+                  groupId={groupId}
+                  userId={userId}
+                />
               }></Route>
             <Route path='googlemap_basic' element={<GoogleMapBasic />}></Route>
             <Route

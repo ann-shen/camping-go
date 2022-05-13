@@ -6,6 +6,7 @@ export const Label = styled.label`
   margin-left: ${(props) => props.ml || "5px"};
   margin-top: ${(props) => props.mt || "10px"};
   color: ${(props) => props.color || "#797659"};
+  text-align: start;
 `;
 export const Input = styled.input`
   font-size: 16px;
@@ -91,7 +92,7 @@ export const Button = styled.button`
   margin-left: ${(props) => props.ml || "0px"};
   width: ${(props) => props.width || "100%"};
   height: ${(props) => props.height || "40px"};
-  border-radius: ${(props) => props.borderRadius || "15px"};
+  border-radius: ${(props) => props.borderRadius || "10px"};
   background-color: ${(props) => props.bgc || "#eae5be"};
   font-size: ${(props) => props.fontSize || "16px"};
   color: ${(props) => props.color || "#797659"};

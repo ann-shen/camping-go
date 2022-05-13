@@ -5,6 +5,8 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db } from "../utils/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import FileUploadRoundedIcon from "@mui/icons-material/FileUploadRounded";
+import { Skeleton, Stack } from "@mui/material";
+
 const ProfileWrap = styled.div`
   position: relative;
 `;
@@ -57,7 +59,9 @@ const InfoWrap = styled.div`
 
 export const ProfilePicture = ({ userId }) => {
   const [selectedFile, setSelectedFile] = useState();
-  const [preview, setPreview] = useState("");
+  const [preview, setPreview] = useState(null);
+
+  console.log(preview);
 
   useEffect(async () => {
     const getInfo = await getDoc(doc(db, "joinGroup", userId));
@@ -95,17 +99,27 @@ export const ProfilePicture = ({ userId }) => {
         console.log(error.message);
       });
   };
-  console.log(preview);
 
   return (
     <InfoWrap>
       <Display direction='column'>
         <ProfileWrap>
-          {preview && (
+          {preview == null ? (
+            <ImgWrap>
+              <Stack spacing={1}>
+                <Skeleton variant='circular' width={120} height={120} />
+              </Stack>
+            </ImgWrap>
+          ) : (
             <ImgWrap>
               <Img src={preview} width='auto' height='115%' />
             </ImgWrap>
           )}
+          {/* {preview && (
+            <ImgWrap>
+              <Img src={preview} width='auto' height='115%' />
+            </ImgWrap>
+          )} */}
           <Label>
             <FileUploadRoundedIcon
               sx={{
