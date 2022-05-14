@@ -116,12 +116,15 @@ function SecondHand({
     invite: false,
     inviteSupplies_index: "",
     note: "",
+    waiting_reply: false,
   });
   const [allSupplies, setAllSupplies] = useState([]);
   const [showBuyerSection, setShowBuyerSection] = useState(false);
   const [buyerArr, setBuyerArr] = useState([]);
   const [choseSupplies, setChoseSupplies] = useState("");
   const [inviteIndex, setInviteIndex] = useState("");
+  const [buyerIndex, setBuyerIndex] = useState("");
+
   const [imgBorder, setImgBorder] = useState("0px solid transparent");
   const [alertOpen, setAlertOpen] = useState(false);
 
@@ -202,20 +205,26 @@ function SecondHand({
       url: "",
     }));
   };
+  console.log(buyerId);
 
   const changeInvite = async (index) => {
     const getBuyerSupplies = await getDoc(doc(db, "joinGroup", buyerId));
     if (getBuyerSupplies.exists()) {
       let buyerArr = [];
       getBuyerSupplies.data().second_hand.map((item) => {
+        console.log(item);
         if (item.change_status == false) {
           buyerArr.push(item);
+        } else {
+          console.log("none");
         }
       });
+      // buyerArr[buyerIndex].waiting_reply = true;
+      console.log(buyerIndex);
+      console.log(buyerArr);
       setBuyerArr(buyerArr);
     }
     setShowBuyerSection(true);
-    console.log(showBuyerSection);
     setInviteIndex(index);
   };
 
@@ -227,10 +236,11 @@ function SecondHand({
     });
     buyerArr[index].border = "3px solid #CFC781";
     console.log(buyerArr);
+    setBuyerIndex(index);
 
     // setImgBorder("2.5px solid #759D9B");
     setChoseSupplies(buyerArr[index]);
-    console.log(index);
+
     allSupplies[inviteIndex].inviteSupplies_index = index;
   };
 
@@ -249,15 +259,45 @@ function SecondHand({
     const docRef = doc(db, "joinGroup", userId);
     await updateDoc(docRef, { second_hand: allSupplies });
 
+    const getBuyerSupplies = await getDoc(doc(db, "joinGroup", buyerId));
+    if (getBuyerSupplies.exists()) {
+      let buyerArr = [];
+      getBuyerSupplies.data().second_hand.map((item) => {
+        console.log(item);
+        if (item.change_status == false) {
+          buyerArr.push(item);
+        } else {
+          console.log("none");
+        }
+      });
+      buyerArr[buyerIndex].waiting_reply = true;
+      console.log(buyerArr);
+      await updateDoc(doc(db, "joinGroup", buyerId), { second_hand: buyerArr });
+    }
+
     setTimeout(() => {
       setAlertOpen(false);
     }, 2000);
   };
 
+  function GetStatus({ item }) {
+    console.log(item);
+    console.log(item.change_status);
+    return (
+      <>
+        {item.waiting_reply == true ? (
+          "等待回覆中"
+        ) : (
+          <> {!item.change_status ? "提出交換邀請" : "已交換"}</>
+        )}
+      </>
+    );
+  }
+
   return (
     <>
       <Display>
-        {allSupplies && (
+        {allSupplies.length !== 0 ? (
           <Display>
             {allSupplies.map((item, index) => (
               <Box
@@ -300,8 +340,7 @@ function SecondHand({
                       已和{item.buyer_name}交換{item.change_supplies}
                     </Font>
                   )}
-
-                  {item.seller_id !== current_userId ? (
+                  {item.seller_id !== current_userId && (
                     <Button
                       width='200px'
                       height='30px'
@@ -309,17 +348,21 @@ function SecondHand({
                       ml='10px'
                       mt='10px'
                       onClick={() => {
+                        if (item.waiting_reply) return;
                         changeInvite(index);
                       }}>
-                      {item.change_status == false ? "提出交換邀請" : "已交換"}
+                      <GetStatus item={item} />
+                      {/* {item.change_status == false ? "提出交換邀請" : "已交換"} */}
                     </Button>
-                  ) : (
-                    <></>
                   )}
                 </Cloumn>
               </Box>
             ))}
           </Display>
+        ) : (
+          <Wrap width='100%' justifyContent='center' m='30px 0px 0px 0px'>
+            <Font>尚未上架二手露營用品</Font>
+          </Wrap>
         )}
       </Display>
       <Display>
@@ -381,7 +424,6 @@ function SecondHand({
                 </Alert>
               </Collapse>
               <br />
-
               <Button width='200px' mt='20px' onClick={comfirmChange}>
                 確認提出交換邀請
               </Button>

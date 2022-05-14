@@ -204,7 +204,7 @@ function IsModal({
               <AnnouncementFontWrap>
                 {currentPosts[index].notice.length !== 0 &&
                   currentPosts[index].notice.map((item) => (
-                    <Display mb='15px' alignItems="start">
+                    <Display mb='15px' alignItems='start'>
                       <Img src={alertIcon} width='30px'></Img>
                       <Font fontSize='14px' marginLeft='10px'>
                         {item}
@@ -218,6 +218,8 @@ function IsModal({
                   <Button
                     width='200px'
                     mt='30px'
+                    bgc='white'
+                    border='1px solid #CFC781'
                     onClick={() => setIsOpen(false)}>
                     我再考慮
                   </Button>
@@ -260,7 +262,9 @@ function IsModal({
                   <Display>
                     <Button
                       width='200px'
+                      bgc='white'
                       mt='20px'
+                      border='1px solid #CFC781'
                       onClick={() => setIsOpen(false)}>
                       我再考慮
                     </Button>
@@ -340,7 +344,7 @@ export default function ReviewCard({
   const confirmJoinThisGroup = (index) => {
     if (!userId) {
       Swal.fire({
-        title: "尚未登入",
+        text: "尚未登入",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#426765",
@@ -407,6 +411,7 @@ export default function ReviewCard({
               margin: 4,
               marginTop: 0,
               backgroundColor: "#F4F4EE",
+
               "&:hover": {
                 transition: "0.7s",
                 opacity: "0.7",
@@ -522,41 +527,61 @@ export default function ReviewCard({
           </Card>
         ))}
       </GroupWrap>
-      <Wrap
+      {/* <Wrap
         width='90%'
-        m='20px 0px 30px 8%'
+        m='120px 0px 30px 8%'
         direction='column'
         alignItems='start'>
-        <Img src={landingpage04} width='120px'></Img>
+        <Img src={landingpage04} width='120px'></Img> 
         <Hr width='90%' m='0px'></Hr>
-      </Wrap>
-
-      <Font letterSpacing='3px' fontSize='16px'>
-        找不到喜愛的？一鍵找尋你的最佳推薦露營團
-      </Font>
-      <FindGroupButton
-        onClick={() => {
-          if (!userId) {
-            Swal.fire({
-              title: "尚未登入",
-              text: "",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "#426765",
-              cancelButtonColor: "#EAE5BE",
-              confirmButtonText: "前往登入",
-            }).then((result) => {
-              if (result.isConfirmed) {
-                navigate("/login");
-                // Swal.fire("Deleted!", "Your file has been deleted.", "success");
+      </Wrap> */}
+      <GroupWrap>
+        <Card
+          sx={{
+            width: "80%",
+            height: "150px",
+            boxShadow:
+              "0.8rem 0.8rem 1.8rem #E2E1D3 , -0.5rem -0.5rem 0.7rem #ffffff",
+            borderRadius: 5,
+            padding: 1,
+            margin: 4,
+            marginTop: 15,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#F8F8F2",
+            border: "1px solid #CFC781 ",
+          }}>
+          <Font letterSpacing='3px' fontSize='16px'>
+            找不到喜愛的？一鍵找尋你的最佳推薦露營團
+          </Font>
+          <FindGroupButton
+            onClick={() => {
+              if (!userId) {
+                Swal.fire({
+                  // title: "尚未登入",
+                  text: "尚未登入",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#426765",
+                  cancelButtonColor: "#EAE5BE",
+                  confirmButtonText: "前往登入",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    navigate("/login");
+                    // Swal.fire("Deleted!", "Your file has been deleted.", "success");
+                  }
+                });
+                return;
               }
-            });
-            return;
-          }
-          setRecommendIsOpen(true);
-        }}>
-        最佳推薦
-      </FindGroupButton>
+              setRecommendIsOpen(true);
+            }}>
+            最佳推薦
+          </FindGroupButton>
+        </Card>
+      </GroupWrap>
+
       <Recommend
         recommendIsOpen={recommendIsOpen}
         setRecommendIsOpen={setRecommendIsOpen}
@@ -565,8 +590,8 @@ export default function ReviewCard({
         userId={userId}
         setGroupId={setGroupId}
       />
-      <Wrap width='100%' justifyContent='end' m=' -80px 0px 0px 0px'>
-        <Img src={landingpage03} width='300px'></Img>
+      <Wrap width='95%' justifyContent='end' m=' -160px 00px 0px 0px'>
+        <Img src={landingpage03} width='280px'></Img>
       </Wrap>
     </>
   );

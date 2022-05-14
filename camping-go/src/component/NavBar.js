@@ -8,6 +8,7 @@ import logoColor from "../image/logoColor2.png";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
+import { fontSize } from "@mui/system";
 
 const LinkRoute = styled(Link)`
   text-decoration: none;
@@ -18,6 +19,7 @@ const LinkRoute = styled(Link)`
   display: flex;
 `;
 const NavFont = styled.p`
+letter-spacing: 2px;
   margin: 0px 0px -10px 0px;
   font-size: 16px;
   &:hover {
@@ -26,7 +28,8 @@ const NavFont = styled.p`
 `;
 
 const NavFontSetGroup = styled.p`
-  margin: 0px 0px -10px 25px;
+letter-spacing: 2px;
+  margin: 0px 0px -10px 45px;
   font-size: 16px;
   &:hover {
     color: #426765;
@@ -65,8 +68,8 @@ function NavBar({ userId }) {
   const swalAlert = () => {
     console.log("123");
     Swal.fire({
-      title: "尚未登入",
-      text: "You won't be able to revert this!",
+      // title: "尚未登入",
+      text: "尚未登入",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#426765",
@@ -103,33 +106,43 @@ function NavBar({ userId }) {
         {userId ? (
           <>
             <LinkRoute to={`/create_group`} ml='45%'>
-              <AddIcon sx={{ marginBottom: "-10px" }}></AddIcon>
+              <AddIcon
+                sx={{
+                  marginTop: "-5px",
+                  color: "#CFC781",
+                  fontSize: "35px",
+                }}></AddIcon>
               <NavFont style={{ color: navFontColor }}>建立露營團</NavFont>
             </LinkRoute>
             <LinkRoute to={`/profile/${userId}`} ml='5%'>
               <NavFont style={{ color: navFontColor }}>我的露營團</NavFont>
             </LinkRoute>
+            <Alert userId={userId}></Alert>
           </>
         ) : (
           <>
             <LinkRoute to={`/`} ml='45%' onClick={swalAlert}>
-              <AddIcon sx={{ marginBottom: "-10px" }}></AddIcon>
+              <AddIcon
+                sx={{ marginBottom: "-10px", color: "#426765" }}></AddIcon>
               <NavFont style={{ color: navFontColor }}>建立露營團</NavFont>
             </LinkRoute>
             <LinkRoute to={`/`} ml='5%' onClick={swalAlert}>
               <NavFont style={{ color: navFontColor }}>我的露營團</NavFont>
             </LinkRoute>
+            <LinkRoute to={`/login`} ml='1%'>
+              <NavFontSetGroup style={{ color: navFontColor }}>
+                登入
+              </NavFontSetGroup>
+            </LinkRoute>
           </>
         )}
-
-        <Alert userId={userId}></Alert>
-        {!userId && (
+        {/* {!userId && (
           <LinkRoute to={`/login`} ml='1%'>
             <NavFontSetGroup style={{ color: navFontColor }}>
               登入
             </NavFontSetGroup>
           </LinkRoute>
-        )}
+        )} */}
       </LogoImgWrap>
     </nav>
   );

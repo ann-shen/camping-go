@@ -19,6 +19,7 @@ import location from "../image/location.png";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2/dist/sweetalert2.js";
 
 const Span = styled.span`
   font-size: 16px;
@@ -119,6 +120,8 @@ function FindGroup({ userId, userName, setGroupId }) {
   const [allGroupSelectArr, setAllGroupSelectArr] = useState([]);
   const [findIndex, setFindIndex] = useState("");
   const [groupPassword, setGroupPassword] = useState("");
+  const [backdropOpen, setbackdropOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(async () => {
     const docRef = await getDoc(doc(db, "joinGroup", userId));
@@ -144,11 +147,24 @@ function FindGroup({ userId, userName, setGroupId }) {
     });
     // console.log(filterHeaderGroup);
 
-    filterHeaderGroup.map((item) => {
+    const filterPrivacyGroup = filterHeaderGroup.filter((e, index) => {
+      return e.privacy !== "私人";
+    });
+
+
+    const fullMemberGroup = filterPrivacyGroup.filter((e, index) => {
+      console.log(e.max_member_number);
+      console.log(e.current_number);
+      return e.max_member_number.toString() !== e.current_number.toString();
+    });
+
+    console.log(fullMemberGroup);
+
+    fullMemberGroup.map((item) => {
       allSelectArr.push(item.select_tag);
     });
     setAllGroupSelectArr(allSelectArr);
-    setAllGroupInfo(filterHeaderGroup);
+    setAllGroupInfo(fullMemberGroup);
   }, []);
 
   useEffect(() => {
@@ -160,6 +176,8 @@ function FindGroup({ userId, userName, setGroupId }) {
         })
         .flat(Infinity);
 
+      console.log(find);
+
       mathArr.push(find.length);
       const max = Math.max(...mathArr);
       const index = mathArr.indexOf(max);
@@ -167,11 +185,99 @@ function FindGroup({ userId, userName, setGroupId }) {
     });
   }, [allGroupSelectArr, allGroupInfo]);
 
-  const joinThisGroup = async (index, password, header_name) => {
-    console.log(allGroupInfo);
-    console.log(index);
-    setGroupId(allGroupInfo[index].group_id.toString());
-    setGroupPassword(password);
+  // const joinThisGroup = async (index, password, header_name) => {
+  //   console.log(allGroupInfo);
+  //   console.log(index);
+  //   setGroupId(allGroupInfo[index].group_id.toString());
+  //   setGroupPassword(password);
+  //   const docRef = await doc(
+  //     db,
+  //     "CreateCampingGroup",
+  //     allGroupInfo[index].group_id.toString()
+  //   );
+
+  //   const docRefMember = await doc(
+  //     db,
+  //     "CreateCampingGroup",
+  //     allGroupInfo[index].group_id.toString(),
+  //     "member",
+  //     userId
+  //   );
+
+  //   const docSnap = await getDoc(docRef);
+  //   if (docSnap.exists()) {
+  //     if (docSnap.data().privacy == "私人") {
+  //       // setIsOpen(true);
+  //     }
+  //   } else {
+  //     // doc.data() will be undefined in this case
+  //     console.log("No such document!");
+  //   }
+  //   setDoc(docRefMember, {
+  //     role: "member",
+  //     member_name: userName,
+  //     member_id: userId,
+  //   }).then(async () => {
+  //     const querySnapshot = await getDocs(
+  //       collection(
+  //         db,
+  //         "CreateCampingGroup",
+  //         allGroupInfo[index].group_id.toString(),
+  //         "member"
+  //       )
+  //     );
+  //     let memberArrLength = [];
+  //     querySnapshot.forEach((doc) => {
+  //       // console.log(doc.id, " => ", doc.data());
+  //       memberArrLength.push(doc.data());
+  //     });
+  //     console.log(memberArrLength.length);
+  //     await updateDoc(docRef, {
+  //       current_number: memberArrLength.length,
+  //     });
+  //   });
+
+  //   const docRefJoinGroup = await doc(db, "joinGroup", userId);
+  //   console.log(allGroupInfo[index].group_id);
+  //   updateDoc(docRefJoinGroup, {
+  //     group: arrayUnion(allGroupInfo[index].group_id),
+  //   });
+
+  //   updateDoc(doc(db, "joinGroup", allGroupInfo[index].header_id), {
+  //     alert: arrayUnion({
+  //       alert_content: `${userName}已加入「${allGroupInfo[index].group_title}」`,
+  //       is_read: false,
+  //     }),
+  //   });
+  // };
+
+  // console.log(findIndex);
+
+  const joinThisGroup = async (
+    index,
+    password,
+    header_name,
+    max_member_number,
+    current_number
+  ) => {
+    console.log(current_number);
+
+    setbackdropOpen(true);
+
+    if (current_number + 1 > max_member_number) {
+      console.log(current_number + 1);
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        text: "已滿團",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      return;
+    }
+
+    // setGroupId(allGroupInfo[index].group_id.toString());
+
     const docRef = await doc(
       db,
       "CreateCampingGroup",
@@ -186,19 +292,31 @@ function FindGroup({ userId, userName, setGroupId }) {
       userId
     );
 
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      if (docSnap.data().privacy == "私人") {
-        // setIsOpen(true);
-      }
-    } else {
-      // doc.data() will be undefined in this case
-      console.log("No such document!");
+    let userSelect;
+
+    const docRefJoinGroup = doc(db, "joinGroup", userId);
+    const docMemberInfo = await getDoc(docRefJoinGroup);
+
+    if (docMemberInfo.exists()) {
+      console.log(docMemberInfo.data().select_tag);
+      userSelect = docMemberInfo.data().select_tag;
     }
+
+    updateDoc(docRefJoinGroup, {
+      group: arrayUnion(allGroupInfo[index].group_id),
+    });
+    updateDoc(doc(db, "joinGroup", allGroupInfo[index].header_id), {
+      alert: arrayUnion({
+        alert_content: `${userName}已加入「${allGroupInfo[index].group_title}」`,
+        is_read: false,
+      }),
+    });
+
     setDoc(docRefMember, {
       role: "member",
       member_name: userName,
       member_id: userId,
+      member_select: userSelect,
     }).then(async () => {
       const querySnapshot = await getDocs(
         collection(
@@ -219,22 +337,12 @@ function FindGroup({ userId, userName, setGroupId }) {
       });
     });
 
-    const docRefJoinGroup = await doc(db, "joinGroup", userId);
     console.log(allGroupInfo[index].group_id);
-    updateDoc(docRefJoinGroup, {
-      group: arrayUnion(allGroupInfo[index].group_id),
-    });
-    
-    updateDoc(doc(db, "joinGroup", allGroupInfo[index].header_id), {
-      alert: arrayUnion({
-        alert_content: `${userName}已加入「${allGroupInfo[index].group_title}」`,
-        is_read: false,
-      }),
-    });
+
+    setTimeout(() => {
+      navigate(`/joinGroup/${allGroupInfo[index].group_id}`);
+    }, 500);
   };
-
-  // console.log(findIndex);
-
   return (
     <div>
       {/* <Font color="white" m="100px 0px 0px 0px" marginLeft="44%" letterSpacing="3px">- 最佳推薦 -</Font> */}
@@ -312,7 +420,9 @@ function FindGroup({ userId, userName, setGroupId }) {
                   joinThisGroup(
                     findIndex,
                     allGroupInfo[findIndex].password,
-                    allGroupInfo[findIndex].header_name
+                    allGroupInfo[findIndex].header_name,
+                    allGroupInfo[findIndex].max_member_number,
+                    allGroupInfo[findIndex].current_number
                   );
                 }}>
                 {allGroupInfo[findIndex].privacy == "公開" &&

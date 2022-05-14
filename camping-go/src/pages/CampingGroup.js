@@ -345,12 +345,12 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
           }}>
           +
         </Button> */}
-        <Display justifyContnet='start' ml='8%' m='60px 0px 0px 0px'>
+        <Display justifyContnet='start' ml='8%' m='140px 0px 0px 0px'>
           <Display>
             <Img src={location_big} alt='' width='40px' />
             <TitleWrap>
               <Font fontSize='20px' letterSpacing='3px'>
-                點擊嚮往縣市
+                點擊你想前往的城市
               </Font>
               <Font fontSize='16px' color='#BFBB92'>
                 忙碌的都市生活之餘，讓大自然調劑你緊湊的生活步伐，來場「森」呼吸。

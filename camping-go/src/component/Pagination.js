@@ -5,7 +5,7 @@ const PageWrap = styled.div`
   width:92%;
   display: flex;
   justify-content: center;
-  margin-top:-550px;
+  margin-top:-580px;
 `;
 
 const PageLink = styled.a`
