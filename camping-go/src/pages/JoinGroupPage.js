@@ -35,7 +35,7 @@ import {
 } from "../css/style";
 import Tent from "../component/Tent";
 import Header from "../component/Header";
-import { Box } from "@mui/material";
+import { Box, Tooltip, IconButton } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import location from "../image/location.png";
 import alert from "../image/alert.png";
@@ -47,7 +47,6 @@ import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import Footer from "../component/Footer";
-import { async } from "@firebase/util";
 
 const Alink = styled.a`
   text-decoration: none;
@@ -104,10 +103,10 @@ const pulse = keyframes`
 const AnimationIndicators = styled.span`
   position: relative;
   display: inline-block;
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   border-radius: 60%;
-  margin-left: 20px;
+  margin-left: 0px;
   background: #ffda72;
   z-index: -1;
   &:before {
@@ -416,8 +415,8 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
       return;
     }
     console.log("continute");
-    e.target.style.transform = "scale(1.1)";
-    e.target.style.backgroundColor = "#426765";
+    e.target.style.transform = "scale(1.2)";
+    e.target.style.backgroundColor = "#EAE5BE";
     e.target.style.transition =
       "border-width 0.2s, transform 0.2s, background-color 0.4s";
     e.preventDefault();
@@ -428,7 +427,8 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   const onDragLeave = async (e) => {
     console.log("leave");
     e.target.style.backgroundColor = "#f5f4e8";
-    e.target.style.border = "3px dotted #426765";
+    e.target.style.transform = "scale(1)";
+    // e.target.style.border = "3px dotted #426765";
   };
 
   //render all camping group
@@ -859,8 +859,8 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                   }}>
                   x
                 </DeleteTentButton>
-                  {/* <Font fontSize='18px'>{index + 1}.</Font> */}
-                  <Font fontSize='14px'>{item.who_create}の帳篷</Font>
+                {/* <Font fontSize='18px'>{index + 1}.</Font> */}
+                <Font fontSize='14px'>{item.who_create} の 帳篷</Font>
                 {/* <TentIndexNumber>{index + 1}</TentIndexNumber> */}
                 <Display key={index} direction='column'>
                   <Img src={tentColor} width='200px'></Img>
@@ -958,20 +958,27 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
             <SourseContainer id='source-container' ref={dragSource}>
               <Display>
                 {!IsMemberInTheTent && (
-                  <PersonWrap
-                    id='drag-source'
-                    draggable='true'
-                    onDragStart={dragStart}>
-                    <EmojiPeopleIcon
-                      sx={{
-                        pointerEvents: "none",
-                        cursor: "not-allowed",
-                        color: "#426765",
-                        fontSize: "45px",
-                      }}
-                      color='primary'
-                      fontSize='large'></EmojiPeopleIcon>
-                  </PersonWrap>
+                  <Tooltip title='請移至方格'>
+                    <IconButton
+                      id='drag-source'
+                      draggable='true'
+                      onDragStart={dragStart}>
+                      {/* <PersonWrap
+                        id='drag-source'
+                        draggable='true'
+                        onDragStart={dragStart}> */}
+                      <EmojiPeopleIcon
+                        sx={{
+                          pointerEvents: "none",
+                          cursor: "not-allowed",
+                          color: "#426765",
+                          fontSize: "65px",
+                        }}
+                        color='primary'
+                        fontSize='large'></EmojiPeopleIcon>
+                      {/* </PersonWrap> */}
+                    </IconButton>
+                  </Tooltip>
                 )}
                 <AnimationIndicators />
                 <Font fontSize='14px' marginLeft='10px'>

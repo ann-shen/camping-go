@@ -20,7 +20,7 @@ const Input = styled.input`
   margin: 20px;
 `;
 
-const min = 0;
+const min = 1;
 const max = 5;
 
 function FormPropsTextFields({ tentInfo, setTentInfo, setSeat, seat }) {
