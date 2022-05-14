@@ -87,8 +87,8 @@ function a11yProps(index) {
 function Login({setUserId, setUserName, userName}) {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
-  const [email, setEmail] = useState("shen@gmail.com");
-  const [password, setPassword] = useState("shenshen");
+  const [email, setEmail] = useState("moon@gmail.com");
+  const [password, setPassword] = useState("moonmo");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 

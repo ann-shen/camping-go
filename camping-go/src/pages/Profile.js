@@ -58,6 +58,7 @@ import { useNavigate } from "react-router-dom";
 import SecondHand from "./SecondHand";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import Footer from "../component/Footer";
+import initial from "../image/initial-09.png";
 
 Modal.setAppElement("#root");
 
@@ -137,6 +138,12 @@ const ProfileWrap = styled.div`
   height: 60px;
   border-radius: 50%;
   overflow: hidden;
+`;
+
+const Span = styled.span`
+  font-size: 20px;
+  color: #cfc781;
+  font-weight: 900;
 `;
 
 function TabPanel(props) {
@@ -260,11 +267,16 @@ function SentCommentToHeader({ groupId, userName, userId }) {
             X
           </DeleteModalButton>
           <Font>評論</Font>
-          <Hr width='60%'></Hr>
+          <Hr width='60%'m="20px 0px"></Hr>
           <TextField
-            sx={{ width: "60%", backgroundColor: "#EAE5BE" }}
-            label=''
+            sx={{
+              width: "70%",
+              backgroundColor: "#E0DCBA",
+              boxShadow:
+                "0.3rem 0.3rem 0.8rem #E2E1D3 , -0.2rem -0.2rem 0.2rem #ffffff",
+            }}
             multiline
+            // label='評論'
             rows={4}
             variant='filled'
             onChange={handleChange}
@@ -412,16 +424,16 @@ function CheckCommentFromMember({ groupId }) {
                 comment.map((item) => (
                   <Box
                     sx={{
-                      width: "500px",
+                      width: "600px",
                       height: "auto",
-                      padding: 1,
+                      padding: 0,
                       margin: 1,
                     }}>
                     <Wrap
                       width='500px'
                       borderBottom='1.4px solid #EAE5BE'
                       paddingBottom='20px'>
-                      <Wrap justifyContent='space-between' width='500px'>
+                      <Wrap justifyContent='space-around' width='500px'>
                         <Display>
                           <Wrap
                             direction='column'
@@ -432,11 +444,11 @@ function CheckCommentFromMember({ groupId }) {
                             </ProfileWrap>
                             <Font fontSize='14px'>{item.name}</Font>
                           </Wrap>
-                          <Wrap width='200px'>
+                          <Wrap width='280px'>
                             <Font fontSize='14px'>{item.note}</Font>
                           </Wrap>
                         </Display>
-                        <Font marginLeft='100px'>{item.score}分</Font>
+                        <Font marginLeft='20px'>{item.score}分</Font>
                       </Wrap>
                     </Wrap>
                   </Box>
@@ -1112,109 +1124,9 @@ export default function Profile({ userName, userId, getLogout }) {
                 index={value}
                 onChangeIndex={handleChangeIndex}>
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                  {yourCreateGroup.map((item, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        width: "85%",
-                        height: "auto",
-                        boxShadow:
-                          "0.8rem 0.8rem 3.2rem #E2E1D3 , -1.0rem -1.0rem 1rem #ffffff",
-                        borderRadius: 6,
-                        padding: 5,
-                        margin: "auto",
-                        marginTop: "30px",
-                        border: "1px solid #CFC781 ",
-                        justifyContent: "space-around",
-                      }}>
-                      <Display justifyContent='space-between' ml='20px'>
-                        <LinkRoute to={`/joinGroup/${item.group_id}`}>
-                          <Display direction='column' alignItems='start'>
-                            <Display alignItems='start'>
-                              <ImgWrap>
-                                <Img
-                                  src={item.picture}
-                                  width='100%'
-                                  m='0px'></Img>
-                              </ImgWrap>
-                              <Display
-                                direction='column'
-                                alignItems='start'
-                                ml='30px'>
-                                <Tag bgc='#CFC781' color='white'>
-                                  {item.status}
-                                </Tag>
-                                <Font
-                                  fontSize='25px'
-                                  letterSpacing='3px'
-                                  m='10px 0px 0px 0px'>
-                                  {item.group_title}
-                                </Font>
-                                <Font fontSize='14px' m='0px 0px 15px 0px'>
-                                  {
-                                    new Date(item.start_date.seconds * 1000)
-                                      .toLocaleString()
-                                      .split(" ")[0]
-                                  }
-                                  ~
-                                  {
-                                    new Date(item.end_date.seconds * 1000)
-                                      .toLocaleString()
-                                      .split(" ")[0]
-                                  }
-                                </Font>
-                                <Display>
-                                  <Img
-                                    src={location}
-                                    width='20px'
-                                    m=' 0px 8px 0px -3px '></Img>
-                                  <Font fontSize='16px'>{item.city}</Font>
-                                </Display>
-                              </Display>
-                            </Display>
-                            <Display alignItems='center'>
-                              {/* {item.score && (
-                          <Display>
-                            <Font fontSize='40px'>{item.score}</Font>
-                            <Font fontSize='20px'>分</Font>
-                          </Display>
-                        )} */}
-                            </Display>
-                          </Display>
-                        </LinkRoute>
-                        <Wrap
-                          direction='column'
-                          alignItems='end'
-                          height='250px'
-                          justifyContent='space-evenly'
-                          m='20px'>
-                          {item.status == "已結束" && (
-                            <CheckCommentFromMember groupId={item.group_id} />
-                          )}
-                          <CheckOfGroupMember
-                            setRenderParticipateArr={setRenderParticipateArr}
-                            groupId={item.group_id}
-                            userId={userId}
-                            group_title={item.group_title}
-                          />
-                          <Button
-                            border='#CFC781'
-                            bgc='#FFFEF4'
-                            width='150px'
-                            onClick={(id) => {
-                              deleteThisGroup(item.group_id);
-                            }}>
-                            刪除此團
-                          </Button>
-                        </Wrap>
-                      </Display>
-                    </Box>
-                  ))}
-                </TabPanel>
-                <TabPanel value={value} index={1} dir={theme.direction}>
-                  {yourParticipateGroup && (
-                    <div>
-                      {yourParticipateGroup.map((item, index) => (
+                  {yourCreateGroup.length !== 0 ? (
+                    <>
+                      {yourCreateGroup.map((item, index) => (
                         <Box
                           key={index}
                           sx={{
@@ -1249,7 +1161,7 @@ export default function Profile({ userName, userId, getLogout }) {
                                     <Font
                                       fontSize='25px'
                                       letterSpacing='3px'
-                                      m='5px 0px 3px 0px'>
+                                      m='10px 0px 0px 0px'>
                                       {item.group_title}
                                     </Font>
                                     <Font fontSize='14px' m='0px 0px 15px 0px'>
@@ -1268,7 +1180,7 @@ export default function Profile({ userName, userId, getLogout }) {
                                     <Display>
                                       <Img
                                         src={location}
-                                        width='24px'
+                                        width='20px'
                                         m=' 0px 8px 0px -3px '></Img>
                                       <Font fontSize='16px'>{item.city}</Font>
                                     </Display>
@@ -1276,11 +1188,11 @@ export default function Profile({ userName, userId, getLogout }) {
                                 </Display>
                                 <Display alignItems='center'>
                                   {/* {item.score && (
-                            <Display>
-                              <Font fontSize='40px'>{item.score}</Font>
-                              {item.score && <Font fontSize='20px'>分</Font>}
-                            </Display>
-                          )} */}
+                          <Display>
+                            <Font fontSize='40px'>{item.score}</Font>
+                            <Font fontSize='20px'>分</Font>
+                          </Display>
+                        )} */}
                                 </Display>
                               </Display>
                             </LinkRoute>
@@ -1291,32 +1203,168 @@ export default function Profile({ userName, userId, getLogout }) {
                               justifyContent='space-evenly'
                               m='20px'>
                               {item.status == "已結束" && (
-                                <SentCommentToHeader
+                                <CheckCommentFromMember
                                   groupId={item.group_id}
-                                  userName={userName}
-                                  userId={userId}
                                 />
                               )}
-                              {item.status == "進行中" && (
-                                <Button
-                                  border='#CFC781'
-                                  bgc='#FFFEF4'
-                                  width='200px'
-                                  onClick={(id) => {
-                                    memberWithdrawGroup(
-                                      item.group_id,
-                                      userId,
-                                      index
-                                    );
-                                  }}>
-                                  我要退團
-                                </Button>
-                              )}
+                              <CheckOfGroupMember
+                                setRenderParticipateArr={
+                                  setRenderParticipateArr
+                                }
+                                groupId={item.group_id}
+                                userId={userId}
+                                group_title={item.group_title}
+                              />
+                              <Button
+                                border='#CFC781'
+                                bgc='#FFFEF4'
+                                width='150px'
+                                onClick={(id) => {
+                                  deleteThisGroup(item.group_id);
+                                }}>
+                                刪除此團
+                              </Button>
                             </Wrap>
                           </Display>
                         </Box>
                       ))}
-                    </div>
+                    </>
+                  ) : (
+                    <>
+                      <Img
+                        src={initial}
+                        width='300px'
+                        m='100px 10px 0px 0px'></Img>
+                      <Font m='30px 0px 0px 0px' letterSpacing='2px'>
+                        點選<Span>建立露營團揪</Span>大家一起露營吧！
+                      </Font>
+                    </>
+                  )}
+                </TabPanel>
+                <TabPanel value={value} index={1} dir={theme.direction}>
+                  {yourParticipateGroup.length !== 0 ? (
+                    <>
+                      
+                      <div>
+                        {yourParticipateGroup.map((item, index) => (
+                          <Box
+                            key={index}
+                            sx={{
+                              width: "85%",
+                              height: "auto",
+                              boxShadow:
+                                "0.8rem 0.8rem 3.2rem #E2E1D3 , -1.0rem -1.0rem 1rem #ffffff",
+                              borderRadius: 6,
+                              padding: 5,
+                              margin: "auto",
+                              marginTop: "30px",
+                              border: "1px solid #CFC781 ",
+                              justifyContent: "space-around",
+                            }}>
+                            <Display justifyContent='space-between' ml='20px'>
+                              <LinkRoute to={`/joinGroup/${item.group_id}`}>
+                                <Display direction='column' alignItems='start'>
+                                  <Display alignItems='start'>
+                                    <ImgWrap>
+                                      <Img
+                                        src={item.picture}
+                                        width='100%'
+                                        m='0px'></Img>
+                                    </ImgWrap>
+                                    <Display
+                                      direction='column'
+                                      alignItems='start'
+                                      ml='30px'>
+                                      <Tag bgc='#CFC781' color='white'>
+                                        {item.status}
+                                      </Tag>
+                                      <Font
+                                        fontSize='25px'
+                                        letterSpacing='3px'
+                                        m='5px 0px 3px 0px'>
+                                        {item.group_title}
+                                      </Font>
+                                      <Font
+                                        fontSize='14px'
+                                        m='0px 0px 15px 0px'>
+                                        {
+                                          new Date(
+                                            item.start_date.seconds * 1000
+                                          )
+                                            .toLocaleString()
+                                            .split(" ")[0]
+                                        }
+                                        ~
+                                        {
+                                          new Date(item.end_date.seconds * 1000)
+                                            .toLocaleString()
+                                            .split(" ")[0]
+                                        }
+                                      </Font>
+                                      <Display>
+                                        <Img
+                                          src={location}
+                                          width='24px'
+                                          m=' 0px 8px 0px -3px '></Img>
+                                        <Font fontSize='16px'>{item.city}</Font>
+                                      </Display>
+                                    </Display>
+                                  </Display>
+                                  <Display alignItems='center'>
+                                    {/* {item.score && (
+                            <Display>
+                              <Font fontSize='40px'>{item.score}</Font>
+                              {item.score && <Font fontSize='20px'>分</Font>}
+                            </Display>
+                          )} */}
+                                  </Display>
+                                </Display>
+                              </LinkRoute>
+                              <Wrap
+                                direction='column'
+                                alignItems='end'
+                                height='250px'
+                                justifyContent='space-evenly'
+                                m='20px'>
+                                {item.status == "已結束" && (
+                                  <SentCommentToHeader
+                                    groupId={item.group_id}
+                                    userName={userName}
+                                    userId={userId}
+                                  />
+                                )}
+                                {item.status == "進行中" && (
+                                  <Button
+                                    border='#CFC781'
+                                    bgc='#FFFEF4'
+                                    width='200px'
+                                    onClick={(id) => {
+                                      memberWithdrawGroup(
+                                        item.group_id,
+                                        userId,
+                                        index
+                                      );
+                                    }}>
+                                    我要退團
+                                  </Button>
+                                )}
+                              </Wrap>
+                            </Display>
+                          </Box>
+                        ))}
+                      </div>
+                      
+                    </>
+                  ) : (
+                    <>
+                      <Img
+                        src={initial}
+                        width='300px'
+                        m='100px 10px 0px 0px'></Img>
+                      <Font m='30px 0px 0px 0px' letterSpacing='2px' >
+                        還沒找到適合的露營團？首頁點選<Span>最佳推薦</Span>搜尋最適合你的露營團
+                      </Font>
+                    </>
                   )}
                 </TabPanel>
                 <TabPanel value={value} index={2} dir={theme.direction}>

@@ -172,6 +172,12 @@ const MemberWrap = styled.div`
   flex-direction: column;
   margin: 10px;
   width: 180px;
+  &:hover {
+    background-color: #fffef0;
+    color: white;
+    border-radius: 10px;
+    transition: 700ms;
+  }
 `;
 
 const AllMemberWrap = styled.div`
@@ -251,6 +257,14 @@ const DeleteTentButton = styled.button`
     transform: scale(1.2);
     transition: 500ms;
   }
+`;
+
+const Span = styled.span`
+  font-size: 14px;
+  color: #cfc781;
+  font-weight: 900;
+  margin-left: 10px;
+  letter-spacing: 1px;
 `;
 
 function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
@@ -1068,10 +1082,10 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                   <Font color='#F4F4EE' marginLeft='7%'>
                     項目
                   </Font>
-                  <Font color='#F4F4EE' marginLeft='22%'>
+                  <Font color='#F4F4EE' marginLeft='15%'>
                     備註
                   </Font>
-                  <Font color='#F4F4EE' marginLeft='20%'>
+                  <Font color='#F4F4EE' marginLeft='32%'>
                     認領
                   </Font>
                 </Display>
@@ -1084,14 +1098,14 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                         </Label>
                       </Wrap>
                       <Wrap
-                        width='150px'
-                        m='0px 0px 0px 15%'
+                        width='250px'
+                        m='0px 0px 0px 5%'
                         justifyContent='start'>
                         <Label fontSize='16px' color='#F3EA98'>
                           {item.note}
                         </Label>
                       </Wrap>
-                      <Label ml='13%' color='#F3EA98'>
+                      <Label ml='15%' color='#F3EA98'>
                         {item.bring_person}
                       </Label>
                     </SuppliesWrap>
@@ -1175,7 +1189,10 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
           )}
 
           <Cloumn>
-            <Font fontSize='20px'>團員</Font>
+            <Display>
+              <Font fontSize='20px'>團員</Font>
+              <Span>點擊頭像查看團員二手換區</Span>
+            </Display>
             <Hr width='100%'></Hr>
           </Cloumn>
           <AllMemberWrap>

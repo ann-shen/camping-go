@@ -11,6 +11,7 @@ const AlertWrap = styled.div`
   flex-direction: column;
   align-items: center;
   margin-top: 4px;
+  margin-left: 40px;
   cursor: pointer;
 `;
 
@@ -47,25 +48,37 @@ const AlertContentIsReadWrap = styled.div`
 const fadeIn = keyframes`
 from {
   opacity: 0;
-  transform: scale(0.2);
+  transform: scale(0.2) translateX(30.5rem);
 }
 to {
   opacity: 1;
-  transform: scale(1);
+  transform: scale(1.3) translateX(0);
 }
 `;
 
+const alertIn = keyframes`
+0% { opacity: 0;
+  transform: scale(0.3)  translateX(40.5rem)  }
+40% { opacity: 0.8;
+  transform: scale(1.2)   }
+  70% { opacity: 0.8;
+  transform: scale(0.9)   }
+100% { opacity: 1;
+  transform: scale(1)  translateX(0em)  }`;
+
 const RedDot = styled.div`
-  width: 90px;
-  height: 30px;
-  border-radius: 15px;
-  background-color: #426765;
+  width: 120px;
+  letter-spacing: 2px;
+  height: 40px;
+  border-radius: 5px;
+  background-color: #f4f4ef;
   font-size: 13px;
-  color: white;
+  color: #4a6664;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: ${fadeIn} 0.3s ease-in-out;
+  border: 1px solid #CFC781;
+  animation: ${alertIn} 1.3s ease-in-out;
 `;
 
 function Alert({ userId }) {
