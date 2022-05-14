@@ -138,8 +138,8 @@ const FindGroupButton = styled.button`
 
 const AnnouncementFontWrap = styled.div`
   width: 80%;
-  line-height: 30px;
-  margin-bottom: 30px;
+  line-height: 25px;
+  margin-bottom: 20px;
 `;
 
 function IsModal({
@@ -201,18 +201,17 @@ function IsModal({
                 注意事項
               </Font>
               <Hr width='80%' m='10px 0px 20px 0px'></Hr>
-              <div>
+              <AnnouncementFontWrap>
                 {currentPosts[index].notice.length !== 0 &&
                   currentPosts[index].notice.map((item) => (
-                    <Display mb='15px'>
-                      {console.log(item)}
+                    <Display mb='15px' alignItems="start">
                       <Img src={alertIcon} width='30px'></Img>
                       <Font fontSize='14px' marginLeft='10px'>
                         {item}
                       </Font>
                     </Display>
                   ))}
-              </div>
+              </AnnouncementFontWrap>
 
               {currentPosts[index].privacy == "公開" && (
                 <Display>
@@ -249,7 +248,7 @@ function IsModal({
                     onChange={handleChange}
                     size='small'
                     helperText='此為私人團，請輸入密碼'
-                    sx={{ marginTop: "40px", width: "200px" }}
+                    sx={{ marginTop: "0px", width: "200px" }}
                   />
                   {alert && (
                     <Stack sx={{ width: "60%" }} spacing={0}>
@@ -261,7 +260,7 @@ function IsModal({
                   <Display>
                     <Button
                       width='200px'
-                      mt='30px'
+                      mt='20px'
                       onClick={() => setIsOpen(false)}>
                       我再考慮
                     </Button>
@@ -460,7 +459,7 @@ export default function ReviewCard({
               </Font>
               <Display justifyContent='space-between'>
                 <Display>
-                  <Img src={location} width='26px'></Img>{" "}
+                  <Img src={location} width='20px'></Img>
                   <Span>{item.city}</Span>
                 </Display>
                 <Display>

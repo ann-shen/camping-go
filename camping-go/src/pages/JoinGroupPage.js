@@ -15,6 +15,7 @@ import {
   increment,
   where,
   getDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { useState, useEffect, useRef, useContext } from "react";
 import { useParams } from "react-router-dom";
@@ -34,7 +35,7 @@ import {
 } from "../css/style";
 import Tent from "../component/Tent";
 import Header from "../component/Header";
-import { Box } from "@mui/material";
+import { Box, Tooltip, IconButton } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import location from "../image/location.png";
 import alert from "../image/alert.png";
@@ -46,9 +47,6 @@ import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import Footer from "../component/Footer";
-
-
-
 
 const Alink = styled.a`
   text-decoration: none;
@@ -105,10 +103,10 @@ const pulse = keyframes`
 const AnimationIndicators = styled.span`
   position: relative;
   display: inline-block;
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   border-radius: 60%;
-  margin-left: 20px;
+  margin-left: 0px;
   background: #ffda72;
   z-index: -1;
   &:before {
@@ -142,7 +140,7 @@ const HeaderName = styled.div`
 const ImagesWrap = styled.div`
   width: 100%;
   height: 400px;
-  border-radius: 20px;
+  border-radius: 50px;
   margin: 40px 0px;
   overflow: hidden;
   display: flex;
@@ -192,11 +190,11 @@ const FontDetail = styled.p`
 `;
 
 const TentIndexNumber = styled.p`
-  font-size: 25px;
+  font-size: 16px;
   color: #797659;
   position: absolute;
-  top: 20px;
-  left: 40px;
+  top: 30px;
+  left: 30px;
 `;
 
 const TentSectionWrap = styled.div`
@@ -234,6 +232,25 @@ const SuppliesNotAllowedButton = styled.button`
   margin-left: 5%;
   cursor: not-allowed;
   border-radius: 15px;
+`;
+
+const DeleteTentButton = styled.button`
+  width: 25px;
+  height: 25px;
+  font-size: 16px;
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  border: none;
+  color: white;
+  background-color: #dedab4;
+  border-radius: 50%;
+  cursor: pointer;
+  &:hover {
+    color: #cfc781;
+    transform: scale(1.2);
+    transition: 500ms;
+  }
 `;
 
 function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
@@ -398,8 +415,8 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
       return;
     }
     console.log("continute");
-    e.target.style.transform = "scale(1.1)";
-    e.target.style.backgroundColor = "#426765";
+    e.target.style.transform = "scale(1.2)";
+    e.target.style.backgroundColor = "#EAE5BE";
     e.target.style.transition =
       "border-width 0.2s, transform 0.2s, background-color 0.4s";
     e.preventDefault();
@@ -410,7 +427,8 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   const onDragLeave = async (e) => {
     console.log("leave");
     e.target.style.backgroundColor = "#f5f4e8";
-    e.target.style.border = "3px dotted #426765";
+    e.target.style.transform = "scale(1)";
+    // e.target.style.border = "3px dotted #426765";
   };
 
   //render all camping group
@@ -434,7 +452,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
     const querySnapshot = await getDocs(q);
     let thisGroupMemberArr = [];
     querySnapshot.forEach((doc) => {
-
       thisGroupMemberArr.push(doc.data());
     });
 
@@ -468,7 +485,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
             }
           }
         });
-        console.log(objArr);
         setSucessSecondChange(objArr);
       });
     } else {
@@ -477,17 +493,31 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   }, [thisGroupMember]);
 
   //getTentData
-  useEffect(async () => {
-    let tentsArr = [];
-    const querySnapshot = await getDocs(
+
+  // useEffect(async () => {
+  //   let tentsArr = [];
+  //   const querySnapshot = await getDocs(
+  //     collection(db, "CreateCampingGroup", params.id, "tent")
+  //   );
+  //   querySnapshot.forEach((doc) => {
+  //     // console.log(doc.id, " => ", doc.data());
+  //     tentsArr.push(doc.data());
+  //   });
+  //   setAllTentArr(tentsArr);
+  // }, []);
+  useEffect(() => {
+    const eventListenerpage = query(
       collection(db, "CreateCampingGroup", params.id, "tent")
     );
-    querySnapshot.forEach((doc) => {
-      // console.log(doc.id, " => ", doc.data());
-      tentsArr.push(doc.data());
+    onSnapshot(eventListenerpage, (snapshot) => {
+      let tentsArr = [];
+      snapshot.forEach((doc) => {
+        tentsArr.push(doc.data());
+      });
+      setAllTentArr(tentsArr);
     });
-    setAllTentArr(tentsArr);
   }, []);
+
   //getSuppliesData
 
   useEffect(() => {
@@ -544,6 +574,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   };
 
   const addNewTent = async () => {
+    console.log(userName);
     const ondocRefNewTent = doc(
       collection(db, "CreateCampingGroup", params.id, "tent")
     );
@@ -554,6 +585,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
         tent_id: ondocRefNewTent.id,
         member: allMemberArr,
         create_time: serverTimestamp(),
+        who_create: userName,
       }
     ).then(async () => {
       let tentsArr = [];
@@ -597,7 +629,22 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
     setAddNewTentSection(true);
   };
 
-  console.log(sucessSecondChange);
+  const deleteThisTent = async (index) => {
+    console.log(index);
+    console.log(allTentArr[index].tent_id);
+    await deleteDoc(
+      doc(
+        db,
+        "CreateCampingGroup",
+        params.id,
+        "tent",
+        allTentArr[index].tent_id
+      )
+    );
+
+    allTentArr.splice(index, 1);
+    console.log(allTentArr);
+  };
 
   return (
     <div>
@@ -685,9 +732,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                 alignItems: "center",
               }}>
               <Cloumn>
-                <Font fontSize='20px' m='10px 0px' color='#F3EA98'>
-                  詳細地址
-                </Font>
+                <Font fontSize='20px' m='10px 0px' color='#F3EA98'></Font>
                 <Font fontSize='16px' m='0px 0px 25px 0px' color='#F3EA98'>
                   {homePageCampGroup.position}
                 </Font>
@@ -808,7 +853,15 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                   border: "2px solid #CFC781",
                   position: "relative",
                 }}>
-                <TentIndexNumber>{index + 1}</TentIndexNumber>
+                <DeleteTentButton
+                  onClick={() => {
+                    deleteThisTent(index);
+                  }}>
+                  x
+                </DeleteTentButton>
+                {/* <Font fontSize='18px'>{index + 1}.</Font> */}
+                <Font fontSize='14px'>{item.who_create} の 帳篷</Font>
+                {/* <TentIndexNumber>{index + 1}</TentIndexNumber> */}
                 <Display key={index} direction='column'>
                   <Img src={tentColor} width='200px'></Img>
                   <Label fontSize='35px'>
@@ -905,20 +958,27 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
             <SourseContainer id='source-container' ref={dragSource}>
               <Display>
                 {!IsMemberInTheTent && (
-                  <PersonWrap
-                    id='drag-source'
-                    draggable='true'
-                    onDragStart={dragStart}>
-                    <EmojiPeopleIcon
-                      sx={{
-                        pointerEvents: "none",
-                        cursor: "not-allowed",
-                        color: "#426765",
-                        fontSize: "45px",
-                      }}
-                      color='primary'
-                      fontSize='large'></EmojiPeopleIcon>
-                  </PersonWrap>
+                  <Tooltip title='請移至方格'>
+                    <IconButton
+                      id='drag-source'
+                      draggable='true'
+                      onDragStart={dragStart}>
+                      {/* <PersonWrap
+                        id='drag-source'
+                        draggable='true'
+                        onDragStart={dragStart}> */}
+                      <EmojiPeopleIcon
+                        sx={{
+                          pointerEvents: "none",
+                          cursor: "not-allowed",
+                          color: "#426765",
+                          fontSize: "65px",
+                        }}
+                        color='primary'
+                        fontSize='large'></EmojiPeopleIcon>
+                      {/* </PersonWrap> */}
+                    </IconButton>
+                  </Tooltip>
                 )}
                 <AnimationIndicators />
                 <Font fontSize='14px' marginLeft='10px'>
@@ -1035,7 +1095,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                         {item.bring_person}
                       </Label>
                     </SuppliesWrap>
-                    
+
                     {item.bring_person == "" ? (
                       <Button
                         width='180px'
@@ -1054,8 +1114,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                         color='#EBEBEB'
                         border='1px solid #EBEBEB'
                         ml='5%'
-                        cursor='not-allowed'
-                        >
+                        cursor='not-allowed'>
                         已認領
                       </SuppliesNotAllowedButton>
                     )}

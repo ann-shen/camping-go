@@ -36,7 +36,7 @@ const ImgWrap = styled.div`
   position: relative;
   width: 100%;
   height: 230px;
-  border-radius: 30px;
+  border-radius: 20px;
   overflow: hidden;
 `;
 
@@ -245,8 +245,8 @@ function FindGroup({ userId, userName, setGroupId }) {
               height: "auto",
               width: "100%",
               boxShadow:
-                "0.2rem 0.2rem 0.2rem #CFC781 , -0.3rem -0.3rem 0.4rem #ffffff",
-              borderRadius: 7.5,
+                "0.2rem 0.2rem 0.2rem #CFC781 , -0.3rem -0.3rem 0.2rem #ffffff",
+              borderRadius: 5,
               padding: 1,
               margin: 5,
               backgroundColor: "#F4F4EE",

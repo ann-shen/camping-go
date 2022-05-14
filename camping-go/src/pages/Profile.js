@@ -467,7 +467,9 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
       memberArr.push(doc.data());
     });
 
-    const removeHeaderArr = memberArr.filter((e, index) => { return e.role !== "header"} );
+    const removeHeaderArr = memberArr.filter((e, index) => {
+      return e.role !== "header";
+    });
     const getHeaderArr = memberArr.filter((e, index) => {
       return e.role == "header";
     });
@@ -651,21 +653,38 @@ function SecondHandInvitation({
         .second_hand.filter(
           (e, index) => e.name == inviteInfo[inviteInfoIndex].change_supplies
         );
-      console.log(getBuyerSpuuliesIndex);
+      console.log(getBuyerSpuuliesIndex[0]);
 
-      //更新主動邀請交換的人
       let data = getInviteDocRef.data().second_hand;
-      getBuyerSpuuliesIndex.change_status = true;
-      getBuyerSpuuliesIndex.buyer_name =
+      getBuyerSpuuliesIndex[0].change_status = true;
+      getBuyerSpuuliesIndex[0].buyer_name =
         inviteInfo[inviteInfoIndex].seller_name;
-      getBuyerSpuuliesIndex.buyer_id = inviteInfo[inviteInfoIndex].seller_id;
-      getBuyerSpuuliesIndex.change_supplies = inviteInfo[inviteInfoIndex].name;
-      console.log(getBuyerSpuuliesIndex);
+      getBuyerSpuuliesIndex[0].buyer_id = inviteInfo[inviteInfoIndex].seller_id;
+      getBuyerSpuuliesIndex[0].change_supplies =
+        inviteInfo[inviteInfoIndex].name;
+      console.log(getBuyerSpuuliesIndex[0]);
+      console.log(data);
+
+      console.log(
+        `${inviteInfo[inviteInfoIndex].seller_name}已接受${getBuyerSpuuliesIndex.name}的二手換物邀請」`
+      );
 
       updateDoc(inviteDocRef, {
-        second_hand: data,
+        second_hand: getBuyerSpuuliesIndex,
+        alert: arrayUnion({
+          alert_content: `${inviteInfo[inviteInfoIndex].seller_name}已接受${getBuyerSpuuliesIndex[0].name}的二手換物邀請」`,
+          is_read: false,
+        }),
       });
     }
+
+    // updateDoc(doc(db, "joinGroup", getBuyerSpuuliesIndex.seller_id), {
+    //   alert: arrayUnion({
+    //     alert_content: `${inviteInfo[inviteInfoIndex].seller_name}已接受${getBuyerSpuuliesIndex.name}的二手換物邀請」`,
+    //     is_read: false,
+    //   }),
+    // });
+
     Swal.fire({
       position: "center",
       icon: "success",
@@ -774,17 +793,17 @@ export default function Profile({ userName, userId, getLogout }) {
   const [sendInvite, setSendInvite] = useState("");
   const [personName, setPersonName] = useState([]);
   const [showBuyerSection, setShowBuyerSection] = useState(false);
+  const [paramsInfo, setParamsInfo] = useState("");
 
   const navigate = useNavigate();
   const auth = getAuth();
 
   const ContextByUserId = useContext(UserContext);
 
+  console.log(userId);
   useEffect(() => {
-    console.log(userId);
     if (userId) {
       const unsub = onSnapshot(doc(db, "joinGroup", userId), (doc) => {
-        console.log("Current data: ", doc.data().second_hand);
         setInviteInfo(doc.data().second_hand);
         doc.data().second_hand.map((item, index) => {
           if (item.invite == true) {
@@ -884,9 +903,19 @@ export default function Profile({ userName, userId, getLogout }) {
     });
   }, []);
 
+  //get param_id profie data
+  useEffect(async () => {
+    const paramIdProfile = await getDoc(doc(db, "joinGroup", params.id));
+    if (paramIdProfile.exists()) {
+      console.log(paramIdProfile.data().info);
+      setParamsInfo(paramIdProfile.data().info);
+    }
+  }, []);
+
   const memberWithdrawGroup = async (id, userId, index) => {
     Swal.fire({
-      title: "確定要退團？",
+      // title: "確定要退團？",
+      text: "確定要退團？",
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#426765",
@@ -934,7 +963,8 @@ export default function Profile({ userName, userId, getLogout }) {
         Swal.fire({
           icon: "success",
           confirmButtonColor: "#426765",
-          title: `成功退出${yourParticipateGroup[index].group_title}`,
+          text: `成功退出${yourParticipateGroup[index].group_title}`,
+          // title: `成功退出${yourParticipateGroup[index].group_title}`,
           // footer: '<a href="/">繼續尋找你的露營團</a>',
         });
       }
@@ -1318,9 +1348,7 @@ export default function Profile({ userName, userId, getLogout }) {
             justifyContent='space-between'
             boxShadow='none'>
             <Display>
-              {yourCreateGroup.length !== 0 && (
-                <ProfilePicture userId={yourCreateGroup[0].header_id} />
-              )}
+              <ProfilePicture userId={paramsInfo.user_id} />
               <Wrap
                 width='500px'
                 direction='column'
@@ -1332,8 +1360,7 @@ export default function Profile({ userName, userId, getLogout }) {
                   margin='0px 0px 10px 20px'
                   marginLeft='20px'
                   color='#426765'>
-                  {yourCreateGroup.length !== 0 &&
-                    yourCreateGroup[0].header_name}
+                  {paramsInfo.user_name}
                 </Font>
               </Wrap>
             </Display>

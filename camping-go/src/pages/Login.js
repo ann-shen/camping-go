@@ -234,6 +234,7 @@ function Login({setUserId, setUserName, userName}) {
               <label htmlFor=''>UserEmail</label>
               <input
                 type='text'
+                value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
                 }}
@@ -282,7 +283,6 @@ function Login({setUserId, setUserName, userName}) {
             <input
               type='password'
               name='password'
-              value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
               }}

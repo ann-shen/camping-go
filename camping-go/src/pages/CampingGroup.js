@@ -25,6 +25,9 @@ import PaginationBar from "../component/Pagination";
 import ReviewCard from "../component/ReviewCard";
 import NavBar from "../component/NavBar";
 import Swal from "sweetalert2/dist/sweetalert2.js";
+import Footer from "../component/Footer";
+import Backdrop from "@mui/material/Backdrop";
+import loading from "../image/loading.gif";
 
 Modal.setAppElement("#root");
 
@@ -62,7 +65,7 @@ const LandingImgWrap = styled.div`
 const Section = styled.div`
   width: 90%;
   height: auto;
-  margin: 50px auto;
+  margin: 50px auto 200px auto;
   justify-content: center;
 `;
 
@@ -80,6 +83,7 @@ const TitleWrap = styled.div`
 `;
 
 function CampingGroup({ setGroupId, userId, userName, groupId }) {
+  const [backdropOpen, setbackdropOpen] = useState(false);
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [currentMemberAmount, setCurrentMemberAmount] = useState("");
@@ -143,9 +147,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       where("city", "==", "新竹縣")
     );
     const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      // console.log(doc.id, " => ", doc.data());
-    });
+    querySnapshot.forEach((doc) => {});
   }, []);
 
   useEffect(async () => {
@@ -177,12 +179,14 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       return;
     }
 
+    setbackdropOpen(true);
+
     if (current_number + 1 > max_member_number) {
       console.log(current_number + 1);
       Swal.fire({
         position: "center",
         icon: "warning",
-        text:"已滿團",
+        text: "已滿團",
         showConfirmButton: false,
         timer: 1500,
       });
@@ -252,7 +256,9 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
 
     console.log(currentPosts[index].group_id);
 
-    navigate(`/joinGroup/${currentPosts[index].group_id}`);
+    setTimeout(() => {
+      navigate(`/joinGroup/${currentPosts[index].group_id}`);
+    }, 500);
   };
 
   const toTaiwanMap = () => {
@@ -271,8 +277,14 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
   return (
     <>
       <HeaderSection>
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={backdropOpen}
+          // onClick={handleClose}
+        >
+          <Img src={loading}></Img>
+        </Backdrop>
         <NavBar userId={userId} />
-
         <LandingSubTitleWrap>
           <Font fontSize='14px'>揪團去露營。</Font>
           <Font fontSize='14px'>忙碌的都市生活之餘，</Font>
@@ -288,7 +300,6 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
           <LandingImg src={landingpage}></LandingImg>
         </LandingImgWrap>
       </HeaderSection>
-
       <Section>
         <ImgGroupPeopleWrap>
           <Img width='35px' src={group_people} />
@@ -350,6 +361,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
         <Hr width='80%' m='20px 0px 0px 8%' ref={immediatelyRef}></Hr>
         <Taiwan />
       </Section>
+      <Footer />
     </>
   );
 }
