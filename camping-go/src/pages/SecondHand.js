@@ -24,6 +24,8 @@ import {
 import { db } from "../utils/firebase";
 import { Alert, Collapse, IconButton, Skeleton, Stack } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+
 
 const CreateLabel = styled.label`
   font-size: 18px;
@@ -275,9 +277,18 @@ function SecondHand({
       await updateDoc(doc(db, "joinGroup", buyerId), { second_hand: buyerArr });
     }
 
-    setTimeout(() => {
-      setAlertOpen(false);
-    }, 2000);
+    Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "已送出邀請",
+      showConfirmButton: false,
+      timer: 1000,
+    });
+    setShowBuyerSection(false)
+
+    // setTimeout(() => {
+    //   setAlertOpen(false);
+    // }, 2000);
   };
 
   function GetStatus({ item }) {
@@ -406,7 +417,7 @@ function SecondHand({
                   </Wrap>
                 ))}
               </Display>
-              <Collapse in={alertOpen}>
+              {/* <Collapse in={alertOpen}>
                 <Alert
                   action={
                     <IconButton
@@ -422,7 +433,7 @@ function SecondHand({
                   sx={{ mb: 2 }}>
                   已送出
                 </Alert>
-              </Collapse>
+              </Collapse> */}
               <br />
               <Button width='200px' mt='20px' onClick={comfirmChange}>
                 確認提出交換邀請

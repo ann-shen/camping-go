@@ -249,6 +249,7 @@ function IsModal({
                     defaultValue=''
                     onChange={handleChange}
                     size='small'
+                    type="password"
                     helperText='此為私人團，請輸入密碼'
                     sx={{ marginTop: "0px", width: "200px" }}
                   />
@@ -322,6 +323,7 @@ function Recommend({
           userName={userName}
           userId={userId}
           setGroupId={setGroupId}
+          setRecommendIsOpen={setRecommendIsOpen}
         />
       </Display>
     </Modal>

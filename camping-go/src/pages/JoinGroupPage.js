@@ -1199,6 +1199,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
             {thisGroupMember.map((item) => (
               <Alink href={`/profile/${item.info.user_id}`}>
                 <MemberWrap>
+                  {console.log(thisGroupMember)}
                   <ProfileImgWrap>
                     <ProfileImg src={item.profile_img} />
                   </ProfileImgWrap>
@@ -1206,8 +1207,12 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                   <Display m='3px'>
                     {item.select_tag
                       .map((obj) => (
-                        <Tag width='auto' m='3px'>
-                          {obj}
+                        <Tag
+                          width='40px'
+                          m='3px'
+                          height='18px'
+                          borderRadius='12px'>
+                          <Font fontSize='13px'>{obj}</Font>
                         </Tag>
                       ))
                       .slice(0, 3)}
