@@ -18,7 +18,7 @@ import Taiwan from "../component/Taiwan";
 import { Font, Display, Img, Button, Hr } from "../css/style";
 import location_big from "../image/location_big.png";
 import group_people from "../image/group_people.png";
-import landingpage from "../image/landingpage.png";
+import landingpage from "../image/landingpage10-01.png";
 import Modal from "react-modal";
 import { UserContext } from "../utils/userContext";
 import PaginationBar from "../component/Pagination";
@@ -39,7 +39,7 @@ const HeaderSection = styled.div`
 `;
 
 const LandingImg = styled.img`
-  width: 66%;
+  width: 87%;
   z-index: -10;
 `;
 

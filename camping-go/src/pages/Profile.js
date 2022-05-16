@@ -59,6 +59,8 @@ import SecondHand from "./SecondHand";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import Footer from "../component/Footer";
 import initial from "../image/initial-09.png";
+import loading from "../image/loading.gif";
+import Backdrop from "@mui/material/Backdrop";
 
 Modal.setAppElement("#root");
 
@@ -267,7 +269,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
             X
           </DeleteModalButton>
           <Font>評論</Font>
-          <Hr width='60%'m="20px 0px"></Hr>
+          <Hr width='60%' m='20px 0px'></Hr>
           <TextField
             sx={{
               width: "70%",
@@ -806,6 +808,7 @@ export default function Profile({ userName, userId, getLogout }) {
   const [personName, setPersonName] = useState([]);
   const [showBuyerSection, setShowBuyerSection] = useState(false);
   const [paramsInfo, setParamsInfo] = useState("");
+  const [backdropOpen, setbackdropOpen] = useState(true);
 
   const navigate = useNavigate();
   const auth = getAuth();
@@ -920,8 +923,10 @@ export default function Profile({ userName, userId, getLogout }) {
     const paramIdProfile = await getDoc(doc(db, "joinGroup", params.id));
     if (paramIdProfile.exists()) {
       console.log(paramIdProfile.data().info);
-      setParamsInfo(paramIdProfile.data().info);
+      setParamsInfo(paramIdProfile.data());
     }
+        setbackdropOpen(false);
+
   }, []);
 
   const memberWithdrawGroup = async (id, userId, index) => {
@@ -1244,7 +1249,6 @@ export default function Profile({ userName, userId, getLogout }) {
                 <TabPanel value={value} index={1} dir={theme.direction}>
                   {yourParticipateGroup.length !== 0 ? (
                     <>
-                      
                       <div>
                         {yourParticipateGroup.map((item, index) => (
                           <Box
@@ -1353,7 +1357,6 @@ export default function Profile({ userName, userId, getLogout }) {
                           </Box>
                         ))}
                       </div>
-                      
                     </>
                   ) : (
                     <>
@@ -1361,8 +1364,9 @@ export default function Profile({ userName, userId, getLogout }) {
                         src={initial}
                         width='300px'
                         m='100px 10px 0px 0px'></Img>
-                      <Font m='30px 0px 0px 0px' letterSpacing='2px' >
-                        還沒找到適合的露營團？首頁點選<Span>最佳推薦</Span>搜尋最適合你的露營團
+                      <Font m='30px 0px 0px 0px' letterSpacing='2px'>
+                        還沒找到適合的露營團？首頁點選<Span>最佳推薦</Span>
+                        搜尋最適合你的露營團
                       </Font>
                     </>
                   )}
@@ -1387,32 +1391,54 @@ export default function Profile({ userName, userId, getLogout }) {
       )}
       {userId !== params.id && (
         <div>
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={backdropOpen}
+            // onClick={handleClose}
+          >
+            <Img src={loading}></Img>
+          </Backdrop>
           <Header ContextByUserId={ContextByUserId} />
-          <Wrap
-            maxWidth='1440px'
-            width='75%'
-            m='100px 40px 0px 12%'
-            alignItems='center'
-            justifyContent='space-between'
-            boxShadow='none'>
-            <Display>
-              <ProfilePicture userId={paramsInfo.user_id} />
-              <Wrap
-                width='500px'
-                direction='column'
-                alignItems='start'
-                m='0px 0px 0px 60px'
-                boxShadow='none'>
-                <Font
-                  fontSize='40px'
-                  margin='0px 0px 10px 20px'
-                  marginLeft='20px'
-                  color='#426765'>
-                  {paramsInfo.user_name}
-                </Font>
-              </Wrap>
-            </Display>
-          </Wrap>
+          {paramsInfo && (
+            <Wrap
+              maxWidth='1440px'
+              width='75%'
+              m='100px 40px 0px 12%'
+              alignItems='center'
+              justifyContent='space-between'
+              boxShadow='none'>
+              <Display>
+                <ProfilePicture userId={paramsInfo.info.user_id} />
+                <Wrap
+                  width='500px'
+                  direction='column'
+                  justifyContent='start'
+                  alignItems='start'
+                  m='0px 0px 0px 60px'
+                  boxShadow='none'>
+                  <Font
+                    fontSize='40px'
+                    margin='0px 0px 10px 0px'
+                    marginLeft='3px'
+                    color='#426765'>
+                    {paramsInfo.info.user_name}
+                  </Font>
+                  <Display>
+                    {paramsInfo.select_tag.map((item) => (
+                      <Tag
+                        width='53px'
+                        m='3px'
+                        height='18px'
+                        borderRadius='12px'>
+                        <Font fontSize='14px'>{item}</Font>
+                      </Tag>
+                    ))}
+                  </Display>
+                </Wrap>
+              </Display>
+            </Wrap>
+          )}
+
           {userId !== params.id ? (
             <Box
               sx={{
