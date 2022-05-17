@@ -44,6 +44,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+import firebase from "../utils/firebaseConfig";
 import CloseIcon from "@mui/icons-material/Close";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import { UserContext } from "../utils/userContext";
@@ -463,7 +464,12 @@ function CheckCommentFromMember({ groupId }) {
   );
 }
 
-function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
+function CheckOfGroupMember({
+  groupId,
+  setRenderParticipateArr,
+  group_title,
+  userName,
+}) {
   const [memberIsOpen, setMemberIsOpen] = useState(false);
   const [member, setMember] = useState([]);
   const checkMemberList = async () => {
@@ -494,8 +500,8 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
     setMember(removeHeaderArr);
   };
 
-  const removeMember = async (index, role, member_id) => {
-    console.log(groupId);
+  const removeMember = async (index, role, member_id, member_name) => {
+    console.log(userName);
     Swal.fire({
       title: "確定移除？",
       icon: "question",
@@ -505,29 +511,24 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
       confirmButtonText: "移除",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await deleteDoc(
-          doc(
-            db,
-            "CreateCampingGroup",
-            groupId,
-            "member",
-            member[index].member_id
-          )
-        ).then(async () => {
-          let afterDeleteMemberArr = [];
-          const commentRef = collection(
-            db,
-            "CreateCampingGroup",
-            groupId,
-            "member"
-          );
-          const querySnapshot = await getDocs(commentRef);
-          querySnapshot.forEach((doc) => {
-            console.log(doc.id, " => ", doc.data());
-            afterDeleteMemberArr.push(doc.data());
+        firebase
+          .deleteMember(groupId, member[index].member_id)
+          .then(async () => {
+            let afterDeleteMemberArr = [];
+            const commentRef = collection(
+              db,
+              "CreateCampingGroup",
+              groupId,
+              "member"
+            );
+            const querySnapshot = await getDocs(commentRef);
+            querySnapshot.forEach((doc) => {
+              console.log(doc.id, " => ", doc.data());
+              afterDeleteMemberArr.push(doc.data());
+            });
+            setMember(afterDeleteMemberArr);
           });
-          setMember(afterDeleteMemberArr);
-        });
+
         const docRefJoinGroup = doc(db, "joinGroup", member_id);
         updateDoc(docRefJoinGroup, {
           group: arrayRemove(groupId),
@@ -536,6 +537,33 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
         const docRefCreateGroup = doc(db, "CreateCampingGroup", groupId);
         updateDoc(docRefCreateGroup, {
           current_number: increment(-1),
+        });
+
+        const q = query(
+          collection(db, "CreateCampingGroup", groupId, "tent"),
+          where("member", "array-contains", member_name)
+        );
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((item) => {
+          console.log(item.id, " => ", item.data());
+          updateDoc(doc(db, "CreateCampingGroup", groupId, "tent", item.id), {
+            current_number: increment(-1),
+            member: arrayRemove(member_name),
+          });
+        });
+        const getSupplies = query(
+          collection(db, "CreateCampingGroup", groupId, "supplies"),
+          where("bring_person", "==", member_name)
+        );
+        const querySupplies = await getDocs(getSupplies);
+        querySupplies.forEach((item) => {
+          console.log(item.id, " => ", item.data());
+          updateDoc(
+            doc(db, "CreateCampingGroup", groupId, "supplies", item.id),
+            {
+              bring_person: "",
+            }
+          );
         });
 
         // updateDoc(doc(db, "joinGroup", member_id), {
@@ -609,7 +637,12 @@ function CheckOfGroupMember({ groupId, setRenderParticipateArr, group_title }) {
                     ml='20px'
                     boxShadow='none'
                     onClick={() => {
-                      removeMember(index, item.role, item.member_id);
+                      removeMember(
+                        index,
+                        item.role,
+                        item.member_id,
+                        item.member_name
+                      );
                     }}>
                     移除成員
                   </Button>
@@ -925,8 +958,6 @@ export default function Profile({ userName, userId, getLogout }) {
       console.log(paramIdProfile.data().info);
       setParamsInfo(paramIdProfile.data());
     }
-        setbackdropOpen(false);
-
   }, []);
 
   const memberWithdrawGroup = async (id, userId, index) => {
@@ -1219,6 +1250,7 @@ export default function Profile({ userName, userId, getLogout }) {
                                 groupId={item.group_id}
                                 userId={userId}
                                 group_title={item.group_title}
+                                userName={userName}
                               />
                               <Button
                                 border='#CFC781'

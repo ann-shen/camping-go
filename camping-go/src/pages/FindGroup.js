@@ -130,7 +130,6 @@ function IsModal({
   joinThisGroup,
   setRecommendIsOpen,
 }) {
-
   const navigate = useNavigate();
 
   return (
@@ -285,74 +284,6 @@ function FindGroup({ userId, userName, setGroupId, setRecommendIsOpen }) {
     });
   }, [allGroupSelectArr, allGroupInfo]);
 
-  // const joinThisGroup = async (index, password, header_name) => {
-  //   console.log(allGroupInfo);
-  //   console.log(index);
-  //   setGroupId(allGroupInfo[index].group_id.toString());
-  //   setGroupPassword(password);
-  //   const docRef = await doc(
-  //     db,
-  //     "CreateCampingGroup",
-  //     allGroupInfo[index].group_id.toString()
-  //   );
-
-  //   const docRefMember = await doc(
-  //     db,
-  //     "CreateCampingGroup",
-  //     allGroupInfo[index].group_id.toString(),
-  //     "member",
-  //     userId
-  //   );
-
-  //   const docSnap = await getDoc(docRef);
-  //   if (docSnap.exists()) {
-  //     if (docSnap.data().privacy == "私人") {
-  //       // setIsOpen(true);
-  //     }
-  //   } else {
-  //     // doc.data() will be undefined in this case
-  //     console.log("No such document!");
-  //   }
-  //   setDoc(docRefMember, {
-  //     role: "member",
-  //     member_name: userName,
-  //     member_id: userId,
-  //   }).then(async () => {
-  //     const querySnapshot = await getDocs(
-  //       collection(
-  //         db,
-  //         "CreateCampingGroup",
-  //         allGroupInfo[index].group_id.toString(),
-  //         "member"
-  //       )
-  //     );
-  //     let memberArrLength = [];
-  //     querySnapshot.forEach((doc) => {
-  //       // console.log(doc.id, " => ", doc.data());
-  //       memberArrLength.push(doc.data());
-  //     });
-  //     console.log(memberArrLength.length);
-  //     await updateDoc(docRef, {
-  //       current_number: memberArrLength.length,
-  //     });
-  //   });
-
-  //   const docRefJoinGroup = await doc(db, "joinGroup", userId);
-  //   console.log(allGroupInfo[index].group_id);
-  //   updateDoc(docRefJoinGroup, {
-  //     group: arrayUnion(allGroupInfo[index].group_id),
-  //   });
-
-  //   updateDoc(doc(db, "joinGroup", allGroupInfo[index].header_id), {
-  //     alert: arrayUnion({
-  //       alert_content: `${userName}已加入「${allGroupInfo[index].group_title}」`,
-  //       is_read: false,
-  //     }),
-  //   });
-  // };
-
-  // console.log(findIndex);
-
   const joinThisGroup = async (index, max_member_number, current_number) => {
     console.log(current_number);
 
@@ -437,6 +368,8 @@ function FindGroup({ userId, userName, setGroupId, setRecommendIsOpen }) {
       navigate(`/joinGroup/${allGroupInfo[index].group_id}`);
     }, 500);
   };
+
+  
   return (
     <div>
       <IsModal
@@ -525,13 +458,6 @@ function FindGroup({ userId, userName, setGroupId, setRecommendIsOpen }) {
                     onClick={(e) => {
                       setIsOpen(true);
                       setRecommendCardIsOpen(false);
-                      // joinThisGroup(
-                      //   findIndex,
-                      //   allGroupInfo[findIndex].password,
-                      //   allGroupInfo[findIndex].header_name,
-                      //   allGroupInfo[findIndex].max_member_number,
-                      //   allGroupInfo[findIndex].current_number
-                      // );
                     }}>
                     {allGroupInfo[findIndex].privacy == "公開" &&
                       allGroupInfo[findIndex].header_name !== userName && (

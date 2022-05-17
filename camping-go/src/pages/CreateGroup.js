@@ -383,9 +383,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     seat: 0,
     create_time: serverTimestamp(),
   });
-  const [tentArr, setTentArr] = useState([]);
-  const [suppliesArr, setSuppliesArr] = useState([]);
-  const [alertItemsArr, setAlertItemsArr] = useState([]);
   const [addNotice, setAddNotice] = useState([]);
   const [time, setTime] = useState("");
   const [clickConfirm, setClickConfirm] = useState(false);
@@ -453,23 +450,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     // group
     const groupId = uuidv4();
     console.log(groupId);
-    // console.log(upload);
-    // const storage = getStorage();
-    // const imageRef = ref(storage, upload.file.name);
-    // uploadBytes(imageRef, upload.file)
-    //   .then(() => {
-    //     getDownloadURL(imageRef)
-    //       .then((url) => {
-    //         console.log(url);
-    //         setUpLoadFile((prevState) => ({ ...prevState, url: url }));
-    //       })
-    //       .catch((error) => {
-    //         console.log(error.message, "error getting the img url");
-    //       });
-    //   })
-    //   .catch((error) => {
-    //     console.log(error.message);
-    //   });
 
     setThisGroupID(groupId);
 
@@ -756,6 +736,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
                 thisGroupId={thisGroupId}
                 setPersonName={setPersonName}
                 personName={personName}
+                
               />
               <br></br>
               <br></br>

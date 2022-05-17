@@ -54,27 +54,14 @@ export default function MultipleSelectChip({
   setPersonName,
 }) {
   const theme = useTheme();
-  // const [personName, setPersonName] = useState([]);
-  // const [chosenTag, setChosenTag] = useState([]);
-  // console.log(groupId);
-  useEffect(async () => {
-    console.log(personName);
-    // if (path == "/create_group") {
-    //   console.log("create");
-    //   await updateDoc(doc(db, "CreateCampingGroup", groupId), {
-    //     select_tag: personName,
-    //   });
-    // }
-  }, [personName]);
-
-  // console.log(personName);
+  
+  
 
   useEffect(async () => {
     if (path !== "/create_group") {
       const docRef = doc(db, "joinGroup", userId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        // setChosenTag(docSnap.data().select_tag);
         setPersonName(docSnap.data().select_tag);
       } else {
         console.log("No such document!");
@@ -82,10 +69,11 @@ export default function MultipleSelectChip({
     }
   }, []);
 
+  
+
   const handleChange = async (event) => {
     const value = event.target.value;
     setPersonName(value, value.toString().split(",")[value.length - 1]);
-    // typeof value === "string" ? value.split(",") : value;
 
     if (path !== "/create_group") {
       await updateDoc(doc(db, "joinGroup", userId), {

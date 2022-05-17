@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Display, Cloumn, Button, Wrap, Img, Font } from "../css/style";
+import { Font } from "../css/style";
 
 const FooterWrap = styled.div`
   width: 100%;
