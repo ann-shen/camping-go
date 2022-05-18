@@ -17,15 +17,11 @@ import {
   updateDoc,
   doc,
   arrayUnion,
-  query,
   onSnapshot,
   getDoc,
 } from "firebase/firestore";
 import { db } from "../utils/firebase";
-import { Alert, Collapse, IconButton, Skeleton, Stack } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-
 
 const CreateLabel = styled.label`
   font-size: 18px;
@@ -133,7 +129,7 @@ function SecondHand({
   let buyerId = current_userId;
   let buyerName = userName;
 
-  console.log(userName);
+  console.log(current_userId);
 
   // const [secondSuppliesArr, setSecondSuppliesArr] = useState([]);
 
@@ -284,7 +280,7 @@ function SecondHand({
       showConfirmButton: false,
       timer: 1000,
     });
-    setShowBuyerSection(false)
+    setShowBuyerSection(false);
 
     // setTimeout(() => {
     //   setAlertOpen(false);
@@ -417,23 +413,7 @@ function SecondHand({
                   </Wrap>
                 ))}
               </Display>
-              {/* <Collapse in={alertOpen}>
-                <Alert
-                  action={
-                    <IconButton
-                      aria-label='close'
-                      color='inherit'
-                      size='small'
-                      onClick={() => {
-                        setAlertOpen(false);
-                      }}>
-                      <CloseIcon fontSize='inherit' />
-                    </IconButton>
-                  }
-                  sx={{ mb: 2 }}>
-                  已送出
-                </Alert>
-              </Collapse> */}
+
               <br />
               <Button width='200px' mt='20px' onClick={comfirmChange}>
                 確認提出交換邀請

@@ -82,9 +82,17 @@ const GroupWrap = styled.div`
   /* flex-direction: column; */
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: start;
   margin: 10px auto;
   align-items: start;
+  flex-wrap: wrap;
+  margin-left: 6%;
+  @media (max-width: 1280px) {
+    margin-left: 3%;
+  }
+  @media (max-width: 580px) {
+    margin-left: 5%;
+  }
 `;
 
 const LinkPrivate = styled(Link)`
@@ -152,12 +160,10 @@ function IsModal({
 }) {
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState(false);
-
-  const navigate = useNavigate();
-
   const handleChange = (event) => {
     setValue(event.target.value);
   };
+  console.log(`點擊到的是${index}`);
 
   const checkPassword = (e) => {
     if (value == currentPosts[index].password) {
@@ -355,7 +361,6 @@ export default function ReviewCard({
       }).then((result) => {
         if (result.isConfirmed) {
           navigate("/login");
-          // Swal.fire("Deleted!", "Your file has been deleted.", "success");
         }
       });
       return;
@@ -413,10 +418,21 @@ export default function ReviewCard({
               margin: 4,
               marginTop: 0,
               backgroundColor: "#F4F4EE",
-
               "&:hover": {
                 transition: "0.7s",
                 opacity: "0.7",
+              },
+              "@media (max-width: 1280px)": {
+                width: "27%",
+                margin: 2,
+              },
+              "@media (max-width: 860px)": {
+                width: "40%",
+                margin: 2,
+              },
+              "@media (max-width: 580px)": {
+                width: "80%",
+                margin: 2,
               },
             }}>
             <ImgWrap>

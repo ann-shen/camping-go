@@ -405,6 +405,8 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     setClickConfirm(true);
   };
 
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     console.log(e.target.value);
@@ -416,6 +418,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       setAddNotice((prev) => [...prev, groupInfo.notice]);
     }
   };
+  
 
   const addGroupNotice = (e) => {
     e.preventDefault();

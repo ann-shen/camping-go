@@ -134,3 +134,26 @@ export const Hr = styled.hr`
   border: ${(props) => props.border || " 1px solid #CFC781"};
   margin: ${(props) => props.m || "10px 0px"};
 `;
+
+export const BoxWrap = {
+  width: "75%",
+  height: "auto",
+  boxShadow: "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+  borderRadius: 5,
+  paddingTop: 8,
+  margin: "auto",
+  marginBottom: "100px",
+  paddingBottom: "50px",
+};
+
+export const ProfileBox = {
+  width: "85%",
+  height: "auto",
+  boxShadow: "0.8rem 0.8rem 3.2rem #E2E1D3 , -1.0rem -1.0rem 1rem #ffffff",
+  borderRadius: 6,
+  padding: 5,
+  margin: "auto",
+  marginTop: "30px",
+  border: "1px solid #CFC781 ",
+  justifyContent: "space-around",
+};

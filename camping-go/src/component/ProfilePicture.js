@@ -63,9 +63,8 @@ export const ProfilePicture = ({ userId }) => {
   const [preview, setPreview] = useState(null);
   let params = useParams();
 
-  
+  console.log(userId);
   useEffect(async () => {
-    console.log(userId);
     console.log("123");
     if (userId) {
       const getInfo = await getDoc(doc(db, "joinGroup", userId));
@@ -77,7 +76,6 @@ export const ProfilePicture = ({ userId }) => {
       }
     }
   }, [selectedFile, userId]);
-
 
   const onSelectFile = (e) => {
     if (!e.target.files || e.target.files.length === 0) {
@@ -121,12 +119,7 @@ export const ProfilePicture = ({ userId }) => {
               <Img src={preview} width='auto' height='115%' />
             </ImgWrap>
           )}
-          {/* {preview && (
-            <ImgWrap>
-              <Img src={preview} width='auto' height='115%' />
-            </ImgWrap>
-          )} */}
-          {params.id !== userId && (
+          {params.id == userId && (
             <Label>
               <FileUploadRoundedIcon
                 sx={{

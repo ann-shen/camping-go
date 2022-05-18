@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
+
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { useState, useEffect } from "react";
 import CreateGroup from "./pages/CreateGroup";
@@ -17,6 +18,7 @@ import { UserContext } from "./utils/userContext";
 import FindGroup from "./pages/FindGroup";
 import SecondHand from "./pages/SecondHand";
 import ScrollToTop from "./component/ScrollToTop";
+
 
 function App() {
   const [userName, setUserName] = useState("");
@@ -40,9 +42,14 @@ function App() {
     });
   }, []);
 
+  const value = {
+    userId,
+    userName,
+  };
+
   return (
     <div className='App'>
-      <UserContext.Provider value={userId}>
+      <UserContext.Provider value={value}>
         <BrowserRouter>
           <ScrollToTop>
             <Routes>

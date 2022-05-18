@@ -46,16 +46,9 @@ function getStyles(name, personName, theme) {
   };
 }
 
-export default function MultipleSelectChip({
-  userId,
-  path,
-  groupId,
-  personName,
-  setPersonName,
-}) {
+export default function MultipleSelectChip({ userId, path, groupId }) {
   const theme = useTheme();
-  
-  
+  const [personName, setPersonName] = useState([]);
 
   useEffect(async () => {
     if (path !== "/create_group") {
@@ -69,8 +62,6 @@ export default function MultipleSelectChip({
     }
   }, []);
 
-  
-
   const handleChange = async (event) => {
     const value = event.target.value;
     setPersonName(value, value.toString().split(",")[value.length - 1]);
@@ -82,12 +73,11 @@ export default function MultipleSelectChip({
     }
   };
 
-
   let formControlStyle;
 
   if (window.location.pathname !== "/create_group") {
     formControlStyle = { ml: 2, mt: 1, width: "400px" };
-  }else{
+  } else {
     formControlStyle = { ml: 0, mt: 0, width: "400px" };
   }
 

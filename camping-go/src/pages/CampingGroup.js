@@ -41,6 +41,9 @@ const HeaderSection = styled.div`
 const LandingImg = styled.img`
   width: 87%;
   z-index: -10;
+  /* @media (max-width: 768px) {
+    flex-direction: column;
+  } */
 `;
 
 const LandingSubTitleWrap = styled.div`
@@ -56,7 +59,7 @@ const LandingImgWrap = styled.div`
   justify-content: end;
   align-items: start;
   width: 100%;
-  height: 540px;
+  height: 80%;
   overflow: hidden;
   z-index: -1;
   /* margin-top: -180px; */
