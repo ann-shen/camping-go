@@ -2,10 +2,14 @@ import styled from "styled-components";
 import { Font, Display, Img, Button } from "../css/style";
 
 const PageWrap = styled.div`
-  width:92%;
+  width: 92%;
   display: flex;
   justify-content: center;
-  margin-top:-580px;
+  margin-top: -580px;
+  @media (max-width: 580px) {
+    margin-top: -330px;
+  }
+  
 `;
 
 const PageLink = styled.a`

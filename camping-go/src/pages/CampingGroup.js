@@ -41,17 +41,38 @@ const HeaderSection = styled.div`
 const LandingImg = styled.img`
   width: 87%;
   z-index: -10;
-  /* @media (max-width: 768px) {
-    flex-direction: column;
-  } */
+  margin-right: -10px;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+  @media (max-width: 680px) {
+    width: 140%;
+  }
 `;
 
 const LandingSubTitleWrap = styled.div`
   position: absolute;
   text-align: start;
-  top: 130px;
+  top: 150px;
   left: 145px;
   line-height: 30px;
+
+  @media (max-width: 1280px) {
+    left: 120px;
+  }
+  @media (max-width: 1024px) {
+    top: 100px;
+    left: 70px;
+    width: 220px;
+  }
+  @media (max-width: 768px) {
+    top: 90px;
+    left: 60px;
+    line-height: 24px;
+  }
+  @media (max-width: 700px) {
+    display: none;
+  }
 `;
 
 const LandingImgWrap = styled.div`
@@ -73,9 +94,14 @@ const Section = styled.div`
 `;
 
 const ImgGroupPeopleWrap = styled.div`
+  position: relative;
   display: flex;
   justify-content: start;
   margin: 0px 0px 0px 9%;
+  width: 110%;
+  @media (max-width: 768px) {
+    width: 80%;
+  }
 `;
 
 const TitleWrap = styled.div`
@@ -83,6 +109,69 @@ const TitleWrap = styled.div`
   align-items: start;
   flex-direction: column;
   margin-left: 15px;
+  font-size: 16px;
+  
+`;
+
+const FindGroupButton = styled.button`
+  &:hover {
+    color: #ffffff;
+    background-color: #dcd8b3;
+    box-shadow: none;
+  }
+  &:active {
+    color: #797659;
+    background-color: #eae5be;
+    box-shadow: inset 0.2rem 0.2rem 1rem #bdb991,
+      inset -0.2rem -0.2rem 1rem #fffef4;
+  }
+  width: 150px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #eae5be;
+  font-size: 16px;
+  color: #797659;
+  cursor: pointer;
+  padding: 5px;
+  letter-spacing: 2px;
+  margin-top: 70px;
+  border: none;
+
+  @media (max-width: 1024px) {
+    margin-top: 40px;
+  }
+
+  @media (max-width: 768px) {
+    margin-top: 30px;
+  }
+`;
+
+const FindImg = styled.img`
+  color: #bfbb92;
+  width: 35px;
+  height: 50px;
+  margin: 0px;
+  @media (max-width: 768px) {
+    width: 25px;
+    height: 35px;
+  }
+`;
+
+const SubTitle = styled.p`
+  color: #bfbb92;
+  font-size: 14px;
+  margin: 0px;
+  text-align: start;
+  @media (max-width: 768px) {
+    margin-left: 0px;
+  }
+`;
+
+const Title = styled.p`
+  color: #797659;
+  font-size: 18px;
+  text-align: start;
+  margin: 0px;
 `;
 
 function CampingGroup({ setGroupId, userId, userName, groupId }) {
@@ -294,9 +383,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
           <Font fontSize='14px'>
             讓大自然調劑你緊湊的生活步伐，來場「森」呼吸。
           </Font>
-          <Button mt='70px' width='150px' onClick={toTaiwanMap}>
-            立即探索
-          </Button>
+          <FindGroupButton onClick={toTaiwanMap}>立即探索</FindGroupButton>
         </LandingSubTitleWrap>
 
         <LandingImgWrap>
@@ -305,14 +392,12 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       </HeaderSection>
       <Section>
         <ImgGroupPeopleWrap>
-          <Img width='35px' src={group_people} />
+          <FindImg src={group_people} />
           <TitleWrap>
-            <Font fontSize='20px' letterSpacing='3px'>
-              尋找你的露營趴 所有好玩的都在這。
-            </Font>
-            <Font fontSize='16px' color='#BFBB92'>
+            <Title>尋找你的露營趴 所有好玩的都在這。</Title>
+            <SubTitle>
               忙碌的都市生活之餘，讓大自然調劑你緊湊的生活步伐，來場「森」呼吸。
-            </Font>
+            </SubTitle>
           </TitleWrap>
         </ImgGroupPeopleWrap>
         <Hr width='80%' m='20px 0px 30px 8%'></Hr>
@@ -332,32 +417,16 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
           totalPosts={homePageCampGroup.length}
           paginate={paginate}
         />
-
-        {/* <Button
-          width='80px'
-          height='80px'
-          borderRadius='50%'
-          mt='90px'
-          ml='90%'
-          fontSize='30px'
-          bgc='#426765'
-          color='#CFC781'
-          boxShadow='none'
-          onClick={() => {
-            navigate("/createGroup");
-          }}>
-          +
-        </Button> */}
         <Display justifyContnet='start' ml='8%' m='140px 0px 0px 0px'>
           <Display>
-            <Img src={location_big} alt='' width='40px' />
+            <FindImg src={location_big} alt='' width='40px' />
             <TitleWrap>
-              <Font fontSize='20px' letterSpacing='3px'>
+              <Title fontSize='20px' letterSpacing='3px'>
                 點擊你想前往的城市
-              </Font>
-              <Font fontSize='16px' color='#BFBB92'>
+              </Title>
+              <SubTitle fontSize='16px' color='#BFBB92'>
                 忙碌的都市生活之餘，讓大自然調劑你緊湊的生活步伐，來場「森」呼吸。
-              </Font>
+              </SubTitle>
             </TitleWrap>
           </Display>
         </Display>

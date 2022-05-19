@@ -150,6 +150,20 @@ const AnnouncementFontWrap = styled.div`
   margin-bottom: 20px;
 `;
 
+
+const TentImg = styled.img`
+  width: 280px;
+  @media (max-width: 768px) {
+    width: 200px;
+    margin-top: 30px;
+    margin-right: -30px;
+  }
+  @media (max-width: 580px) {
+    display: none;
+  }
+  
+`;
+
 function IsModal({
   modalIsOpen,
   setIsOpen,
@@ -177,6 +191,7 @@ function IsModal({
       setAlert(true);
     }
   };
+  
   // console.log(currentPosts[index]);
 
   return (
@@ -255,7 +270,7 @@ function IsModal({
                     defaultValue=''
                     onChange={handleChange}
                     size='small'
-                    type="password"
+                    type='password'
                     helperText='此為私人團，請輸入密碼'
                     sx={{ marginTop: "0px", width: "200px" }}
                   />
@@ -545,14 +560,7 @@ export default function ReviewCard({
           </Card>
         ))}
       </GroupWrap>
-      {/* <Wrap
-        width='90%'
-        m='120px 0px 30px 8%'
-        direction='column'
-        alignItems='start'>
-        <Img src={landingpage04} width='120px'></Img> 
-        <Hr width='90%' m='0px'></Hr>
-      </Wrap> */}
+
       <GroupWrap>
         <Card
           sx={{
@@ -570,6 +578,11 @@ export default function ReviewCard({
             justifyContent: "center",
             backgroundColor: "#F8F8F2",
             border: "1px solid #CFC781 ",
+            "@media (max-width: 580px)": {
+              marginTop: 10,
+              marginBottom:10,
+              marginLeft:"20px",
+            },
           }}>
           <Font letterSpacing='3px' fontSize='16px'>
             找不到喜愛的？一鍵找尋你的最佳推薦露營團
@@ -609,7 +622,7 @@ export default function ReviewCard({
         setGroupId={setGroupId}
       />
       <Wrap width='95%' justifyContent='end' m=' -160px 00px 0px 0px'>
-        <Img src={landingpage03} width='280px'></Img>
+        <TentImg src={landingpage03} />
       </Wrap>
     </>
   );
