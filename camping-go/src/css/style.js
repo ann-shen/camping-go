@@ -39,7 +39,6 @@ export const Display = styled.div`
   border-bottom: ${(props) => props.borderBottom || "none"};
   padding-bottom: ${(props) => props.paddingBottom || "0px"};
   /* height: ${(props) => props.height || "200px"}; */
-  
 `;
 
 export const Wrap = styled.div`
@@ -52,9 +51,7 @@ export const Wrap = styled.div`
   align-items: ${(props) => props.alignItems || "center"};
   border-bottom: ${(props) => props.borderBottom || "none"};
   padding-bottom: ${(props) => props.paddingBottom || "0px"};
-  box-shadow: ${(props) =>
-    props.boxShadow ||
-    "none"};
+  box-shadow: ${(props) => props.boxShadow || "none"};
   background-color: ${(props) => props.bgc || "none"};
 `;
 
@@ -122,7 +119,6 @@ export const Tag = styled.div`
   }
 `;
 
-
 export const Cloumn = styled.div`
   display: flex;
   flex-direction: column;
@@ -156,4 +152,31 @@ export const ProfileBox = {
   marginTop: "30px",
   border: "1px solid #CFC781 ",
   justifyContent: "space-around",
+};
+
+export const secondHandSectionByJoinGroup = {
+  width: "25%",
+  height: "200px",
+  boxShadow: "0.3rem 0.3rem 2.6rem #E2E1D3 , -1.0rem -1.0rem 0.7rem #ffffff",
+  borderRadius: 6,
+  padding: "10px",
+  margin: "auto",
+  marginTop: "60px",
+  border: "1px solid #CFC781 ",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+export const suppliesSectionByJoinGroup = {
+  width: "100%",
+  height: "auto",
+  boxShadow: "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
+  borderRadius: 10,
+  padding: 3,
+  paddingLeft: 6,
+  alignItems: "center",
+  marginTop: 3,
+  marginBottom: 5,
 };

@@ -1,3 +1,4 @@
+import { getSeconds } from "date-fns";
 import {
   getDocs,
   collection,
@@ -55,6 +56,10 @@ function querySuppliesOfMember(groupId, memberName) {
   return getSupplies;
 }
 
+function allSupplies(groupId) {
+  return collection(db, "CreateCampingGroup", groupId, "supplies");
+}
+
 const firebase = {
   async deleteMember(groupId, memberID) {
     await deleteDoc(doc(db, "CreateCampingGroup", groupId, "member", memberID));
@@ -64,10 +69,18 @@ const firebase = {
     let memberArr = [];
     const querySnapshot = await getDocs(subCollectionOfMember(groupId));
     querySnapshot.forEach((doc) => {
-      // console.log(doc.id, " => ", doc.data());
       memberArr.push(doc.data());
     });
     return memberArr;
+  },
+
+  async getDocsOfSupplies(groupId) {
+    let takeAwayArr = [];
+    const querySnapshot = await getDocs(allSupplies(groupId));
+    querySnapshot.forEach((doc) => {
+      takeAwayArr.push(doc.data());
+    });
+    return takeAwayArr;
   },
 
   async updateDocOfArrayRemoveGroup(memberId, groupId) {
@@ -121,9 +134,7 @@ const firebase = {
       return paramIdProfile.data();
     }
   },
-
   
-
 };
 
 export default firebase;

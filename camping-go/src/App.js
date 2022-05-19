@@ -19,7 +19,6 @@ import FindGroup from "./pages/FindGroup";
 import SecondHand from "./pages/SecondHand";
 import ScrollToTop from "./component/ScrollToTop";
 
-
 function App() {
   const [userName, setUserName] = useState("");
   const [groupId, setGroupId] = useState("");
@@ -78,12 +77,7 @@ function App() {
               <Route
                 path='joinGroup/:id'
                 element={
-                  <JoinGroupPage
-                    setAllMemberArr={setAllMemberArr}
-                    allMemberArr={allMemberArr}
-                    userName={userName}
-                    userId={userId}
-                  />
+                  <JoinGroupPage userName={userName} userId={userId} />
                 }></Route>
               <Route
                 path='profile/:id'
