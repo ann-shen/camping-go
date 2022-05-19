@@ -155,10 +155,8 @@ function IsModal({
     max_member_number,
     current_number
   ) => {
-    console.log(current_number);
 
     if (header_name == userName) {
-      console.log("nono");
       Swal.fire({
         position: "center",
         icon: "warning",
@@ -170,7 +168,6 @@ function IsModal({
     }
 
     if (current_number + 1 > max_member_number) {
-      console.log(current_number + 1);
       Swal.fire({
         position: "center",
         icon: "warning",
@@ -201,7 +198,6 @@ function IsModal({
     const docMemberInfo = await getDoc(docRefJoinGroup);
 
     if (docMemberInfo.exists()) {
-      console.log(docMemberInfo.data().select_tag);
       userSelect = docMemberInfo.data().select_tag;
     }
 
@@ -231,16 +227,13 @@ function IsModal({
       );
       let memberArrLength = [];
       querySnapshot.forEach((doc) => {
-        // console.log(doc.id, " => ", doc.data());
         memberArrLength.push(doc.data());
       });
-      console.log(memberArrLength.length);
       await updateDoc(docRef, {
         current_number: memberArrLength.length,
       });
     });
 
-    console.log(currentPosts[index].group_id);
 
     navigate(`/joinGroup/${currentPosts[index].group_id}`);
   };
@@ -277,7 +270,6 @@ function IsModal({
                 {currentPosts[index].notice.length !== 0 &&
                   currentPosts[index].notice.map((item) => (
                     <Display mb='15px'>
-                      {console.log(item)}
                       <Img src={alertIcon} width='30px'></Img>
                       <Font fontSize='14px' marginLeft='10px'>
                         {item}
@@ -549,7 +541,6 @@ function CityCamping({ userName, groupId, userId }) {
     },
   ];
 
-  console.log(targetCity);
 
   useEffect(() => {
     let result = place_data.filter((obj) => {
@@ -567,10 +558,8 @@ function CityCamping({ userName, groupId, userId }) {
       const querySnapshot = await getDocs(q);
       let Arr = [];
       querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
         Arr.push(doc.data());
       });
-      console.log(Arr);
       setTargetCityArr(Arr);
     }
   }, [targetCity]);
@@ -592,7 +581,6 @@ function CityCamping({ userName, groupId, userId }) {
       });
       return;
     }
-    console.log(index);
     setTargetIndex(index);
     setIsOpen(true);
   };

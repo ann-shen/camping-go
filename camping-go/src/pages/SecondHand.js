@@ -131,7 +131,6 @@ function SecondHand({
 
   console.log(current_userId);
 
-  // const [secondSuppliesArr, setSecondSuppliesArr] = useState([]);
 
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
@@ -141,7 +140,6 @@ function SecondHand({
   useEffect(() => {
     if (userId) {
       const unsub = onSnapshot(doc(db, "joinGroup", userId), (doc) => {
-        // console.log("Current data: ", doc.data().second_hand);
         setAllSupplies(doc.data().second_hand);
       });
     }
@@ -169,12 +167,9 @@ function SecondHand({
       });
   }, [upload]);
 
-  console.log(suppliesInfo.picture);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(e.target.value);
-
     setSuppliesInfo((prevState) => ({
       ...prevState,
       [name]: value,
@@ -183,8 +178,6 @@ function SecondHand({
 
   const addNewSecondHandSupplies = async (event) => {
     event.preventDefault();
-    console.log(`吼唷！${userId}`);
-    console.log(suppliesInfo);
     if (userId) {
       const docRef = doc(db, "joinGroup", userId);
       await updateDoc(docRef, { second_hand: arrayUnion(suppliesInfo) });
@@ -203,7 +196,6 @@ function SecondHand({
       url: "",
     }));
   };
-  console.log(buyerId);
 
   const changeInvite = async (index) => {
     const getBuyerSupplies = await getDoc(doc(db, "joinGroup", buyerId));
@@ -213,13 +205,8 @@ function SecondHand({
         console.log(item);
         if (item.change_status == false) {
           buyerArr.push(item);
-        } else {
-          console.log("none");
         }
       });
-      // buyerArr[buyerIndex].waiting_reply = true;
-      console.log(buyerIndex);
-      console.log(buyerArr);
       setBuyerArr(buyerArr);
     }
     setShowBuyerSection(true);
@@ -233,10 +220,8 @@ function SecondHand({
       }
     });
     buyerArr[index].border = "3px solid #CFC781";
-    console.log(buyerArr);
     setBuyerIndex(index);
 
-    // setImgBorder("2.5px solid #759D9B");
     setChoseSupplies(buyerArr[index]);
 
     allSupplies[inviteIndex].inviteSupplies_index = index;
@@ -252,8 +237,6 @@ function SecondHand({
     allSupplies[inviteIndex].change_supplies_picture = choseSupplies.picture;
     allSupplies[inviteIndex].change_note = choseSupplies.note;
     allSupplies[inviteIndex].invite = true;
-    // console.log(allSupplies[inviteIndex]);
-    console.log(allSupplies);
     const docRef = doc(db, "joinGroup", userId);
     await updateDoc(docRef, { second_hand: allSupplies });
 
@@ -261,15 +244,11 @@ function SecondHand({
     if (getBuyerSupplies.exists()) {
       let buyerArr = [];
       getBuyerSupplies.data().second_hand.map((item) => {
-        console.log(item);
         if (item.change_status == false) {
           buyerArr.push(item);
-        } else {
-          console.log("none");
         }
       });
       buyerArr[buyerIndex].waiting_reply = true;
-      console.log(buyerArr);
       await updateDoc(doc(db, "joinGroup", buyerId), { second_hand: buyerArr });
     }
 
@@ -281,15 +260,9 @@ function SecondHand({
       timer: 1000,
     });
     setShowBuyerSection(false);
-
-    // setTimeout(() => {
-    //   setAlertOpen(false);
-    // }, 2000);
   };
 
   function GetStatus({ item }) {
-    console.log(item);
-    console.log(item.change_status);
     return (
       <>
         {item.waiting_reply == true ? (
@@ -359,7 +332,6 @@ function SecondHand({
                         changeInvite(index);
                       }}>
                       <GetStatus item={item} />
-                      {/* {item.change_status == false ? "提出交換邀請" : "已交換"} */}
                     </Button>
                   )}
                 </Cloumn>

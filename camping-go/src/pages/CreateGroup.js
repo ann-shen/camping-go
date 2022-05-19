@@ -215,7 +215,6 @@ function Calander({ setEndDate, setStartDate, startDate, endDate }) {
   // const [endDate, setEndDate] = useState(new Date());
 
   const handleSelect = (ranges) => {
-    console.log(ranges);
     setStartDate(ranges.selection.startDate);
     setEndDate(ranges.selection.endDate);
   };
@@ -244,7 +243,6 @@ function MaterialUIPickers({ setTime }) {
     setTime(newValue);
     setValue(newValue);
   };
-  // console.log(value);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -265,12 +263,10 @@ function Multiple({ setUpLoadFile }) {
 
   function uploadSingleFile(e) {
     setFile([...file, URL.createObjectURL(e.target.files[0])]);
-    console.log("file", file);
   }
 
   function upload(e) {
     e.preventDefault();
-    console.log(file);
     setUpLoadFile((prevState) => ({
       ...prevState,
       detail_picture: file,
@@ -280,7 +276,6 @@ function Multiple({ setUpLoadFile }) {
   function deleteFile(e) {
     const s = file.filter((item, index) => index !== e);
     setFile(s);
-    console.log(s);
   }
 
   return (
@@ -409,7 +404,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(e.target.value);
     setGroupInfo((prevState) => ({
       ...prevState,
       [name]: value,
@@ -425,7 +419,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     setAddNotice((prev) => [...prev, groupInfo.notice]);
   };
 
-  console.log(groupInfo);
 
   const setUpGroup = async () => {
     let timerInterval;
@@ -445,14 +438,10 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
         clearInterval(timerInterval);
       },
     }).then((result) => {
-      /* Read more about handling dismissals below */
       if (result.dismiss === Swal.DismissReason.timer) {
-        console.log("I was closed by the timer");
       }
     });
-    // group
     const groupId = uuidv4();
-    console.log(groupId);
 
     setThisGroupID(groupId);
 
@@ -485,7 +474,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
         collection(db, "CreateCampingGroup", groupId, "tent")
       );
       await setDoc(ondocRefNewTent, item);
-      console.log(ondocRefNewTent.id);
       updateDoc(
         doc(db, "CreateCampingGroup", groupId, "tent", ondocRefNewTent.id),
         {
@@ -501,7 +489,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
         collection(db, "CreateCampingGroup", groupId, "supplies")
       );
       await setDoc(ondocRefNewSupplies, item);
-      console.log(ondocRefNewSupplies.id);
       updateDoc(
         doc(db, "CreateCampingGroup", groupId, "tent", ondocRefNewSupplies.id),
         {
@@ -549,7 +536,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
   //   }
   // }, [upload.url]);
 
-  console.log(tentInfo);
   const addNewTent = (e) => {
     e.preventDefault();
     if (tentInfo.max_number == "") {
@@ -564,7 +550,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       who_create: userName,
     }));
   };
-  console.log(getAllTent);
 
   const addSupplies = (e) => {
     e.preventDefault();
@@ -573,16 +558,13 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
 
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
-    console.log(e.target.files[0].name);
 
-    console.log(upload);
     const storage = getStorage();
     const imageRef = ref(storage, e.target.files[0].name);
     uploadBytes(imageRef, e.target.files[0])
       .then(() => {
         getDownloadURL(imageRef)
           .then((url) => {
-            console.log(url);
             setUpLoadFile((prevState) => ({ ...prevState, url: url }));
           })
           .catch((error) => {

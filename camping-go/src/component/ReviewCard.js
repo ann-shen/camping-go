@@ -22,10 +22,7 @@ import {
   getDoc,
   getDocs,
   collection,
-  query,
-  where,
   updateDoc,
-  orderBy,
   arrayUnion,
 } from "firebase/firestore";
 import { db } from "../utils/firebase";
@@ -222,8 +219,8 @@ function IsModal({
               <Hr width='80%' m='10px 0px 20px 0px'></Hr>
               <AnnouncementFontWrap>
                 {currentPosts[index].notice.length !== 0 &&
-                  currentPosts[index].notice.map((item) => (
-                    <Display mb='15px' alignItems='start'>
+                  currentPosts[index].notice.map((item,index) => (
+                    <Display mb='15px' alignItems='start' key={index}>
                       <Img src={alertIcon} width='30px'></Img>
                       <Font fontSize='14px' marginLeft='10px'>
                         {item}
@@ -453,7 +450,6 @@ export default function ReviewCard({
     );
     let memberArrLength = [];
     querySnapshot.forEach((doc) => {
-      console.log(doc.data());
       memberArrLength.push(doc.data());
     });
     await updateDoc(docRef, {
@@ -506,8 +502,8 @@ export default function ReviewCard({
       <GroupWrap>
         {currentPosts.length == 0 && (
           <Wrap width='80%' justifyContent='space-between'>
-            {loadingArr.map((_) => (
-              <Stack spacing={2} style={{ marginRight: 30 }}>
+            {loadingArr.map((_,index) => (
+              <Stack spacing={2} style={{ marginRight: 30 }} key={index}>
                 <Skeleton
                   variant='rectangular'
                   width={290}
@@ -559,7 +555,8 @@ export default function ReviewCard({
                 width: "80%",
                 margin: 2,
               },
-            }}>
+            }}
+            key={index}>
             <ImgWrap>
               <CardMedia
                 sx={{
@@ -653,7 +650,7 @@ export default function ReviewCard({
             />
             <CardActions disableSpacing>
               {item.select_tag
-                .map((obj) => <SelectTag>{obj}</SelectTag>)
+                .map((obj,index) => <SelectTag key={index}>{obj}</SelectTag>)
                 .slice(0, 3)}
             </CardActions>
           </Card>

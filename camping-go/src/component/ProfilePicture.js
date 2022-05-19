@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { useState, useEffect, useContext } from "react";
-import { Font, Display, Img, Button } from "../css/style";
+import { useState, useEffect } from "react";
+import { Display, Img } from "../css/style";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db } from "../utils/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -63,16 +63,11 @@ export const ProfilePicture = ({ userId }) => {
   const [preview, setPreview] = useState(null);
   let params = useParams();
 
-  console.log(userId);
   useEffect(async () => {
-    console.log("123");
     if (userId) {
       const getInfo = await getDoc(doc(db, "joinGroup", userId));
       if (getInfo.exists()) {
-        console.log(getInfo.data().profile_img);
         setPreview(getInfo.data().profile_img);
-      } else {
-        console.log("no such pic");
       }
     }
   }, [selectedFile, userId]);
@@ -88,7 +83,6 @@ export const ProfilePicture = ({ userId }) => {
       .then(() => {
         getDownloadURL(imageRef)
           .then((url) => {
-            console.log(url);
             setPreview(url);
             updateDoc(doc(db, "joinGroup", userId), {
               profile_img: url,

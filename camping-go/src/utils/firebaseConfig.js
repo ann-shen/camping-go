@@ -1,4 +1,3 @@
-import { getSeconds } from "date-fns";
 import {
   getDocs,
   collection,
@@ -27,8 +26,7 @@ function subCollectionOfMember(groupId) {
 }
 
 function joinGroupOfuserID(memberId) {
-  let joinGroup;
-  return (joinGroup = doc(db, "joinGroup", memberId));
+  return  doc(db, "joinGroup", memberId)
 }
 
 function CreateCampingGroupOfGroupID(groupId) {

@@ -37,7 +37,6 @@ const names = [
 ];
 
 function getStyles(name, personName, theme) {
-  // console.log(personName,name)
   return {
     fontWeight:
       personName.indexOf(name) === -1
@@ -56,9 +55,7 @@ export default function MultipleSelectChip({ userId, path, groupId }) {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         setPersonName(docSnap.data().select_tag);
-      } else {
-        console.log("No such document!");
-      }
+      } 
     }
   }, []);
 

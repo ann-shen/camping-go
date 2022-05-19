@@ -227,7 +227,7 @@ export function CheckOfGroupMember({
     });
   };
   const removeMember = async (index, member_id, member_name) => {
-    console.log(userName);
+    console.log(member_name);
     Swal.fire({
       title: "確定移除？",
       icon: "question",
@@ -243,7 +243,7 @@ export function CheckOfGroupMember({
             firebase.getDocsOfSubCollectionMember(groupId).then((res) => {
               setMember(res);
             });
-            firebase.updateDocOfArrayRemoveGroup(member_id, groupId);
+            firebase.updateDocOfArrayRemoveGroup(member[index].member_id, groupId);
             firebase.updateDocIncrementCurrentOfMember(groupId);
             firebase.updateDocIncrementTentOfMember(groupId, member_name);
             firebase.updateDocSuppliesOfMember(groupId, member_name);
@@ -322,7 +322,6 @@ export function CheckOfGroupMember({
                     onClick={() => {
                       removeMember(
                         index,
-                        item.role,
                         item.member_id,
                         item.member_name
                       );

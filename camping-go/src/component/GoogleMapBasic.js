@@ -9,7 +9,6 @@ import styled from "styled-components";
 import Geocode from "react-geocode";
 import { useEffect } from "react";
 import Autocomplete from "react-google-autocomplete";
-import { Display, Cloumn, Button } from "../css/style";
 
 const MapWrap = styled.div`
   width: 100%;
@@ -54,7 +53,6 @@ const MapWithAMarker = withScriptjs(
 );
 
 function GoogleMapBasic({ state, setState }) {
-  console.log(state);
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
@@ -75,13 +73,11 @@ function GoogleMapBasic({ state, setState }) {
               position.coords.longitude
             ).then(
               (response) => {
-                console.log(response);
                 const address = response.results[0].formatted_address,
                   addressArray = response.results[0].address_components,
                   city = getCity(addressArray),
                   area = getArea(addressArray),
                   state = getState(addressArray);
-                console.log("city", city, area, state);
                 setState({
                   address: address ? address : "",
                   area: area ? area : "",
@@ -151,7 +147,6 @@ function GoogleMapBasic({ state, setState }) {
       newLng = event.latLng.lng();
 
     Geocode.fromLatLng(newLat, newLng).then((response) => {
-      console.log(response);
       const address = response.results[0].formatted_address,
         addressArray = response.results[0].address_components,
         city = getCity(addressArray),
@@ -176,7 +171,6 @@ function GoogleMapBasic({ state, setState }) {
   };
 
   const onPlaceSelected = (place) => {
-    console.log("plc", place);
     const address = place.formatted_address,
       addressArray = place.address_components,
       city = getCity(addressArray),
@@ -185,10 +179,6 @@ function GoogleMapBasic({ state, setState }) {
       latValue = place.geometry.location.lat(),
       lngValue = place.geometry.location.lng();
 
-    console.log("latvalue", latValue);
-    console.log("lngValue", lngValue);
-
-    // Set these values in the state.
     setState({
       address: address ? address : "",
       area: area ? area : "",
@@ -221,7 +211,6 @@ function GoogleMapBasic({ state, setState }) {
       <br />
       <br />
       <div>{state.city}</div>
-      {/* <div>{state.area}</div> */}
       <div>{state.state}</div>
       <div>{state.address}</div>
     </MapWrap>

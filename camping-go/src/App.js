@@ -2,13 +2,10 @@ import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
-
-import Swal from "sweetalert2/dist/sweetalert2.js";
 import { useState, useEffect } from "react";
 import CreateGroup from "./pages/CreateGroup";
 import JoinGroupPage from "./pages/JoinGroupPage";
 import CampingGroup from "./pages/CampingGroup";
-import PersonalOfHeader from "./pages/PersonalOfHeader";
 import Login from "./pages/Login";
 import GoogleMapBasic from "./component/GoogleMapBasic";
 import Member from "./component/Member";
@@ -105,9 +102,6 @@ function App() {
               <Route
                 path='googlemap_basic'
                 element={<GoogleMapBasic />}></Route>
-              <Route
-                path='personal_header/:id'
-                element={<PersonalOfHeader />}></Route>
               <Route
                 path='find_group'
                 element={<FindGroup userId={userId} />}></Route>

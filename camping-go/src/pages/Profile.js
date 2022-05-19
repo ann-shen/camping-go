@@ -187,13 +187,11 @@ function SentCommentToHeader({ groupId, userName, userId }) {
   const [startValue, setStartValue] = React.useState(2);
   const [profileImg, setProfileImg] = useState("");
 
-  // console.log(groupId);
   const handleChange = (event) => {
     setValue(event.target.value);
   };
 
   const sendComment = async () => {
-    // console.log(groupId);
     setAlertOpen(true);
 
     const feedbackInCreateRef = doc(
@@ -209,7 +207,6 @@ function SentCommentToHeader({ groupId, userName, userId }) {
     const docRefJoinGroup = doc(db, "joinGroup", userId);
     const docMemberInfo = await getDoc(docRefJoinGroup);
     if (docMemberInfo.exists()) {
-      console.log(docMemberInfo.data().profile_img);
       profile_img = docMemberInfo.data().profile_img;
     }
 
@@ -238,7 +235,6 @@ function SentCommentToHeader({ groupId, userName, userId }) {
         return total + e;
       }, 0);
 
-      // console.log(totalScore);
 
       updateDoc(doc(db, "CreateCampingGroup", groupId), {
         total_score: totalScore / scoreArr.length,
@@ -300,7 +296,6 @@ function SentCommentToHeader({ groupId, userName, userId }) {
             value={startValue}
             sx={{ marginBottom: "50px", color: "#FFE588", fontSize: "40px" }}
             onChange={(event, newValue) => {
-              console.log(newValue);
               setStartValue(newValue);
             }}
           />
@@ -342,7 +337,6 @@ function CheckCommentFromMember({ groupId }) {
   const checkComment = async () => {
     setCommentIsOpen(true);
     firebase.getCocsFeedback(groupId).then((res) => {
-      console.log(res);
       setComment(res);
     });
   };
@@ -450,140 +444,6 @@ function CheckCommentFromMember({ groupId }) {
   );
 }
 
-// function CheckOfGroupMember({
-//   groupId,
-//   setRenderParticipateArr,
-//   group_title,
-//   userName,
-// }) {
-//   const [memberIsOpen, setMemberIsOpen] = useState(false);
-//   const [member, setMember] = useState([]);
-//   const checkMemberList = async () => {
-//     setMemberIsOpen(true);
-//     firebase.getDocsOfSubCollectionMember(groupId).then((res) => {
-//       const removeHeaderArr = res.filter((e, index) => {
-//         console.log(e.role);
-//         return e.role !== "header";
-//       });
-//       const getHeaderArr = res.filter((e, index) => {
-//         return e.role == "header";
-//       });
-//       removeHeaderArr.unshift(getHeaderArr[0]);
-//       setMember(removeHeaderArr);
-//     });
-//   };
-//   const removeMember = async (index, member_id, member_name) => {
-//     console.log(userName);
-//     Swal.fire({
-//       title: "確定移除？",
-//       icon: "question",
-//       showCancelButton: true,
-//       confirmButtonColor: "#426765",
-//       cancelButtonColor: "#EAE5BE",
-//       confirmButtonText: "移除",
-//     }).then(async (result) => {
-//       if (result.isConfirmed) {
-//         firebase
-//           .deleteMember(groupId, member[index].member_id)
-//           .then(async () => {
-//             firebase.getDocsOfSubCollectionMember(groupId).then((res) => {
-//               setMember(res);
-//             });
-//             firebase.updateDocOfArrayRemoveGroup(member_id, groupId);
-//             firebase.updateDocIncrementCurrentOfMember(groupId);
-//             firebase.updateDocIncrementTentOfMember(groupId, member_name);
-//             firebase.updateDocSuppliesOfMember(groupId, member_name);
-//           });
-
-//         updateDoc(doc(db, "joinGroup", member_id), {
-//           alert: arrayUnion({
-//             alert_content: `你已被移除${group_title}`,
-//             is_read: false,
-//           }),
-//         });
-//         setRenderParticipateArr(true);
-//       }
-//     });
-//   };
-//   return (
-//     <div>
-//       <Button
-//         width=' 150px'
-//         onClick={checkMemberList}
-//         setMemberIsOpen={setMemberIsOpen}>
-//         查看團員名單
-//       </Button>
-//       <Modal
-//         isOpen={memberIsOpen}
-//         onRequestClose={() => setMemberIsOpen(false)}
-//         overlayClassName={{
-//           base: "overlay-base",
-//           afterOpen: "overlay-after",
-//           beforeClose: "overlay-before",
-//         }}
-//         className={{
-//           base: "content-base",
-//           afterOpen: "content-after",
-//           beforeClose: "content-before",
-//         }}
-//         closeTimeoutMS={500}>
-//         <CheckCommentWrap>
-//           <DeleteModalButton onClick={() => setMemberIsOpen(false)}>
-//             X
-//           </DeleteModalButton>
-//           <Font fontSize='20px'>你的團員</Font>
-//           <Hr width='60%'></Hr>
-//           <ScrollWrap>
-//             {member.map((item, index) => (
-//               <Box
-//                 key={uuidv4()}
-//                 sx={{
-//                   width: "500px",
-//                   height: "50px",
-//                   borderBottom: " 1.4px solid #EAE5BE",
-//                   padding: 1,
-//                   margin: 1,
-//                   display: "flex",
-//                   justifyContent: "space-between",
-//                 }}>
-//                 <Display>
-//                   {item.role == "header" && (
-//                     <Tag
-//                       width='40px'
-//                       p='3px 0px 0px 1px'
-//                       fontSize='14px'
-//                       height='25px'
-//                       m='0px 10px 0px 0px'>
-//                       團長
-//                     </Tag>
-//                   )}
-//                   <Font>{item.member_name}</Font>
-//                 </Display>
-//                 {item.role == "member" && (
-//                   <Button
-//                     width='150px'
-//                     mt='0px'
-//                     ml='20px'
-//                     boxShadow='none'
-//                     onClick={() => {
-//                       removeMember(
-//                         index,
-//                         item.role,
-//                         item.member_id,
-//                         item.member_name
-//                       );
-//                     }}>
-//                     移除成員
-//                   </Button>
-//                 )}
-//               </Box>
-//             ))}
-//           </ScrollWrap>
-//         </CheckCommentWrap>
-//       </Modal>
-//     </div>
-//   );
-// }
 
 function SecondHandInvitation({
   inviteIsOpen,
@@ -593,7 +453,6 @@ function SecondHandInvitation({
   userId,
   setShowBuyerSection,
 }) {
-  console.log(inviteInfo[inviteInfoIndex]);
 
   const rejectInvite = async () => {
     inviteInfo[inviteInfoIndex].buyer_name = "";
@@ -622,14 +481,12 @@ function SecondHandInvitation({
     );
     const getInviteDocRef = await getDoc(inviteDocRef);
     if (getInviteDocRef.exists()) {
-      console.log(getInviteDocRef.data().second_hand);
 
       const getBuyerSpuuliesIndex = getInviteDocRef
         .data()
         .second_hand.filter(
           (e, index) => e.name == inviteInfo[inviteInfoIndex].change_supplies
         );
-      console.log(getBuyerSpuuliesIndex[0]);
 
       let data = getInviteDocRef.data().second_hand;
       getBuyerSpuuliesIndex[0].change_status = true;
@@ -638,12 +495,7 @@ function SecondHandInvitation({
       getBuyerSpuuliesIndex[0].buyer_id = inviteInfo[inviteInfoIndex].seller_id;
       getBuyerSpuuliesIndex[0].change_supplies =
         inviteInfo[inviteInfoIndex].name;
-      console.log(getBuyerSpuuliesIndex[0]);
-      console.log(data);
 
-      console.log(
-        `${inviteInfo[inviteInfoIndex].seller_name}已接受${getBuyerSpuuliesIndex.name}的二手換物邀請」`
-      );
 
       updateDoc(inviteDocRef, {
         second_hand: getBuyerSpuuliesIndex,
@@ -769,7 +621,6 @@ export default function Profile({ userName, userId }) {
   const [showBuyerSection, setShowBuyerSection] = useState(false);
   const [paramsInfo, setParamsInfo] = useState("");
   const [backdropOpen, setbackdropOpen] = useState(true);
-  const navigate = useNavigate();
   const auth = getAuth();
   const ContextByUserId = useContext(UserContext);
 
@@ -809,10 +660,7 @@ export default function Profile({ userName, userId }) {
     const docSnap = await getDoc(q);
     if (docSnap.exists()) {
       participateGroupArr = docSnap.data().group;
-    } else {
-      console.log("noway");
-    }
-    console.log(participateGroupArr);
+    } 
 
     if (participateGroupArr.length === 0) {
       setYourParticipateGroup([]);
@@ -865,7 +713,6 @@ export default function Profile({ userName, userId }) {
   useEffect(async () => {
     const paramIdProfile = await getDoc(doc(db, "joinGroup", params.id));
     if (paramIdProfile.exists()) {
-      console.log(paramIdProfile.data().info);
       setParamsInfo(paramIdProfile.data());
     }
   }, []);
@@ -899,7 +746,6 @@ export default function Profile({ userName, userId }) {
         );
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((item) => {
-          console.log(item.id, " => ", item.data());
           updateDoc(doc(db, "CreateCampingGroup", id, "tent", item.id), {
             current_number: increment(-1),
             member: arrayRemove(userName),
@@ -911,7 +757,6 @@ export default function Profile({ userName, userId }) {
         );
         const querySupplies = await getDocs(getSupplies);
         querySupplies.forEach((item) => {
-          console.log(item.id, " => ", item.data());
           updateDoc(doc(db, "CreateCampingGroup", id, "supplies", item.id), {
             bring_person: "",
           });

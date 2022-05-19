@@ -209,7 +209,6 @@ const TentIndexNumber = styled.p`
 const TentSectionWrap = styled.div`
   width: 100%;
   display: flex;
-  /* justify-content:center; */
   flex-wrap: wrap;
 `;
 
@@ -294,7 +293,6 @@ function JoinGroupPage({ userName }) {
     supplies: "",
   });
 
-  //------------------------DND ------------------------//
 
   const dragSource = useRef();
   const dropTarget = useRef();
@@ -306,17 +304,13 @@ function JoinGroupPage({ userName }) {
     e.target.style = "drop-shadow(0px 0px 0px white)";
 
     let secondTargetTentId = e.target.getAttribute("data-key");
-    console.log(secondTargetTentId);
     setAlreadyTentId(secondTargetTentId);
-    console.log("dragStart");
     console.log("前一頂帳篷", currentTentId);
   };
 
   const drop = async (e) => {
     let targetTentId = e.target.getAttribute("data-key");
     //你目標要去的帳篷
-    console.log(targetTentId);
-    console.log(currentTentId);
     if (currentTentId === targetTentId) {
       Swal.fire({
         position: "center",
@@ -343,7 +337,6 @@ function JoinGroupPage({ userName }) {
     );
     setCurrentTentId(targetTentId);
     if (currentTentId == " ") {
-      console.log("minus");
       await updateDoc(
         doc(db, "CreateCampingGroup", params.id, "tent", currentTentId),
         {
@@ -373,7 +366,6 @@ function JoinGroupPage({ userName }) {
     if (targetTentId == alreadyTentId) {
       return;
     }
-    console.log("continute");
     e.target.style.transform = "scale(1.2)";
     e.target.style.backgroundColor = "#EAE5BE";
     e.target.style.transition =

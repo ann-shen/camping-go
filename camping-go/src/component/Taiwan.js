@@ -240,10 +240,8 @@ function Taiwan() {
       const querySnapshot = await getDocs(q);
       let Arr = [];
       querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
         Arr.push(doc.data());
       });
-      console.log(Arr.length);
       setTargetCityAmount(Arr.length);
     }
   }, [targetCity]);
@@ -282,7 +280,6 @@ function Taiwan() {
 
   const handleMove = (e) => {
     e.persist();
-    console.log(e.target.getAttribute("data-name"));
     let tagname = e.target.getAttribute("data-name");
     let result = place_data.filter((obj) => {
       return obj.tag == tagname;

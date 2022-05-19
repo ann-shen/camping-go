@@ -162,7 +162,8 @@ const SubTitle = styled.p`
 
 const Title = styled.p`
   color: #797659;
-  font-size: 18px;
+  font-size: 16px;
+  letter-spacing: 1px;
   text-align: start;
   margin: 0px;
 `;

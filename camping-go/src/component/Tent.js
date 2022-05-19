@@ -1,7 +1,5 @@
-import styled from "styled-components";
 import React from "react";
 import { useState } from "react";
-import "../pages/reuite.css";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import { Wrap } from "../css/style";
@@ -25,7 +23,6 @@ function FormPropsTextFields({ setTentInfo, setSeat,}) {
           <TextField
             size='small'
             name='max_number'
-            // value={tentInfo.max_number}
             id='standard-number'
             label='帳篷可容納人數'
             type='number'
@@ -35,7 +32,6 @@ function FormPropsTextFields({ setTentInfo, setSeat,}) {
               shrink: true,
             }}
             onChange={(e) => {
-              console.log(e.target.value);
               if (e.target.value === "") {
                 return;
               }
@@ -89,9 +85,6 @@ function Tent({ tentInfo, setTentInfo}) {
         m=' 0px 30px 0px 0px'
         width='auto'
         alignItems='start'>
-        {/* <Font fontSize='14px' marginLeft='10px'>
-          帳篷可容納人數
-        </Font> */}
         <FormPropsTextFields
           setTentInfo={setTentInfo}
           tentInfo={tentInfo}
