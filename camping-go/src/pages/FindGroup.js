@@ -9,13 +9,13 @@ import {
   arrayUnion,
   setDoc,
 } from "firebase/firestore";
-import { useState, useEffect } from "react";
+import { useState, useEffect,useContext } from "react";
+import { UserContext } from "../utils/userContext";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import { Font, Display, Img, Button, Hr } from "../css/style";
-import { TextField, Alert, Stack, Skeleton } from "@mui/material";
 import location from "../image/location.png";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
@@ -123,15 +123,13 @@ const LinkOpen = styled.a`
 `;
 
 function IsModal({
-  modalIsOpen,
   setIsOpen,
-  currentPosts,
+  modalIsOpen,
+  allGroupInfo,
   index,
   joinThisGroup,
   setRecommendIsOpen,
 }) {
-  const navigate = useNavigate();
-
   return (
     <div className='App'>
       <Modal
@@ -149,20 +147,20 @@ function IsModal({
         }}
         closeTimeoutMS={500}>
         <Display direction='column'>
-          {currentPosts[index] ? (
+          {allGroupInfo[index] && (
             <>
               <Font letterSpacing='3px'>介紹-即將加入露營團</Font>
               <Hr width='80%' m='10px 0px 20px 0px'></Hr>
               <AnnouncementFontWrap>
-                <Font fontSize='14px'>{currentPosts[index].announcement}</Font>
+                <Font fontSize='14px'>{allGroupInfo[index].announcement}</Font>
               </AnnouncementFontWrap>
               <Font fontSize='18px' color='#426765'>
                 注意事項
               </Font>
               <Hr width='80%' m='10px 0px 20px 0px'></Hr>
               <AnnouncementFontWrap>
-                {currentPosts[index].notice.length !== 0 &&
-                  currentPosts[index].notice.map((item) => (
+                {allGroupInfo[index].notice.length !== 0 &&
+                  allGroupInfo[index].notice.map((item) => (
                     <Display mb='15px' alignItems='start'>
                       <Img src={alertIcon} width='30px'></Img>
                       <Font fontSize='14px' marginLeft='10px'>
@@ -172,7 +170,7 @@ function IsModal({
                   ))}
               </AnnouncementFontWrap>
 
-              {currentPosts[index].privacy == "公開" && (
+              {allGroupInfo[index].privacy == "公開" && (
                 <Display>
                   <Button
                     width='200px'
@@ -192,9 +190,10 @@ function IsModal({
                     onClick={() => {
                       joinThisGroup(
                         index,
-                        currentPosts[index].header_name,
-                        currentPosts[index].max_member_number,
-                        currentPosts[index].current_number
+                        allGroupInfo[index].header_name,
+                        allGroupInfo[index].max_member_number,
+                        allGroupInfo[index].current_number,
+                        allGroupInfo
                       );
                     }}>
                     確認加入
@@ -202,8 +201,6 @@ function IsModal({
                 </Display>
               )}
             </>
-          ) : (
-            <></>
           )}
         </Display>
       </Modal>
@@ -211,26 +208,21 @@ function IsModal({
   );
 }
 
-function FindGroup({ userId, userName, setGroupId, setRecommendIsOpen }) {
+function FindGroup({ userId, userName, setRecommendIsOpen,joinThisGroup }) {
   const [userTag, setUserTag] = useState([]);
   const [allGroupInfo, setAllGroupInfo] = useState([]);
   const [allGroupSelectArr, setAllGroupSelectArr] = useState([]);
   const [findIndex, setFindIndex] = useState("");
-  const [groupPassword, setGroupPassword] = useState("");
   const [backdropOpen, setbackdropOpen] = useState(false);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [recommendCardIsOpen, setRecommendCardIsOpen] = useState(true);
-
-  const navigate = useNavigate();
+  const Context = useContext(UserContext);
 
   useEffect(async () => {
     const docRef = await getDoc(doc(db, "joinGroup", userId));
     if (docRef.exists()) {
       setUserTag(docRef.data().select_tag);
-      console.log(docRef.data().select_tag);
-    } else {
-      console.log("nono~");
-    }
+    } 
   }, []);
 
   useEffect(async () => {
@@ -238,26 +230,20 @@ function FindGroup({ userId, userName, setGroupId, setRecommendIsOpen }) {
     let allSelectArr = [];
     let allInfoArr = [];
     docRef.forEach((doc) => {
-      // allSelectArr.push(doc.data().select_tag);
       allInfoArr.push(doc.data());
     });
 
-    const filterHeaderGroup = allInfoArr.filter((e, index) => {
+    const filterHeaderGroup = allInfoArr.filter((e) => {
       return e.header_id !== userId;
     });
-    // console.log(filterHeaderGroup);
 
-    const filterPrivacyGroup = filterHeaderGroup.filter((e, index) => {
+    const filterPrivacyGroup = filterHeaderGroup.filter((e) => {
       return e.privacy !== "私人";
     });
 
-    const fullMemberGroup = filterPrivacyGroup.filter((e, index) => {
-      console.log(e.max_member_number);
-      console.log(e.current_number);
+    const fullMemberGroup = filterPrivacyGroup.filter((e) => {
       return e.max_member_number.toString() !== e.current_number.toString();
     });
-
-    console.log(fullMemberGroup);
 
     fullMemberGroup.map((item) => {
       allSelectArr.push(item.select_tag);
@@ -274,9 +260,6 @@ function FindGroup({ userId, userName, setGroupId, setRecommendIsOpen }) {
           return userTag.filter((e) => e == item);
         })
         .flat(Infinity);
-
-      console.log(find);
-
       mathArr.push(find.length);
       const max = Math.max(...mathArr);
       const index = mathArr.indexOf(max);
@@ -284,103 +267,18 @@ function FindGroup({ userId, userName, setGroupId, setRecommendIsOpen }) {
     });
   }, [allGroupSelectArr, allGroupInfo]);
 
-  const joinThisGroup = async (index, max_member_number, current_number) => {
-    console.log(current_number);
 
-    setbackdropOpen(true);
 
-    if (current_number + 1 > max_member_number) {
-      console.log(current_number + 1);
-      Swal.fire({
-        position: "center",
-        icon: "warning",
-        text: "已滿團",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-      return;
-    }
-
-    // setGroupId(allGroupInfo[index].group_id.toString());
-
-    const docRef = await doc(
-      db,
-      "CreateCampingGroup",
-      allGroupInfo[index].group_id.toString()
-    );
-
-    const docRefMember = await doc(
-      db,
-      "CreateCampingGroup",
-      allGroupInfo[index].group_id.toString(),
-      "member",
-      userId
-    );
-
-    let userSelect;
-
-    const docRefJoinGroup = doc(db, "joinGroup", userId);
-    const docMemberInfo = await getDoc(docRefJoinGroup);
-
-    if (docMemberInfo.exists()) {
-      console.log(docMemberInfo.data().select_tag);
-      userSelect = docMemberInfo.data().select_tag;
-    }
-
-    updateDoc(docRefJoinGroup, {
-      group: arrayUnion(allGroupInfo[index].group_id),
-    });
-    updateDoc(doc(db, "joinGroup", allGroupInfo[index].header_id), {
-      alert: arrayUnion({
-        alert_content: `${userName}已加入「${allGroupInfo[index].group_title}」`,
-        is_read: false,
-      }),
-    });
-
-    setDoc(docRefMember, {
-      role: "member",
-      member_name: userName,
-      member_id: userId,
-      member_select: userSelect,
-    }).then(async () => {
-      const querySnapshot = await getDocs(
-        collection(
-          db,
-          "CreateCampingGroup",
-          allGroupInfo[index].group_id.toString(),
-          "member"
-        )
-      );
-      let memberArrLength = [];
-      querySnapshot.forEach((doc) => {
-        // console.log(doc.id, " => ", doc.data());
-        memberArrLength.push(doc.data());
-      });
-      console.log(memberArrLength.length);
-      await updateDoc(docRef, {
-        current_number: memberArrLength.length,
-      });
-    });
-
-    console.log(allGroupInfo[index].group_id);
-
-    setTimeout(() => {
-      navigate(`/joinGroup/${allGroupInfo[index].group_id}`);
-    }, 500);
-  };
-
-  
   return (
     <div>
       <IsModal
-        currentPosts={allGroupInfo}
         setIsOpen={setIsOpen}
         modalIsOpen={modalIsOpen}
+        allGroupInfo={allGroupInfo}
         index={findIndex}
         joinThisGroup={joinThisGroup}
         setRecommendIsOpen={setRecommendIsOpen}
       />
-      {/* <Font color="white" m="100px 0px 0px 0px" marginLeft="44%" letterSpacing="3px">- 最佳推薦 -</Font> */}
       {allGroupInfo.length !== 0 && (
         <>
           {recommendCardIsOpen && (
@@ -460,13 +358,8 @@ function FindGroup({ userId, userName, setGroupId, setRecommendIsOpen }) {
                       setRecommendCardIsOpen(false);
                     }}>
                     {allGroupInfo[findIndex].privacy == "公開" &&
-                      allGroupInfo[findIndex].header_name !== userName && (
-                        // <LinkPrivate
-                        //   to={`joinGroup/${allGroupInfo[findIndex].group_id}`}>
-                        //   我要加入
-                        // </LinkPrivate>
-                        <LinkOpen>我要加入</LinkOpen>
-                      )}
+                      allGroupInfo[findIndex].header_name !==
+                        Context.userName && <LinkOpen>我要加入</LinkOpen>}
                   </Button>
                 </ButtonWrap>
 

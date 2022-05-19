@@ -4,27 +4,31 @@ import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
-import {
-  Font,
-  Display,
-  Img,
-  Button,
-  Hr,
-  Cloumn,
-  Wrap,
-  Tag,
-} from "../css/style";
+import { Font, Display, Img, Button, Hr, Wrap, Tag } from "../css/style";
 import location from "../image/location.png";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { UserContext } from "../utils/userContext";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
 import { TextField, Alert, Stack, Skeleton } from "@mui/material";
 import { Link } from "react-router-dom";
 import FindGroup from "../pages/FindGroup";
-import landingpage04 from "../image/landingpage-04.png";
 import landingpage03 from "../image/landingpage-03.png";
 import alertIcon from "../image/alert.png";
 import Swal from "sweetalert2/dist/sweetalert2.js";
+import {
+  setDoc,
+  doc,
+  getDoc,
+  getDocs,
+  collection,
+  query,
+  where,
+  updateDoc,
+  orderBy,
+  arrayUnion,
+} from "firebase/firestore";
+import { db } from "../utils/firebase";
 
 const Alink = styled.a`
   text-decoration: none;
@@ -126,7 +130,6 @@ const FindGroupButton = styled.button`
   border: none;
   background-color: #eae5be;
   letter-spacing: 3px;
-  /* border: 2px solid #cfc781; */
   font-size: 14px;
   padding: 3px;
   margin-top: 40px;
@@ -150,7 +153,6 @@ const AnnouncementFontWrap = styled.div`
   margin-bottom: 20px;
 `;
 
-
 const TentImg = styled.img`
   width: 280px;
   @media (max-width: 768px) {
@@ -161,7 +163,6 @@ const TentImg = styled.img`
   @media (max-width: 580px) {
     display: none;
   }
-  
 `;
 
 function IsModal({
@@ -170,14 +171,12 @@ function IsModal({
   currentPosts,
   index,
   joinThisGroup,
-  header_name,
 }) {
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState(false);
   const handleChange = (event) => {
     setValue(event.target.value);
   };
-  console.log(`點擊到的是${index}`);
 
   const checkPassword = (e) => {
     if (value == currentPosts[index].password) {
@@ -185,14 +184,13 @@ function IsModal({
         index,
         currentPosts[index].header_name,
         currentPosts[index].max_member_number,
-        currentPosts[index].current_number
+        currentPosts[index].current_number,
+        currentPosts
       );
     } else {
       setAlert(true);
     }
   };
-  
-  // console.log(currentPosts[index]);
 
   return (
     <div className='App'>
@@ -211,7 +209,7 @@ function IsModal({
         }}
         closeTimeoutMS={500}>
         <Display direction='column'>
-          {currentPosts[index] ? (
+          {currentPosts[index] && (
             <>
               <Font letterSpacing='3px'>介紹-即將加入露營團</Font>
               <Hr width='80%' m='10px 0px 20px 0px'></Hr>
@@ -253,7 +251,8 @@ function IsModal({
                         index,
                         currentPosts[index].header_name,
                         currentPosts[index].max_member_number,
-                        currentPosts[index].current_number
+                        currentPosts[index].current_number,
+                        currentPosts
                       );
                     }}>
                     確認加入
@@ -261,7 +260,7 @@ function IsModal({
                 </Display>
               )}
 
-              {currentPosts[index].privacy == "私人" ? (
+              {currentPosts[index].privacy == "私人" && (
                 <>
                   <TextField
                     required
@@ -300,12 +299,8 @@ function IsModal({
                     </Button>
                   </Display>
                 </>
-              ) : (
-                <></>
               )}
             </>
-          ) : (
-            <></>
           )}
         </Display>
       </Modal>
@@ -316,13 +311,11 @@ function IsModal({
 function Recommend({
   recommendIsOpen,
   setRecommendIsOpen,
-  groupId,
   joinThisGroup,
-  userName,
-  Expanded,
-  userId,
   setGroupId,
 }) {
+  const Context = useContext(UserContext);
+
   return (
     <Modal
       isOpen={recommendIsOpen}
@@ -341,8 +334,8 @@ function Recommend({
       <Display direction='column'>
         <FindGroup
           joinThisGroup={joinThisGroup}
-          userName={userName}
-          userId={userId}
+          userName={Context.userName}
+          userId={Context.userId}
           setGroupId={setGroupId}
           setRecommendIsOpen={setRecommendIsOpen}
         />
@@ -353,19 +346,18 @@ function Recommend({
 
 export default function ReviewCard({
   currentPosts,
-  joinThisGroup,
-  userName,
+  setbackdropOpen,
   setIsOpen,
   modalIsOpen,
-  userId,
   setGroupId,
 }) {
   const [recommendIsOpen, setRecommendIsOpen] = useState(false);
   const [targetIndex, setTargetIndex] = useState("");
-
+  const Context = useContext(UserContext);
   const navigate = useNavigate();
+
   const confirmJoinThisGroup = (index) => {
-    if (!userId) {
+    if (!Context.userId) {
       Swal.fire({
         text: "尚未登入",
         icon: "warning",
@@ -380,23 +372,141 @@ export default function ReviewCard({
       });
       return;
     }
-    console.log(index);
     setTargetIndex(index);
     setIsOpen(true);
   };
 
-  if (window.location.pathname !== "/") {
-    console.log("ohya");
-  }
-
   let loadingArr = [1, 2, 3];
+
+  const checkIsHeader = (header_name, userName) => {
+    if (header_name == userName) {
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        text: "你是此團團長，不能加入唷！請至我的露營團-開團，查看頁面",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+      navigate("/");
+      return;
+    }
+  };
+
+  const isBackdropOpen = () => {
+    setbackdropOpen(true);
+  };
+
+  const isFullGroup = () => {
+    Swal.fire({
+      position: "center",
+      icon: "warning",
+      text: "已滿團",
+      showConfirmButton: false,
+      timer: 800,
+    });
+    setIsOpen(false);
+  };
+
+  const addMemberSelectTag = async () => {
+    let userSelect;
+    const docRefJoinGroup = doc(db, "joinGroup", Context.userId);
+    const docMemberInfo = await getDoc(docRefJoinGroup);
+    if (docMemberInfo.exists()) {
+      userSelect = docMemberInfo.data().select_tag;
+    }
+    return userSelect;
+  };
+
+  const addNewMemberInfo = async (index, cardData) => {
+    const docRefMember = doc(
+      db,
+      "CreateCampingGroup",
+      cardData[index].group_id.toString(),
+      "member",
+      Context.userId
+    );
+
+    addMemberSelectTag().then(async(res) => {
+      setDoc(docRefMember, {
+        role: "member",
+        member_name: Context.userName,
+        member_id: Context.userId,
+        member_select: res,
+      });
+    });
+  };
+
+  const updateCurrentMemberNumber = async (index, cardData) => {
+    const docRef = doc(
+      db,
+      "CreateCampingGroup",
+      cardData[index].group_id.toString()
+    );
+
+    const querySnapshot = await getDocs(
+      collection(
+        db,
+        "CreateCampingGroup",
+        cardData[index].group_id.toString(),
+        "member"
+      )
+    );
+    let memberArrLength = [];
+    querySnapshot.forEach((doc) => {
+      console.log(doc.data());
+      memberArrLength.push(doc.data());
+    });
+    await updateDoc(docRef, {
+      current_number: memberArrLength.length,
+    });
+  };
+
+  const addAlertToThisGroupHeader = async (index, cardData) => {
+    updateDoc(doc(db, "joinGroup", cardData[index].header_id), {
+      alert: arrayUnion({
+        alert_content: `${Context.userName}已加入「${cardData[index].group_title}」`,
+        is_read: false,
+      }),
+    });
+  };
+
+  const updateUserJoinGroupList = async (index, cardData) => {
+    const docRefJoinGroup = doc(db, "joinGroup", Context.userId);
+    updateDoc(docRefJoinGroup, {
+      group: arrayUnion(cardData[index].group_id),
+    });
+  };
+
+  const joinThisGroup = async (
+    index,
+    header_name,
+    max_member_number,
+    current_number,
+    cardData
+  ) => {
+    if (header_name == Context.userName) {
+      checkIsHeader(header_name, Context.userName);
+      return;
+    }
+    if (current_number + 1 > max_member_number) {
+      isFullGroup(current_number);
+      return;
+    }
+    isBackdropOpen();
+    setGroupId(cardData[index].group_id.toString());
+    addNewMemberInfo(index, cardData);
+    updateUserJoinGroupList(index, cardData);
+    updateCurrentMemberNumber(index, cardData);
+    addAlertToThisGroupHeader(index, cardData);
+    navigate(`/joinGroup/${cardData[index].group_id}`);
+  };
 
   return (
     <>
       <GroupWrap>
         {currentPosts.length == 0 && (
           <Wrap width='80%' justifyContent='space-between'>
-            {loadingArr.map((load) => (
+            {loadingArr.map((_) => (
               <Stack spacing={2} style={{ marginRight: 30 }}>
                 <Skeleton
                   variant='rectangular'
@@ -522,18 +632,7 @@ export default function ReviewCard({
                   <LinkOpen>我要加入</LinkOpen>
                 </Button>
               )}
-              {/* {item.status == "" && (
-                <Button
-                  width='90%'
-                  margin='auto'
-                  group_id={item.group_id}
-                  variant='outlined'
-                  onClick={() => {
-                    confirmJoinThisGroup(index);
-                  }}>
-                  <LinkOpen>我要加入</LinkOpen>
-                </Button>
-              )} */}
+
               {item.status == "已結束" && (
                 <Button
                   width='90%'
@@ -580,8 +679,8 @@ export default function ReviewCard({
             border: "1px solid #CFC781 ",
             "@media (max-width: 580px)": {
               marginTop: 10,
-              marginBottom:10,
-              marginLeft:"20px",
+              marginBottom: 10,
+              marginLeft: "20px",
             },
           }}>
           <Font letterSpacing='3px' fontSize='16px'>
@@ -589,9 +688,8 @@ export default function ReviewCard({
           </Font>
           <FindGroupButton
             onClick={() => {
-              if (!userId) {
+              if (!Context.userId) {
                 Swal.fire({
-                  // title: "尚未登入",
                   text: "尚未登入",
                   icon: "warning",
                   showCancelButton: true,
@@ -601,7 +699,6 @@ export default function ReviewCard({
                 }).then((result) => {
                   if (result.isConfirmed) {
                     navigate("/login");
-                    // Swal.fire("Deleted!", "Your file has been deleted.", "success");
                   }
                 });
                 return;
@@ -612,13 +709,12 @@ export default function ReviewCard({
           </FindGroupButton>
         </Card>
       </GroupWrap>
-
       <Recommend
         recommendIsOpen={recommendIsOpen}
         setRecommendIsOpen={setRecommendIsOpen}
         joinThisGroup={joinThisGroup}
-        userName={userName}
-        userId={userId}
+        userName={Context.userName}
+        userId={Context.userId}
         setGroupId={setGroupId}
       />
       <Wrap width='95%' justifyContent='end' m=' -160px 00px 0px 0px'>

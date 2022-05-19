@@ -26,7 +26,7 @@ function App() {
   const [allMemberArr, setAllMemberArr] = useState([]);
   const auth = getAuth();
 
-  console.log(userName);
+  console.log(groupId);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -120,7 +120,6 @@ function App() {
           </ScrollToTop>
         </BrowserRouter>
       </UserContext.Provider>
-      {/* <MaterialUIPickers></MaterialUIPickers> */}
     </div>
   );
 }

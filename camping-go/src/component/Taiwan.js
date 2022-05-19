@@ -11,7 +11,6 @@ import {
   Display,
 } from "../css/style";
 import { Link } from "react-router-dom";
-import { ListItem } from "@mui/material";
 
 const fadeIn = keyframes`
 from {

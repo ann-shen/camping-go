@@ -1,21 +1,16 @@
 import styled from "styled-components";
 import { db } from "../utils/firebase";
 import {
-  setDoc,
   doc,
-  getDoc,
   getDocs,
   collection,
   query,
-  where,
   updateDoc,
   orderBy,
-  arrayUnion,
 } from "firebase/firestore";
 import { useState, useEffect, useContext, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import Taiwan from "../component/Taiwan";
-import { Font, Display, Img, Button, Hr } from "../css/style";
+import { Font, Display, Img, Hr } from "../css/style";
 import location_big from "../image/location_big.png";
 import group_people from "../image/group_people.png";
 import landingpage from "../image/landingpage10-01.png";
@@ -24,7 +19,6 @@ import { UserContext } from "../utils/userContext";
 import PaginationBar from "../component/Pagination";
 import ReviewCard from "../component/ReviewCard";
 import NavBar from "../component/NavBar";
-import Swal from "sweetalert2/dist/sweetalert2.js";
 import Footer from "../component/Footer";
 import Backdrop from "@mui/material/Backdrop";
 import loading from "../image/loading.gif";
@@ -110,7 +104,6 @@ const TitleWrap = styled.div`
   flex-direction: column;
   margin-left: 15px;
   font-size: 16px;
-  
 `;
 
 const FindGroupButton = styled.button`
@@ -174,18 +167,16 @@ const Title = styled.p`
   margin: 0px;
 `;
 
-function CampingGroup({ setGroupId, userId, userName, groupId }) {
+function CampingGroup({ setGroupId, userName }) {
   const [backdropOpen, setbackdropOpen] = useState(false);
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [currentMemberAmount, setCurrentMemberAmount] = useState("");
-  const ContextByUserId = useContext(UserContext);
+  const Context = useContext(UserContext);
   const [pagination, setPaagination] = useState({
     loading: false,
     currentPage: 1,
     posts_per_page: 3,
   });
-  const navigate = useNavigate();
   const immediatelyRef = useRef(null);
 
   const indexOfLastPost = pagination.currentPage * pagination.posts_per_page;
@@ -232,130 +223,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
     }));
   }, []);
 
-  //particular city
-  useEffect(async () => {
-    const q = query(
-      collection(db, "CreateCampingGroup"),
-      where("city", "==", "新竹縣")
-    );
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {});
-  }, []);
-
-  useEffect(async () => {
-    if (currentMemberAmount) {
-      console.log(currentMemberAmount);
-      await updateDoc(doc(db, "CreateCampingGroup", groupId), {
-        current_number: currentMemberAmount,
-      });
-    }
-  }, [currentMemberAmount]);
-
-  const joinThisGroup = async (
-    index,
-    header_name,
-    max_member_number,
-    current_number
-  ) => {
-    console.log(current_number);
-
-    if (header_name == userName) {
-      Swal.fire({
-        position: "center",
-        icon: "warning",
-        text: "你是此團團長，不能加入唷！請至我的露營團-開團，查看頁面",
-        showConfirmButton: false,
-        timer: 2500,
-      });
-      navigate("/");
-      return;
-    }
-
-    setbackdropOpen(true);
-
-    if (current_number + 1 > max_member_number) {
-      console.log(current_number + 1);
-      Swal.fire({
-        position: "center",
-        icon: "warning",
-        text: "已滿團",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-      return;
-    }
-
-    setGroupId(currentPosts[index].group_id.toString());
-
-    const docRef = await doc(
-      db,
-      "CreateCampingGroup",
-      currentPosts[index].group_id.toString()
-    );
-
-    const docRefMember = await doc(
-      db,
-      "CreateCampingGroup",
-      currentPosts[index].group_id.toString(),
-      "member",
-      userId
-    );
-
-    let userSelect;
-
-    const docRefJoinGroup = doc(db, "joinGroup", userId);
-    const docMemberInfo = await getDoc(docRefJoinGroup);
-
-    if (docMemberInfo.exists()) {
-      console.log(docMemberInfo.data().select_tag);
-      userSelect = docMemberInfo.data().select_tag;
-    }
-
-    updateDoc(docRefJoinGroup, {
-      group: arrayUnion(currentPosts[index].group_id),
-    });
-    updateDoc(doc(db, "joinGroup", currentPosts[index].header_id), {
-      alert: arrayUnion({
-        alert_content: `${userName}已加入「${currentPosts[index].group_title}」`,
-        is_read: false,
-      }),
-    });
-
-    setDoc(docRefMember, {
-      role: "member",
-      member_name: userName,
-      member_id: userId,
-      member_select: userSelect,
-    }).then(async () => {
-      const querySnapshot = await getDocs(
-        collection(
-          db,
-          "CreateCampingGroup",
-          currentPosts[index].group_id.toString(),
-          "member"
-        )
-      );
-      let memberArrLength = [];
-      querySnapshot.forEach((doc) => {
-        // console.log(doc.id, " => ", doc.data());
-        memberArrLength.push(doc.data());
-      });
-      console.log(memberArrLength.length);
-      await updateDoc(docRef, {
-        current_number: memberArrLength.length,
-      });
-    });
-
-    console.log(currentPosts[index].group_id);
-
-    setTimeout(() => {
-      navigate(`/joinGroup/${currentPosts[index].group_id}`);
-    }, 500);
-  };
-
   const toTaiwanMap = () => {
-    console.log("smooth");
-    console.log(immediatelyRef.current);
     if (immediatelyRef.current) {
       window.scrollTo({
         top: immediatelyRef.current.scrollHeight,
@@ -366,6 +234,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
       return;
     }
   };
+
   return (
     <>
       <HeaderSection>
@@ -376,7 +245,7 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
         >
           <Img src={loading}></Img>
         </Backdrop>
-        <NavBar userId={userId} />
+        <NavBar userId={Context.userId} />
         <LandingSubTitleWrap>
           <Font fontSize='14px'>揪團去露營。</Font>
           <Font fontSize='14px'>忙碌的都市生活之餘，</Font>
@@ -403,13 +272,12 @@ function CampingGroup({ setGroupId, userId, userName, groupId }) {
         <Hr width='80%' m='20px 0px 30px 8%'></Hr>
 
         <ReviewCard
-          homePageCampGroup={homePageCampGroup}
           currentPosts={currentPosts}
-          joinThisGroup={joinThisGroup}
+          setbackdropOpen={setbackdropOpen}
           userName={userName}
           setIsOpen={setIsOpen}
           modalIsOpen={modalIsOpen}
-          userId={userId}
+          userId={Context.userId}
           setGroupId={setGroupId}
         />
         <PaginationBar
