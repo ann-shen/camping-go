@@ -38,7 +38,7 @@ export const Display = styled.div`
   align-items: ${(props) => props.alignItems || "center"};
   border-bottom: ${(props) => props.borderBottom || "none"};
   padding-bottom: ${(props) => props.paddingBottom || "0px"};
-  /* height: ${(props) => props.height || "200px"}; */
+  text-align: start;
 `;
 
 export const Wrap = styled.div`
@@ -132,7 +132,7 @@ export const Hr = styled.hr`
 `;
 
 export const BoxWrap = {
-  width: "75%",
+  width: "85%",
   height: "auto",
   boxShadow: "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
   borderRadius: 5,

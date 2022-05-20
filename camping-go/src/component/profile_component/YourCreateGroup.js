@@ -86,7 +86,7 @@ function YourCreateGroup() {
           <Display justifyContent='space-between' ml='20px'>
             <LinkRoute to={`/joinGroup/${item.group_id}`}>
               <Display direction='column' alignItems='start'>
-                <Display alignItems='start'>
+                <Display alignItems='start' >
                   <ImgWrap>
                     <Img src={item.picture} width='100%' m='0px'></Img>
                   </ImgWrap>
@@ -122,7 +122,6 @@ function YourCreateGroup() {
                     </Display>
                   </Display>
                 </Display>
-                <Display alignItems='center'></Display>
               </Display>
             </LinkRoute>
             {Context.userId == params.id && (
@@ -130,6 +129,7 @@ function YourCreateGroup() {
                 direction='column'
                 alignItems='end'
                 height='250px'
+                width="20%"
                 justifyContent='space-evenly'
                 m='20px'>
                 {item.status == "已結束" && (
