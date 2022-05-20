@@ -9,7 +9,7 @@ import {
   arrayUnion,
   setDoc,
 } from "firebase/firestore";
-import { useState, useEffect,useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { UserContext } from "../utils/userContext";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
@@ -208,7 +208,7 @@ function IsModal({
   );
 }
 
-function FindGroup({ userId, userName, setRecommendIsOpen,joinThisGroup }) {
+function FindGroup({ userId, userName, setRecommendIsOpen, joinThisGroup }) {
   const [userTag, setUserTag] = useState([]);
   const [allGroupInfo, setAllGroupInfo] = useState([]);
   const [allGroupSelectArr, setAllGroupSelectArr] = useState([]);
@@ -222,17 +222,28 @@ function FindGroup({ userId, userName, setRecommendIsOpen,joinThisGroup }) {
     const docRef = await getDoc(doc(db, "joinGroup", userId));
     if (docRef.exists()) {
       setUserTag(docRef.data().select_tag);
-    } 
+    }
   }, []);
+
+  const pushfilteredGroupsSelsetTagInNewArr = (arr) => {
+    let allSelectArr = [];
+    arr.map((item) => {
+      allSelectArr.push(item.select_tag);
+    });
+    return allSelectArr;
+  };
+
+  const handleGroupSelectArr = (arr) => {
+    setAllGroupSelectArr(pushfilteredGroupsSelsetTagInNewArr(arr));
+    setAllGroupInfo(arr);
+  };
 
   useEffect(async () => {
     const docRef = await getDocs(collection(db, "CreateCampingGroup"));
-    let allSelectArr = [];
     let allInfoArr = [];
     docRef.forEach((doc) => {
       allInfoArr.push(doc.data());
     });
-
     const filterHeaderGroup = allInfoArr.filter((e) => {
       return e.header_id !== userId;
     });
@@ -241,33 +252,26 @@ function FindGroup({ userId, userName, setRecommendIsOpen,joinThisGroup }) {
       return e.privacy !== "私人";
     });
 
-    const fullMemberGroup = filterPrivacyGroup.filter((e) => {
+    const filterfullMemberGroup = filterPrivacyGroup.filter((e) => {
       return e.max_member_number.toString() !== e.current_number.toString();
     });
-
-    fullMemberGroup.map((item) => {
-      allSelectArr.push(item.select_tag);
-    });
-    setAllGroupSelectArr(allSelectArr);
-    setAllGroupInfo(fullMemberGroup);
+    handleGroupSelectArr(filterfullMemberGroup);
   }, []);
 
   useEffect(() => {
     let mathArr = [];
-    allGroupSelectArr.map(async (groupSelect) => {
+    allGroupSelectArr.map((groupSelect) => {
       const find = groupSelect
         .map((item) => {
           return userTag.filter((e) => e == item);
         })
         .flat(Infinity);
       mathArr.push(find.length);
-      const max = Math.max(...mathArr);
-      const index = mathArr.indexOf(max);
-      setFindIndex(index);
     });
+    const max = Math.max(...mathArr);
+    const index = mathArr.indexOf(max);
+    setFindIndex(index);
   }, [allGroupSelectArr, allGroupInfo]);
-
-
 
   return (
     <div>

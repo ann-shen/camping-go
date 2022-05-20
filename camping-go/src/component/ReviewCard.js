@@ -680,7 +680,7 @@ export default function ReviewCard({
               marginLeft: "20px",
             },
           }}>
-          <Font letterSpacing='3px' fontSize='16px'>
+          <Font letterSpacing='1px' fontSize='16px'>
             找不到喜愛的？一鍵找尋你的最佳推薦露營團
           </Font>
           <FindGroupButton

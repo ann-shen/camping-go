@@ -329,120 +329,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
   );
 }
 
-function CheckCommentFromMember({ groupId }) {
-  const [commentIsOpen, setCommentIsOpen] = useState(false);
-  const [comment, setComment] = useState([]);
-  const [totalScore, setTotalScore] = useState("");
 
-  const checkComment = async () => {
-    setCommentIsOpen(true);
-    firebase.getCocsFeedback(groupId).then((res) => {
-      setComment(res);
-    });
-  };
-
-  useEffect(() => {
-    if (comment.length !== 0) {
-      let scoreArr = [];
-      comment.map((item) => {
-        scoreArr.push(Number(item.score));
-      });
-      let totalScoreNumber = scoreArr.reduce(function (total, e) {
-        return total + e;
-      }, 0);
-      setTotalScore((totalScoreNumber / comment.length).toFixed(1));
-    } else {
-      return;
-    }
-  }, [comment]);
-
-  return (
-    <div className='App'>
-      <Button
-        width=' 150px'
-        onClick={checkComment}
-        setCommentIsOpen={setCommentIsOpen}>
-        查看評論
-      </Button>
-      <Modal
-        isOpen={commentIsOpen}
-        onRequestClose={() => setCommentIsOpen(false)}
-        overlayClassName={{
-          base: "overlay-base",
-          afterOpen: "overlay-after",
-          beforeClose: "overlay-before",
-        }}
-        className={{
-          base: "content-base",
-          afterOpen: "content-after",
-          beforeClose: "content-before",
-        }}
-        closeTimeoutMS={500}>
-        <CheckCommentWrap>
-          <DeleteModalButton onClick={() => setCommentIsOpen(false)}>
-            X
-          </DeleteModalButton>
-          {/* <CommentTitleWrap> */}
-          <Font fontSize='20px' letterSpacing='3px'>
-            你的評論
-          </Font>
-          <Hr width='60%'></Hr>
-          <Display>
-            {totalScore ? (
-              <div>
-                <Display>
-                  <Font fontSize='16px'>總分</Font>
-                  <Font fontSize='35px' marginLeft='3px'>
-                    {totalScore}
-                  </Font>
-                </Display>
-              </div>
-            ) : (
-              <Font>尚未有回饋唷！</Font>
-            )}
-          </Display>
-          {totalScore && (
-            <ScrollWrap>
-              {comment &&
-                comment.map((item) => (
-                  <Box
-                    sx={{
-                      width: "600px",
-                      height: "auto",
-                      padding: 0,
-                      margin: 1,
-                    }}>
-                    <Wrap
-                      width='500px'
-                      borderBottom='1.4px solid #EAE5BE'
-                      paddingBottom='20px'>
-                      <Wrap justifyContent='space-around' width='500px'>
-                        <Display>
-                          <Wrap
-                            direction='column'
-                            width='100px'
-                            m='0px 40px 0px 0px'>
-                            <ProfileWrap>
-                              <Img src={item.profile_img}></Img>
-                            </ProfileWrap>
-                            <Font fontSize='14px'>{item.name}</Font>
-                          </Wrap>
-                          <Wrap width='280px'>
-                            <Font fontSize='14px'>{item.note}</Font>
-                          </Wrap>
-                        </Display>
-                        <Font marginLeft='20px'>{item.score}分</Font>
-                      </Wrap>
-                    </Wrap>
-                  </Box>
-                ))}
-            </ScrollWrap>
-          )}
-        </CheckCommentWrap>
-      </Modal>
-    </div>
-  );
-}
 
 
 function SecondHandInvitation({
@@ -543,7 +430,7 @@ function SecondHandInvitation({
           <DeleteModalButton onClick={() => setInviteIsOpen(false)}>
             X
           </DeleteModalButton>
-          {inviteInfo ? (
+          {inviteInfo && (
             <>
               <Wrap
                 width='100%'
@@ -597,8 +484,6 @@ function SecondHandInvitation({
                 </Display>
               </Wrap>
             </>
-          ) : (
-            <></>
           )}
         </CheckCommentWrap>
       </Modal>

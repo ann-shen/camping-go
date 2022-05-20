@@ -310,7 +310,6 @@ function JoinGroupPage({ userName }) {
 
   const drop = async (e) => {
     let targetTentId = e.target.getAttribute("data-key");
-    //你目標要去的帳篷
     if (currentTentId === targetTentId) {
       Swal.fire({
         position: "center",
@@ -323,7 +322,6 @@ function JoinGroupPage({ userName }) {
     }
     onDragOver(e);
     console.log("drop");
-    //前一頂帳篷
     let id = e.dataTransfer.getData("text");
     e.target.appendChild(document.querySelector("#" + id));
     e.target.style = "backgroundColor:white ; border:4px solid #f5f4e8;";
