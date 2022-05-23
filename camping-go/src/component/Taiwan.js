@@ -362,12 +362,12 @@ function Taiwan() {
         )}
       </>
       <svg
-        id='cf503461-00bd-459a-aeb5-062ebc913211'
+        id='taiwan_svg'
         data-name='圖層 1'
         xmlns='http://www.w3.org/2000/svg'
         viewBox='0 0 595.28 841.89'>
         <defs></defs>
-        <title>20170427直播用台灣</title>
+        <title>前進你想去的城市</title>
         <path
           onMouseEnter={handleMove}
           id='161d6372-ac8f-409c-ad51-9db7795c8614'

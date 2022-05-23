@@ -10,6 +10,32 @@ import {
 } from "../../css/style";
 import { Box } from "@mui/material";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
+import styled, { keyframes } from "styled-components";
+
+const SecondHandImgWrap = styled.div`
+  width: 150px;
+  height: 100px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  @media (max-width: 500px) {
+    width: 100%;
+  }
+`;
+
+const SecondHandSectionWrap = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  align-items: center;
+  @media (max-width: 500px) {
+    flex-direction: column;
+    margin: 40px 0px;
+    margin-bottom: 70px;
+  }
+`;
 
 function SecondHandSection({ thisGroupMember }) {
   const [sucessSecondChange, setSucessSecondChange] = useState([]);
@@ -49,12 +75,12 @@ function SecondHandSection({ thisGroupMember }) {
             <Hr width='100%'></Hr>
           </Cloumn>
           {sucessSecondChange.map((item, index) => (
-            <Wrap width='100%' justifyContent='space-around' key={index}>
+            <SecondHandSectionWrap key={index}>
               <Box sx={secondHandSectionByJoinGroup}>
                 <Font m='0px 0px 20px 0px'>{item.buyer_name}</Font>
-                <ImgWrap width='150px' height='100px' mb='10px'>
+                <SecondHandImgWrap>
                   <Img width='100%' src={item.change_supplies_picture}></Img>
-                </ImgWrap>
+                </SecondHandImgWrap>
                 <Hr width='50%'></Hr>
                 <Font color='#426765' fontSize='16px'>
                   {item.change_supplies}
@@ -64,15 +90,15 @@ function SecondHandSection({ thisGroupMember }) {
               <CompareArrowsIcon sx={{ fontSize: "50px", color: "#426765" }} />
               <Box sx={secondHandSectionByJoinGroup}>
                 <Font m='0px 0px 20px 0px'>{item.seller_name}</Font>
-                <ImgWrap width='150px' height='100px' mb='10px'>
+                <SecondHandImgWrap>
                   <Img width='100%' src={item.picture}></Img>
-                </ImgWrap>
+                </SecondHandImgWrap>
                 <Hr width='50%'></Hr>
                 <Font color='#426765' fontSize='16px'>
                   {item.name}
                 </Font>
               </Box>
-            </Wrap>
+            </SecondHandSectionWrap>
           ))}
         </>
       )}

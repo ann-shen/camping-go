@@ -1,33 +1,43 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../utils/userContext";
+import styled from "styled-components";
+
+
+
 import {
   getDocs,
   collection,
   query,
   where,
   updateDoc,
-  increment,
   doc,
   arrayUnion,
   getDoc,
   setDoc,
 } from "firebase/firestore";
-import { Font, Display, Img, Button, Wrap, Hr,Tag } from "../css/style";
-import location from "../image/location.png";
 import { db } from "../utils/firebase";
-import { Link, useNavigate } from "react-router-dom";
-import { UserContext } from "../utils/userContext";
-import Header from "../component/Header";
-import styled from "styled-components";
-import Card from "@mui/material/Card";
-import CardMedia from "@mui/material/CardMedia";
-import CardContent from "@mui/material/CardContent";
-import CardActions from "@mui/material/CardActions";
-import Modal from "react-modal";
-import { TextField, Alert, AlertTitle, Stack } from "@mui/material";
+
+import { Font, Display, Img, Button, Wrap, Hr,Tag } from "../css/style";
+import {
+  TextField,
+  Alert,
+  Stack,
+  Card,
+  CardMedia,
+  CardContent,
+  CardActions,
+} from "@mui/material";
+
 import location_big from "../image/location_big.png";
-import Swal from "sweetalert2/dist/sweetalert2.js";
 import alertIcon from "../image/alert.png";
+import location from "../image/location.png";
+
+import Header from "../component/Header";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+import Modal from "react-modal";
+
 
 const Alink = styled.a`
   text-decoration: none;

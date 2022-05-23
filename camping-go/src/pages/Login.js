@@ -1,25 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { setDoc, doc } from "firebase/firestore";
 import styled from "styled-components";
-import { db } from "../utils/firebase";
+
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import login from "../css/login.css";
-import { Display, Font, Wrap } from "../css/style";
-import * as React from "react";
+import { setDoc, doc } from "firebase/firestore";
+import { db } from "../utils/firebase";
+
+import { Font, Wrap } from "../css/style";
 import PropTypes from "prop-types";
 import SwipeableViews from "react-swipeable-views";
 import { useTheme } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
+import { AppBar, Tabs, Tab, Typography, Box } from "@mui/material/";
+
 
 const Title = styled.div`
   color: #333;
@@ -86,7 +83,7 @@ function a11yProps(index) {
 
 function Login({ setUserId, setUserName, userName }) {
   const theme = useTheme();
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
   const [email, setEmail] = useState("moon@gmail.com");
   const [password, setPassword] = useState("moonmo");
   const [errorMessage, setErrorMessage] = useState("");

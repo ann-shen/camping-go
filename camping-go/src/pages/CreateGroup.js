@@ -1,6 +1,10 @@
 import styled from "styled-components";
-import { db } from "../utils/firebase";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../utils/userContext";
+
+
+
 import {
   setDoc,
   doc,
@@ -9,25 +13,29 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { DateRange } from "react-date-range";
-import { useNavigate } from "react-router-dom";
-import Tent from "../component/Tent";
-import CampSupplies from "../component/CampSupplies";
-import { TextField, Box, Autocomplete, Stack } from "@mui/material";
+import { db } from "../utils/firebase";
+
+import { TextField, Autocomplete, Stack } from "@mui/material";
+import { Display, Cloumn, Button, Wrap, Img, Font } from "../css/style";
+
+import landingPage04 from "../image/landingpage-04.png";
+import tentColor from "../image/tentColor.png";
+import supplies from "../image/supplies.png";
+
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import GoogleMapBasic from "../component/GoogleMapBasic";
-import MultipleSelectChip from "../component/MultipleSelectChip";
+import { DateRange } from "react-date-range";
+import Tent from "../component/Tent";
 import Header from "../component/Header";
 import Footer from "../component/Footer";
-import { Display, Cloumn, Button, Wrap, Img, Font } from "../css/style";
-import landingPage04 from "../image/landingpage-04.png";
-import { v4 as uuidv4 } from "uuid";
+import CampSupplies from "../component/CampSupplies";
+import GoogleMapBasic from "../component/GoogleMapBasic";
+import MultipleSelectChip from "../component/MultipleSelectChip";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { UserContext } from "../utils/userContext";
-import tentColor from "../image/tentColor.png";
-import supplies from "../image/supplies.png";
+import { v4 as uuidv4 } from "uuid";
+
+
 
 const RockImg = styled.img`
   width: 150px;
@@ -326,7 +334,7 @@ function Multiple({ setUpLoadFile }) {
   );
 }
 
-function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
+function CreateGroup({ userId, userName, allMemberArr }) {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [state, setState] = useState({
@@ -391,16 +399,16 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
   const [personName, setPersonName] = useState([]);
   const [getAllTent, setGetAllTent] = useState([]);
   const [getAllSupplies, setGetAllSupplies] = useState([]);
-  const ContextByUserId = useContext(UserContext);
+  const Context = useContext(UserContext);
 
   let path = window.location.pathname;
+
+  console.log(Context.personName);
 
   const addNewGroup = async (e) => {
     e.preventDefault();
     setClickConfirm(true);
   };
-
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -412,13 +420,11 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       setAddNotice((prev) => [...prev, groupInfo.notice]);
     }
   };
-  
 
   const addGroupNotice = (e) => {
     e.preventDefault();
     setAddNotice((prev) => [...prev, groupInfo.notice]);
   };
-
 
   const setUpGroup = async () => {
     let timerInterval;
@@ -459,7 +465,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       detail_picture: upload.detail_picture,
       privacy: privacyValue,
       notice: addNotice,
-      select_tag: personName,
+      select_tag: Context.personName,
       current_number: 1,
       create_time: serverTimestamp(),
       status: "",
@@ -583,7 +589,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
 
   return (
     <>
-      <Header ContextByUserId={ContextByUserId} />
+      <Header ContextByUserId={Context.userId} />
       <Form onSubmit={handleSubmit}>
         <RockImg src={landingPage04} alt='' />
         <Title>創建你的露營團</Title>
@@ -721,7 +727,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
                 thisGroupId={thisGroupId}
                 setPersonName={setPersonName}
                 personName={personName}
-                
+                condiion="create"
               />
               <br></br>
               <br></br>
@@ -752,12 +758,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
                     justifyContent='end'
                     alignItems='end'
                     m=' 30px 0px 30px 0px'>
-                    <Tent
-                      setTentInfo={setTentInfo}
-                      tentInfo={tentInfo}
-                      setAllMemberArr={setAllMemberArr}
-                      allMemberArr={allMemberArr}
-                    />
+                    <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
                     <AddButton onClick={addNewTent}>新增帳篷</AddButton>
                   </Display>
                   <Cloumn>

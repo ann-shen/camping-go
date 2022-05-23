@@ -28,12 +28,11 @@ function App() {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log(user.displayName);
         setUserName(user.displayName);
         setUserId(user.uid);
         console.log("yes");
       } else {
-        console.log("no!");
+        console.log("logout");
       }
     });
   }, []);
@@ -41,6 +40,7 @@ function App() {
   const value = {
     userId,
     userName,
+    personName: "",
   };
 
   return (
@@ -56,7 +56,6 @@ function App() {
                     userId={userId}
                     setUserName={setUserName}
                     userName={userName}
-                    setAllMemberArr={setAllMemberArr}
                     allMemberArr={allMemberArr}
                   />
                 }></Route>
@@ -65,9 +64,6 @@ function App() {
                 element={
                   <CampingGroup
                     setGroupId={setGroupId}
-                    userId={userId}
-                    groupId={groupId}
-                    userName={userName}
                   />
                 }></Route>
               <Route path='/member' element={<Member />}></Route>

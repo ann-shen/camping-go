@@ -40,6 +40,7 @@ const Label = styled.label`
   position: absolute;
   bottom: 5px;
   right: 0px;
+  text-align: center;
 `;
 
 const Input = styled.input`
@@ -56,6 +57,9 @@ const InfoWrap = styled.div`
   justify-content: start;
   align-items: center;
   margin: 30px 0px;
+  @media (max-width: 1024px) {
+    margin: 10px 0px;
+  }
 `;
 
 export const ProfilePicture = ({ userId }) => {
@@ -113,7 +117,7 @@ export const ProfilePicture = ({ userId }) => {
               <Img src={preview} width='auto' height='115%' />
             </ImgWrap>
           )}
-          {params.id == userId && (
+          {params.id !== userId && (
             <Label>
               <FileUploadRoundedIcon
                 sx={{

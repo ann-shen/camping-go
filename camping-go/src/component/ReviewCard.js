@@ -1,21 +1,9 @@
-// import { styled } from "@mui/material/styles";
 import styled, { keyframes } from "styled-components";
-import Card from "@mui/material/Card";
-import CardMedia from "@mui/material/CardMedia";
-import CardContent from "@mui/material/CardContent";
-import CardActions from "@mui/material/CardActions";
-import { Font, Display, Img, Button, Hr, Wrap, Tag } from "../css/style";
-import location from "../image/location.png";
 import { useState, useContext } from "react";
 import { UserContext } from "../utils/userContext";
 import { useNavigate } from "react-router-dom";
-import Modal from "react-modal";
-import { TextField, Alert, Stack, Skeleton } from "@mui/material";
 import { Link } from "react-router-dom";
-import FindGroup from "../pages/FindGroup";
-import landingpage03 from "../image/landingpage-03.png";
-import alertIcon from "../image/alert.png";
-import Swal from "sweetalert2/dist/sweetalert2.js";
+
 import {
   setDoc,
   doc,
@@ -26,6 +14,36 @@ import {
   arrayUnion,
 } from "firebase/firestore";
 import { db } from "../utils/firebase";
+
+import {
+  Font,
+  Display,
+  Img,
+  Button,
+  Hr,
+  Wrap,
+  Tag,
+  CardByGroup,
+} from "../css/style";
+import {
+  TextField,
+  Alert,
+  Stack,
+  Skeleton,
+  Card,
+  CardMedia,
+  CardContent,
+  CardActions,
+} from "@mui/material";
+
+import location from "../image/location.png";
+import landingpage03 from "../image/landingpage-03.png";
+import alertIcon from "../image/alert.png";
+
+import Modal from "react-modal";
+import FindGroup from "../pages/FindGroup";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+
 
 const Alink = styled.a`
   text-decoration: none;
@@ -219,7 +237,7 @@ function IsModal({
               <Hr width='80%' m='10px 0px 20px 0px'></Hr>
               <AnnouncementFontWrap>
                 {currentPosts[index].notice.length !== 0 &&
-                  currentPosts[index].notice.map((item,index) => (
+                  currentPosts[index].notice.map((item, index) => (
                     <Display mb='15px' alignItems='start' key={index}>
                       <Img src={alertIcon} width='30px'></Img>
                       <Font fontSize='14px' marginLeft='10px'>
@@ -305,14 +323,8 @@ function IsModal({
   );
 }
 
-function Recommend({
-  recommendIsOpen,
-  setRecommendIsOpen,
-  joinThisGroup,
-  setGroupId,
-}) {
+function Recommend({ recommendIsOpen, setRecommendIsOpen, joinThisGroup }) {
   const Context = useContext(UserContext);
-
   return (
     <Modal
       isOpen={recommendIsOpen}
@@ -331,9 +343,6 @@ function Recommend({
       <Display direction='column'>
         <FindGroup
           joinThisGroup={joinThisGroup}
-          userName={Context.userName}
-          userId={Context.userId}
-          setGroupId={setGroupId}
           setRecommendIsOpen={setRecommendIsOpen}
         />
       </Display>
@@ -375,7 +384,7 @@ export default function ReviewCard({
 
   let loadingArr = [1, 2, 3];
 
-  const checkIsHeader = (header_name, userName) => {
+  const popUpAlertWithcheckIsHeader = (header_name, userName) => {
     if (header_name == userName) {
       Swal.fire({
         position: "center",
@@ -385,7 +394,6 @@ export default function ReviewCard({
         timer: 2500,
       });
       navigate("/");
-      return;
     }
   };
 
@@ -393,7 +401,7 @@ export default function ReviewCard({
     setbackdropOpen(true);
   };
 
-  const isFullGroup = () => {
+  const popUpAlertWithisFullGroup = () => {
     Swal.fire({
       position: "center",
       icon: "warning",
@@ -423,7 +431,7 @@ export default function ReviewCard({
       Context.userId
     );
 
-    addMemberSelectTag().then(async(res) => {
+    addMemberSelectTag().then(async (res) => {
       setDoc(docRefMember, {
         role: "member",
         member_name: Context.userName,
@@ -481,11 +489,11 @@ export default function ReviewCard({
     cardData
   ) => {
     if (header_name == Context.userName) {
-      checkIsHeader(header_name, Context.userName);
+      popUpAlertWithcheckIsHeader(header_name, Context.userName);
       return;
     }
     if (current_number + 1 > max_member_number) {
-      isFullGroup(current_number);
+      popUpAlertWithisFullGroup(current_number);
       return;
     }
     isBackdropOpen();
@@ -502,7 +510,7 @@ export default function ReviewCard({
       <GroupWrap>
         {currentPosts.length == 0 && (
           <Wrap width='80%' justifyContent='space-between'>
-            {loadingArr.map((_,index) => (
+            {loadingArr.map((_, index) => (
               <Stack spacing={2} style={{ marginRight: 30 }} key={index}>
                 <Skeleton
                   variant='rectangular'
@@ -650,7 +658,7 @@ export default function ReviewCard({
             />
             <CardActions disableSpacing>
               {item.select_tag
-                .map((obj,index) => <SelectTag key={index}>{obj}</SelectTag>)
+                .map((obj, index) => <SelectTag key={index}>{obj}</SelectTag>)
                 .slice(0, 3)}
             </CardActions>
           </Card>
@@ -658,28 +666,7 @@ export default function ReviewCard({
       </GroupWrap>
 
       <GroupWrap>
-        <Card
-          sx={{
-            width: "80%",
-            height: "150px",
-            boxShadow:
-              "0.8rem 0.8rem 1.8rem #E2E1D3 , -0.5rem -0.5rem 0.7rem #ffffff",
-            borderRadius: 5,
-            padding: 1,
-            margin: 4,
-            marginTop: 15,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#F8F8F2",
-            border: "1px solid #CFC781 ",
-            "@media (max-width: 580px)": {
-              marginTop: 10,
-              marginBottom: 10,
-              marginLeft: "20px",
-            },
-          }}>
+        <Card sx={CardByGroup}>
           <Font letterSpacing='1px' fontSize='16px'>
             找不到喜愛的？一鍵找尋你的最佳推薦露營團
           </Font>
@@ -710,9 +697,6 @@ export default function ReviewCard({
         recommendIsOpen={recommendIsOpen}
         setRecommendIsOpen={setRecommendIsOpen}
         joinThisGroup={joinThisGroup}
-        userName={Context.userName}
-        userId={Context.userId}
-        setGroupId={setGroupId}
       />
       <Wrap width='95%' justifyContent='end' m=' -160px 00px 0px 0px'>
         <TentImg src={landingpage03} />

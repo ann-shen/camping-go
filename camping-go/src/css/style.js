@@ -1,4 +1,3 @@
-import styleFunctionSx from "@mui/system/styleFunctionSx";
 import styled from "styled-components";
 
 export const Label = styled.label`
@@ -67,6 +66,7 @@ export const ImgWrap = styled.div`
   justify-content: center;
   margin: ${(props) => props.m || "0px"};
   margin-bottom: ${(props) => props.mb || "0px"};
+  margin-top: ${(props) => props.mt || "0px"};
   width: ${(props) => props.width || "350px"};
   height: ${(props) => props.height || "200px"};
   border-radius: 20px;
@@ -157,7 +157,7 @@ export const ProfileBox = {
 export const secondHandSectionByJoinGroup = {
   width: "25%",
   height: "200px",
-  boxShadow: "0.3rem 0.3rem 2.6rem #E2E1D3 , -1.0rem -1.0rem 0.7rem #ffffff",
+  boxShadow: "0.3rem 0.3rem 0.6rem #E2E1D3 , -0.3rem -0.3rem 0.7rem #ffffff",
   borderRadius: 6,
   padding: "10px",
   margin: "auto",
@@ -167,6 +167,13 @@ export const secondHandSectionByJoinGroup = {
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
+  "@media (max-width: 768px)": {
+    width: "80%",
+  },
+  "@media (max-width: 500px)": {
+    width: "80%",
+    marginTop: "0px",
+  },
 };
 
 export const suppliesSectionByJoinGroup = {
@@ -179,4 +186,51 @@ export const suppliesSectionByJoinGroup = {
   alignItems: "center",
   marginTop: 3,
   marginBottom: 5,
+};
+
+export const allSecondHandSuppliesByProfile = {
+  width: "25%",
+  height: "390px",
+  boxShadow: "0.8rem 0.8rem 3.2rem #E2E1D3 , -1.0rem -1.0rem 1rem #ffffff",
+  borderRadius: 6,
+  padding: "20px",
+  marginTop: "60px",
+  marginLeft: "30px",
+  border: "1px solid #CFC781 ",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "space-around",
+  "@media (max-width: 1175px)": {
+    marginLeft: "40px",
+  },
+  "@media (max-width: 950px)": {
+    width: "38%",
+    marginLeft: "20px",
+  },
+  "@media (max-width: 765px)": {
+    width: "80%",
+    marginLeft: "3%",
+  },
+};
+
+export const CardByGroup = {
+  width: "80%",
+  height: "150px",
+  boxShadow: "0.8rem 0.8rem 1.8rem #E2E1D3 , -0.5rem -0.5rem 0.7rem #ffffff",
+  borderRadius: 5,
+  padding: 1,
+  margin: 4,
+  marginTop: 15,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#F8F8F2",
+  border: "1px solid #CFC781 ",
+  "@media (max-width: 580px)": {
+    marginTop: 10,
+    marginBottom: 10,
+    marginLeft: "20px",
+  },
 };

@@ -1,4 +1,5 @@
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import React, { useState, useEffect, useContext } from "react";
+import { UserContext } from "../utils/userContext";
 import styled from "styled-components";
 import {
   Display,
@@ -10,26 +11,15 @@ import {
   ImgWrap,
   Hr,
   Tag,
+  allSecondHandSuppliesByProfile,
 } from "../css/style";
-import React, { useState, useEffect } from "react";
 import { TextField, Box } from "@mui/material";
-import {
-  updateDoc,
-  doc,
-  arrayUnion,
-  onSnapshot,
-  getDoc,
-} from "firebase/firestore";
+import { updateDoc, doc, arrayUnion, onSnapshot } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import firebase from "../utils/firebaseConfig";
 import { db } from "../utils/firebase";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-
-const CreateLabel = styled.label`
-  font-size: 18px;
-  margin-left: 20px;
-  margin: 5px 0px;
-  letter-spacing: 2px;
-  color: #605f56;
-`;
+import { v4 as uuidv4 } from "uuid";
 
 const FileLabel = styled.label`
   &:hover {
@@ -86,15 +76,70 @@ const DefaultPriviewImgWrap = styled.div`
   border-radius: 10px;
   overflow: hidden;
   position: relative;
+  @media (max-width: 420px) {
+    width: 95%;
+  }
 `;
 
-function SecondHand({
-  userName,
-  userId,
-  current_userId,
-  setSendInvite,
-  sendInvite,
-}) {
+const SuppliesWrap = styled.div`
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-right: 70px;
+  @media (max-width: 1080px) {
+    justify-content: start;
+    margin-right: 30px;
+  }
+  @media (max-width: 765px) {
+    justify-content: start;
+    margin-right: 0px;
+  }
+`;
+
+const UploadSecondSuppliesWrap = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: start;
+  @media (max-width: 900px) {
+    flex-direction: column;
+  }
+`;
+
+const ChoseYourSuppliesToChangeWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  flex-wrap: wrap;
+  @media (max-width: 900px) {
+    justify-content: start;
+  }
+  @media (max-width: 880px) {
+    justify-content: center;
+  }
+`;
+
+const LetChosenSuppliesAddBorder = (index, buyerArr) => {
+  buyerArr.map((item) => {
+    {
+      item.border = "none";
+    }
+  });
+  buyerArr[index].border = "3px solid #CFC781";
+};
+
+const ChangeSuppliesArrFromBuyer = (data, setBuyerArr) => {
+  let buyerArr = [];
+  data.second_hand.map((item) => {
+    if (item.change_status == false) {
+      buyerArr.push(item);
+    }
+  });
+  setBuyerArr(buyerArr);
+};
+
+function SecondHand({ userName, userId }) {
   const [upload, setUpLoadFile] = useState({
     file: "",
     url: "",
@@ -122,15 +167,11 @@ function SecondHand({
   const [choseSupplies, setChoseSupplies] = useState("");
   const [inviteIndex, setInviteIndex] = useState("");
   const [buyerIndex, setBuyerIndex] = useState("");
-
-  const [imgBorder, setImgBorder] = useState("0px solid transparent");
   const [alertOpen, setAlertOpen] = useState(false);
+  const Context = useContext(UserContext);
 
-  let buyerId = current_userId;
+  let buyerId = Context.userId;
   let buyerName = userName;
-
-  console.log(current_userId);
-
 
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
@@ -139,7 +180,7 @@ function SecondHand({
 
   useEffect(() => {
     if (userId) {
-      const unsub = onSnapshot(doc(db, "joinGroup", userId), (doc) => {
+      onSnapshot(doc(db, "joinGroup", userId), (doc) => {
         setAllSupplies(doc.data().second_hand);
       });
     }
@@ -156,6 +197,7 @@ function SecondHand({
             setSuppliesInfo((prevState) => ({
               ...prevState,
               picture: url,
+              supplies_id: uuidv4(),
             }));
           })
           .catch((error) => {
@@ -166,7 +208,6 @@ function SecondHand({
         console.log(error.message);
       });
   }, [upload]);
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -198,60 +239,42 @@ function SecondHand({
   };
 
   const changeInvite = async (index) => {
-    const getBuyerSupplies = await getDoc(doc(db, "joinGroup", buyerId));
-    if (getBuyerSupplies.exists()) {
-      let buyerArr = [];
-      getBuyerSupplies.data().second_hand.map((item) => {
-        console.log(item);
-        if (item.change_status == false) {
-          buyerArr.push(item);
-        }
-      });
-      setBuyerArr(buyerArr);
-    }
+    firebase.getDocJoinGroupOfMember(buyerId).then((res) => {
+      ChangeSuppliesArrFromBuyer(res, setBuyerArr);
+    });
     setShowBuyerSection(true);
     setInviteIndex(index);
   };
 
-  const choseSuppliesToChange = (e, index) => {
-    buyerArr.map((item) => {
-      {
-        item.border = "none";
-      }
-    });
-    buyerArr[index].border = "3px solid #CFC781";
+  const choseSuppliesToChange = (index) => {
+    LetChosenSuppliesAddBorder(index, buyerArr);
     setBuyerIndex(index);
-
     setChoseSupplies(buyerArr[index]);
-
     allSupplies[inviteIndex].inviteSupplies_index = index;
   };
 
-  const comfirmChange = async () => {
-    setAlertOpen(true);
+  const updateSecondHandBySeller = async (data, index) => {
+    data[index].buyer_name = buyerName;
+    data[index].buyer_id = buyerId;
+    data[index].change_status = false;
+    data[index].change_supplies = choseSupplies.name;
+    data[index].change_supplies_picture = choseSupplies.picture;
+    data[index].change_note = choseSupplies.note;
+    data[index].change_supplies_id = choseSupplies.supplies_id;
+    data[index].invite = true;
 
-    allSupplies[inviteIndex].buyer_name = buyerName;
-    allSupplies[inviteIndex].buyer_id = buyerId;
-    allSupplies[inviteIndex].change_status = false;
-    allSupplies[inviteIndex].change_supplies = choseSupplies.name;
-    allSupplies[inviteIndex].change_supplies_picture = choseSupplies.picture;
-    allSupplies[inviteIndex].change_note = choseSupplies.note;
-    allSupplies[inviteIndex].invite = true;
     const docRef = doc(db, "joinGroup", userId);
     await updateDoc(docRef, { second_hand: allSupplies });
+  };
 
-    const getBuyerSupplies = await getDoc(doc(db, "joinGroup", buyerId));
-    if (getBuyerSupplies.exists()) {
-      let buyerArr = [];
-      getBuyerSupplies.data().second_hand.map((item) => {
-        if (item.change_status == false) {
-          buyerArr.push(item);
-        }
-      });
-      buyerArr[buyerIndex].waiting_reply = true;
-      await updateDoc(doc(db, "joinGroup", buyerId), { second_hand: buyerArr });
-    }
+  // const updateSecondHandByBuyer = async (buyerArr) => {
+  //   buyerArr[buyerIndex].waiting_reply = true;
+  //   await updateDoc(doc(db, "joinGroup", buyerId), { second_hand: buyerArr });
+  // };
 
+  const comfirmChange = async () => {
+    setAlertOpen(true);
+    updateSecondHandBySeller(allSupplies, inviteIndex);
     Swal.fire({
       position: "center",
       icon: "success",
@@ -276,126 +299,105 @@ function SecondHand({
 
   return (
     <>
-      <Display>
-        {allSupplies.length !== 0 ? (
-          <Display>
-            {allSupplies.map((item, index) => (
-              <Box
-                sx={{
-                  width: "85%",
-                  height: "390px",
-                  boxShadow:
-                    "0.8rem 0.8rem 3.2rem #E2E1D3 , -1.0rem -1.0rem 1rem #ffffff",
-                  borderRadius: 6,
-                  padding: "20px",
-                  margin: "auto",
-                  marginTop: "60px",
-                  marginLeft: "40px",
-                  border: "1px solid #CFC781 ",
-                  justifyContent: "space-around",
-                }}>
-                <Cloumn>
-                  {item.change_status == true && (
-                    <Tag fontSize='14px'>已交換</Tag>
-                  )}
-                  {item.change_status == false && (
-                    <Tag bgc='#426765' color='white' fontSize='14px'>
-                      可交換
-                    </Tag>
-                  )}
-                  <ImgWrap width='230px' height='200px' m='10px 0px 0px 0px'>
-                    <Img src={item.picture} width='120%' />
-                  </ImgWrap>
-                  <Font m=' 10px 0px 0px 0px'> {item.name}</Font>
-                  <Hr width='100%'></Hr>
-                  {item.change_status == false ? (
-                    <>
-                      <Font fontSize='16px' color='#CFC781'>
-                        希望交換的物品
-                      </Font>
-                      <Font fontSize='16px'> {item.hope}</Font>
-                    </>
-                  ) : (
-                    <Font fontSize='14px'>
-                      已和{item.buyer_name}交換{item.change_supplies}
+      {allSupplies.length !== 0 ? (
+        <SuppliesWrap>
+          {allSupplies.map((item, index) => (
+            <Box sx={allSecondHandSuppliesByProfile}>
+              <Cloumn>
+                {item.change_status == true && (
+                  <Tag fontSize='14px'>已交換</Tag>
+                )}
+                {item.change_status == false && (
+                  <Tag bgc='#426765' color='white' fontSize='14px'>
+                    可交換
+                  </Tag>
+                )}
+                <ImgWrap width='100%' height='200px' mt='10px'>
+                  <Img src={item.picture} width='120%' />
+                </ImgWrap>
+                <Font mt='10px'> {item.name}</Font>
+                <Hr width='100%'></Hr>
+                {item.change_status == false ? (
+                  <>
+                    <Font fontSize='16px' color='#CFC781'>
+                      希望交換的物品
                     </Font>
-                  )}
-                  {item.seller_id !== current_userId && (
-                    <Button
-                      width='200px'
-                      height='30px'
-                      fontSize='14px'
-                      ml='10px'
-                      mt='10px'
-                      onClick={() => {
-                        if (item.waiting_reply) return;
-                        changeInvite(index);
-                      }}>
-                      <GetStatus item={item} />
-                    </Button>
-                  )}
-                </Cloumn>
-              </Box>
-            ))}
-          </Display>
-        ) : (
-          <Wrap width='100%' justifyContent='center' m='30px 0px 0px 0px'>
-            <Font>尚未上架二手露營用品</Font>
-          </Wrap>
-        )}
-      </Display>
-      <Display>
-        {showBuyerSection && (
-          <>
-            <Box
-              sx={{
-                width: "85%",
-                height: "280px",
-                boxShadow:
-                  "0.8rem 0.8rem 3.2rem #E2E1D3 , -1.0rem -1.0rem 1rem #ffffff",
-                borderRadius: 6,
-                padding: 5,
-                margin: "auto",
-                marginTop: "60px",
-                marginLeft: "40px",
-                border: "1px solid #CFC781 ",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-              }}>
-              <Font>你目前可以交換的物品</Font>
-              <Font fontSize='14px'>點選你想交換的物品吧～</Font>
-              <br />
-              <Display>
-                {buyerArr.map((item, index) => (
-                  <Wrap width='180px' direction='column' m='0px 10px 10px 0px'>
-                    <ImgCursorWrap style={{ border: item.border }}>
-                      <Img
-                        width='100%'
-                        src={item.picture}
-                        onClick={(e) => {
-                          choseSuppliesToChange(e, index);
-                        }}
-                      />
-                    </ImgCursorWrap>
-                    <Font fontSize='14px' m='10px 0px 0px'>
-                      {item.name}
-                    </Font>
-                  </Wrap>
-                ))}
-              </Display>
-
-              <br />
-              <Button width='200px' mt='20px' onClick={comfirmChange}>
-                確認提出交換邀請
-              </Button>
+                    <Font fontSize='16px'> {item.hope}</Font>
+                  </>
+                ) : (
+                  <Font fontSize='14px'>
+                    已和{item.buyer_name}交換{item.change_supplies}
+                  </Font>
+                )}
+              </Cloumn>
+              {item.seller_id !== Context.userId && (
+                <Button
+                  width='200px'
+                  height='30px'
+                  fontSize='14px'
+                  mt='10px'
+                  onClick={() => {
+                    if (item.waiting_reply) return;
+                    changeInvite(index);
+                  }}>
+                  <GetStatus item={item} />
+                </Button>
+              )}
             </Box>
-          </>
-        )}
-      </Display>
+          ))}
+        </SuppliesWrap>
+      ) : (
+        <Wrap width='100%' justifyContent='center' m='30px 0px 0px 0px'>
+          <Font>尚未上架二手露營用品</Font>
+        </Wrap>
+      )}
+      {showBuyerSection && (
+        <Box
+          sx={{
+            width: "85%",
+            height: "auto",
+            boxShadow:
+              "0.8rem 0.8rem 3.2rem #E2E1D3 , -1.0rem -1.0rem 1rem #ffffff",
+            borderRadius: 6,
+            padding: "20px",
+            margin: "auto",
+            marginTop: "60px",
+            border: "1px solid #CFC781 ",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
+          <Font>你目前可以交換的物品</Font>
+          <Font fontSize='14px'>點選你想交換的物品吧～</Font>
+          <br />
+          <ChoseYourSuppliesToChangeWrap>
+            {buyerArr.map((item, index) => (
+              <Wrap width='180px' direction='column' m='0px 10px 10px 0px'>
+                <ImgCursorWrap style={{ border: item.border }}>
+                  <Img
+                    width='100%'
+                    src={item.picture}
+                    onClick={() => {
+                      choseSuppliesToChange(index);
+                    }}
+                  />
+                </ImgCursorWrap>
+                <Font fontSize='14px' m='10px 0px 0px'>
+                  {item.name}
+                </Font>
+              </Wrap>
+            ))}
+          </ChoseYourSuppliesToChangeWrap>
 
-      {userId === current_userId && (
+          <br />
+          <Button width='200px' mt='20px' onClick={comfirmChange}>
+            確認提出交換邀請
+          </Button>
+        </Box>
+      )}
+
+      {userId === Context.userId && (
         <Box
           sx={{
             width: "85%",
@@ -408,8 +410,11 @@ function SecondHand({
             marginTop: "60px",
             border: "1px solid #CFC781 ",
             justifyContent: "space-around",
+            "@media (max-width: 470px)": {
+              padding: "10px",
+            },
           }}>
-          <Wrap justifyContent='space-around' alignItems='start' width='100%'>
+          <UploadSecondSuppliesWrap>
             <Wrap
               direction='column'
               width='100%'
@@ -435,7 +440,13 @@ function SecondHand({
               <br />
               <TextField
                 size='small'
-                sx={{ width: "70%", marginBottom: "30px" }}
+                sx={{
+                  width: "70%",
+                  marginBottom: "30px",
+                  "@media (max-width: 470px)": {
+                    marginBottom: "10px",
+                  },
+                }}
                 label='交換物品名稱'
                 name='name'
                 required
@@ -444,7 +455,13 @@ function SecondHand({
               <br />
               <TextField
                 size='small'
-                sx={{ width: "70%", marginBottom: "30px" }}
+                sx={{
+                  width: "70%",
+                  marginBottom: "30px",
+                  "@media (max-width: 470px)": {
+                    marginBottom: "10px",
+                  },
+                }}
                 label='希望交換的類型'
                 name='hope'
                 required
@@ -453,7 +470,13 @@ function SecondHand({
               <br />
               <TextField
                 size='small'
-                sx={{ width: "70%", marginBottom: "30px" }}
+                sx={{
+                  width: "70%",
+                  marginBottom: "30px",
+                  "@media (max-width: 470px)": {
+                    marginBottom: "10px",
+                  },
+                }}
                 label='狀態'
                 name='note'
                 required
@@ -461,7 +484,7 @@ function SecondHand({
                 onChange={handleChange}></TextField>
               <br />
             </Wrap>
-          </Wrap>
+          </UploadSecondSuppliesWrap>
           <Button onClick={addNewSecondHandSupplies} width='150px'>
             上架二手用品
           </Button>

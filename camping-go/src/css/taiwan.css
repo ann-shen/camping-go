@@ -1,29 +1,29 @@
 * {
   font-family: 'Fjalla One'; }
 
-svg {
+#taiwan_svg {
   height: 80vh; 
 width: 90%
 }
 
 @media (max-width: 768px) {
-  svg {
+  #taiwan_svg {
     width: 100%;
-    margin-left: -50px;
+    margin-left: -20px;
   }
 }
 @media (max-width: 600px) {
-  svg {
+  #taiwan_svg {
     width: 100%;
-    margin-left: -50px;
+    margin-left: -20px;
     margin-top: -20px;
   }
 }
 @media (max-width: 400px) {
-  svg {
+  #taiwan_svg {
     width: 100%;
-    margin-left: -50px;
-    margin-top: -110px;
+    margin-left: -20px;
+    margin-top: -80px;
   }
 }
 

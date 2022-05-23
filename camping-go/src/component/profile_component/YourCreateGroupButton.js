@@ -61,9 +61,14 @@ const DeleteModalButton = styled.button`
     transform: scale(1.2);
     transition: 500ms;
   }
+  @media (max-width: 768px) {
+    top: 30px;
+    right: 30px;
+  }
 `;
 
 const ScrollWrap = styled.div`
+  width: 90%;
   height: 280px;
   margin-top: 30px;
   overflow: scroll;
@@ -86,6 +91,41 @@ const ProfileWrap = styled.div`
   height: 60px;
   border-radius: 50%;
   overflow: hidden;
+`;
+
+const RemoveMemberButton = styled.button`
+  width: 150px;
+  height: 30px;
+  background-color: #eae5be;
+  margin-left: 20px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  color: #797659;
+  &:hover {
+    color: #ffffff;
+    background-color: #dcd8b3;
+    box-shadow: none;
+  }
+  @media (max-width: 640px) {
+    width: 50%;
+    height: 35px;
+    margin-top: 15px;
+  }
+`;
+
+const MobileNoteWrap = styled.div`
+  width: 60%;
+  display: flex;
+  flex-wrap: wrap;
+  height: auto;
+`;
+
+const MobileScroeFont = styled.p`
+  font-size: 14px;
+  color: #797659;
+  margin-left: 10px;
+  text-align: center;
 `;
 
 export function CheckCommentFromMember({ groupId }) {
@@ -165,36 +205,27 @@ export function CheckCommentFromMember({ groupId }) {
             <ScrollWrap>
               {comment &&
                 comment.map((item) => (
-                  <Box
-                    sx={{
-                      width: "600px",
-                      height: "auto",
-                      padding: 0,
-                      margin: 1,
-                    }}>
-                    <Wrap
-                      width='500px'
-                      borderBottom='1.4px solid #EAE5BE'
-                      paddingBottom='20px'>
-                      <Wrap justifyContent='space-around' width='500px'>
-                        <Display>
-                          <Wrap
-                            direction='column'
-                            width='100px'
-                            m='0px 40px 0px 0px'>
-                            <ProfileWrap>
-                              <Img src={item.profile_img}></Img>
-                            </ProfileWrap>
-                            <Font fontSize='14px'>{item.name}</Font>
-                          </Wrap>
-                          <Wrap width='280px'>
-                            <Font fontSize='14px'>{item.note}</Font>
-                          </Wrap>
-                        </Display>
-                        <Font marginLeft='20px'>{item.score}分</Font>
+                  <Wrap
+                    width='90%'
+                    borderBottom='1.4px solid #EAE5BE'
+                    paddingBottom='20px'
+                    justifyContent="space-between">
+                    <Display>
+                      <Wrap
+                        direction='column'
+                        width='100px'
+                        m='0px 40px 0px 0px'>
+                        <ProfileWrap>
+                          <Img src={item.profile_img}></Img>
+                        </ProfileWrap>
+                        <Font fontSize='14px'>{item.name}</Font>
                       </Wrap>
-                    </Wrap>
-                  </Box>
+                      <MobileNoteWrap>
+                        <Font fontSize='14px'>{item.note}</Font>
+                      </MobileNoteWrap>
+                    </Display>
+                    <MobileScroeFont>{item.score}分</MobileScroeFont>
+                  </Wrap>
                 ))}
             </ScrollWrap>
           )}
@@ -208,26 +239,28 @@ export function CheckOfGroupMember({
   groupId,
   setRenderParticipateArr,
   group_title,
-  userName,
 }) {
   const [memberIsOpen, setMemberIsOpen] = useState(false);
   const [member, setMember] = useState([]);
+
+
   const checkMemberList = async () => {
     setMemberIsOpen(true);
+
     firebase.getDocsOfSubCollectionMember(groupId).then((res) => {
-      const removeHeaderArr = res.filter((e, index) => {
-        console.log(e.role);
+      const removeHeaderArr = res.filter((e) => {
         return e.role !== "header";
       });
-      const getHeaderArr = res.filter((e, index) => {
+      const getHeaderArr = res.filter((e) => {
         return e.role == "header";
       });
       removeHeaderArr.unshift(getHeaderArr[0]);
       setMember(removeHeaderArr);
     });
   };
+
+
   const removeMember = async (index, member_id, member_name) => {
-    console.log(member_name);
     Swal.fire({
       title: "確定移除？",
       icon: "question",
@@ -243,7 +276,10 @@ export function CheckOfGroupMember({
             firebase.getDocsOfSubCollectionMember(groupId).then((res) => {
               setMember(res);
             });
-            firebase.updateDocOfArrayRemoveGroup(member[index].member_id, groupId);
+            firebase.updateDocOfArrayRemoveGroup(
+              member[index].member_id,
+              groupId
+            );
             firebase.updateDocIncrementCurrentOfMember(groupId);
             firebase.updateDocIncrementTentOfMember(groupId, member_name);
             firebase.updateDocSuppliesOfMember(groupId, member_name);
@@ -292,13 +328,16 @@ export function CheckOfGroupMember({
               <Box
                 key={uuidv4()}
                 sx={{
-                  width: "500px",
+                  width: "80%",
                   height: "50px",
                   borderBottom: " 1.4px solid #EAE5BE",
                   padding: 1,
                   margin: 1,
                   display: "flex",
                   justifyContent: "space-between",
+                  "@media (max-width: 640px)": {
+                    height: "70px",
+                  },
                 }}>
                 <Display>
                   {item.role == "header" && (
@@ -314,20 +353,16 @@ export function CheckOfGroupMember({
                   <Font>{item.member_name}</Font>
                 </Display>
                 {item.role == "member" && (
-                  <Button
+                  <RemoveMemberButton
                     width='150px'
                     mt='0px'
                     ml='20px'
                     boxShadow='none'
                     onClick={() => {
-                      removeMember(
-                        index,
-                        item.member_id,
-                        item.member_name
-                      );
+                      removeMember(index, item.member_id, item.member_name);
                     }}>
                     移除成員
-                  </Button>
+                  </RemoveMemberButton>
                 )}
               </Box>
             ))}

@@ -2,38 +2,32 @@ import MultipleSelectChip from "../MultipleSelectChip";
 import { useContext, useEffect, useState } from "react";
 import { ProfilePicture } from "../ProfilePicture";
 import { UserContext } from "../../utils/userContext";
-import { signOut, getAuth } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import firebase from "../../utils/firebaseConfig";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 import styled from "styled-components";
-import {
-  Font,
-  Img,
-  Display,
-  Button,
-  Wrap,
-  Tag,
-  ImgWrap,
-  Cloumn,
-  Hr,
-} from "../../css/style";
+import { Font, Display, Button, Wrap, Tag } from "../../css/style";
+
+const MatchesInfoWrap = styled.div`
+  max-width: 1024px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
 
 function InfoSection() {
   const Context = useContext(UserContext);
   const navigate = useNavigate();
   const auth = getAuth();
   let params = useParams();
+  const matches = useMediaQuery("(max-width:1024px)");
 
   const [paramsInfo, setParamsInfo] = useState("");
-
-  function getLogout() {
-    signOut(auth)
-      .then(() => {})
-      .catch((error) => {});
-    navigate("/login");
-  }
 
   useEffect(async () => {
     firebase.getDocJoinGroupOfMember(params.id).then((res) => {
@@ -43,7 +37,7 @@ function InfoSection() {
 
   return (
     <>
-      {Context.userId == params.id ? (
+      {Context.userId == params.id && !matches ? (
         <Wrap
           maxWidth='1440px'
           width='75%'
@@ -67,13 +61,10 @@ function InfoSection() {
                 {Context.userName}
               </Font>
               <Display>
-                <MultipleSelectChip userId={Context.userId} />
+                <MultipleSelectChip userId={Context.userId} condiion={"profile"}/>
               </Display>
             </Wrap>
           </Display>
-          <Button width='100px' onClick={getLogout}>
-            登出
-          </Button>
         </Wrap>
       ) : (
         <Wrap
@@ -83,9 +74,9 @@ function InfoSection() {
           alignItems='center'
           justifyContent='space-between'
           boxShadow='none'>
-          {paramsInfo && (
+          {paramsInfo && !matches && (
             <Display>
-              <ProfilePicture userId={Context.userId} />
+              <ProfilePicture userId={paramsInfo.info.user_id} />
               <Wrap
                 width='500px'
                 direction='column'
@@ -111,6 +102,43 @@ function InfoSection() {
             </Display>
           )}
         </Wrap>
+      )}
+      {Context.userId == params.id && matches ? (
+        <>
+          <MatchesInfoWrap>
+            <ProfilePicture userId={Context.userId} />
+            <Font
+              fontSize='40px'
+              margin='0px 0px 10px 20px'
+              marginLeft='20px'
+              color='#426765'>
+              {Context.userName}
+            </Font>
+            <MultipleSelectChip userId={Context.userId} />
+          </MatchesInfoWrap>
+        </>
+      ) : (
+        <>
+          {paramsInfo && matches && (
+            <MatchesInfoWrap>
+              <ProfilePicture userId={paramsInfo.info.user_id} />
+              <Font
+                fontSize='40px'
+                margin='0px 0px 10px 0px'
+                marginLeft='20px'
+                color='#426765'>
+                {paramsInfo.info.user_name}
+              </Font>
+              <Display ml='20px'>
+                {paramsInfo.select_tag.map((item) => (
+                  <Tag width='53px' m='3px' height='18px' borderRadius='12px'>
+                    <Font fontSize='14px'>{item}</Font>
+                  </Tag>
+                ))}
+              </Display>
+            </MatchesInfoWrap>
+          )}
+        </>
       )}
     </>
   );

@@ -1,27 +1,23 @@
-import { db } from "../utils/firebase";
 import styled, { keyframes } from "styled-components";
+import { useState, useEffect, useContext } from "react";
+import { UserContext } from "../utils/userContext";
+import { Link } from "react-router-dom";
+
 import {
   doc,
   collection,
   getDocs,
   getDoc,
-  updateDoc,
-  arrayUnion,
-  setDoc,
 } from "firebase/firestore";
-import { useState, useEffect, useContext } from "react";
-import { UserContext } from "../utils/userContext";
-import Card from "@mui/material/Card";
-import CardMedia from "@mui/material/CardMedia";
-import CardContent from "@mui/material/CardContent";
-import CardActions from "@mui/material/CardActions";
+import { db } from "../utils/firebase";
+
+import { Card, CardMedia, CardContent, CardActions } from "@mui/material";
 import { Font, Display, Img, Button, Hr } from "../css/style";
+
 import location from "../image/location.png";
-import { useNavigate } from "react-router-dom";
-import Modal from "react-modal";
-import { Link } from "react-router-dom";
-import Swal from "sweetalert2/dist/sweetalert2.js";
 import alertIcon from "../image/alert.png";
+
+import Modal from "react-modal";
 
 const AnnouncementFontWrap = styled.div`
   width: 80%;
@@ -86,16 +82,7 @@ const breatheAnimation = keyframes`
   transform: scale(1)    }
 `;
 
-const fadeIn = keyframes`
-from {
-  opacity: 0;
-  transform: scale(0.3)   translateX(1.5rem)  ;
-}
-to {
-  opacity: 1;
-  transform: scale(1)  translateX(1) ;
-}
-`;
+
 
 const GroupWrap = styled.div`
   display: flex;
@@ -208,7 +195,7 @@ function IsModal({
   );
 }
 
-function FindGroup({ userId, userName, setRecommendIsOpen, joinThisGroup }) {
+function FindGroup({ setRecommendIsOpen, joinThisGroup }) {
   const [userTag, setUserTag] = useState([]);
   const [allGroupInfo, setAllGroupInfo] = useState([]);
   const [allGroupSelectArr, setAllGroupSelectArr] = useState([]);
@@ -219,7 +206,7 @@ function FindGroup({ userId, userName, setRecommendIsOpen, joinThisGroup }) {
   const Context = useContext(UserContext);
 
   useEffect(async () => {
-    const docRef = await getDoc(doc(db, "joinGroup", userId));
+    const docRef = await getDoc(doc(db, "joinGroup", Context.userId));
     if (docRef.exists()) {
       setUserTag(docRef.data().select_tag);
     }
@@ -245,7 +232,7 @@ function FindGroup({ userId, userName, setRecommendIsOpen, joinThisGroup }) {
       allInfoArr.push(doc.data());
     });
     const filterHeaderGroup = allInfoArr.filter((e) => {
-      return e.header_id !== userId;
+      return e.header_id !== Context.userId;
     });
 
     const filterPrivacyGroup = filterHeaderGroup.filter((e) => {

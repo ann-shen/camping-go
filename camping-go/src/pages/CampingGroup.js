@@ -1,5 +1,9 @@
 import styled from "styled-components";
-import { db } from "../utils/firebase";
+import { useState, useEffect, useContext, useRef } from "react";
+import { UserContext } from "../utils/userContext";
+import useMediaQuery from "@mui/material/useMediaQuery";
+
+
 import {
   doc,
   getDocs,
@@ -8,20 +12,23 @@ import {
   updateDoc,
   orderBy,
 } from "firebase/firestore";
-import { useState, useEffect, useContext, useRef } from "react";
-import Taiwan from "../component/Taiwan";
+import { db } from "../utils/firebase";
+
+
 import { Font, Display, Img, Hr } from "../css/style";
+import Backdrop from "@mui/material/Backdrop";
+
 import location_big from "../image/location_big.png";
 import group_people from "../image/group_people.png";
 import landingpage from "../image/landingpage10-01.png";
+import loading from "../image/loading.gif";
+
 import Modal from "react-modal";
-import { UserContext } from "../utils/userContext";
+import Taiwan from "../component/Taiwan";
 import PaginationBar from "../component/Pagination";
 import ReviewCard from "../component/ReviewCard";
 import NavBar from "../component/NavBar";
 import Footer from "../component/Footer";
-import Backdrop from "@mui/material/Backdrop";
-import loading from "../image/loading.gif";
 
 Modal.setAppElement("#root");
 
@@ -168,16 +175,19 @@ const Title = styled.p`
   margin: 0px;
 `;
 
-function CampingGroup({ setGroupId, userName }) {
+function CampingGroup({ setGroupId }) {
   const [backdropOpen, setbackdropOpen] = useState(false);
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
   const Context = useContext(UserContext);
+  const matches = useMediaQuery("(max-width:860px)");
+
   const [pagination, setPaagination] = useState({
     loading: false,
     currentPage: 1,
-    posts_per_page: 3,
+    posts_per_page: 6,
   });
+  
   const immediatelyRef = useRef(null);
 
   const indexOfLastPost = pagination.currentPage * pagination.posts_per_page;
@@ -275,7 +285,6 @@ function CampingGroup({ setGroupId, userName }) {
         <ReviewCard
           currentPosts={currentPosts}
           setbackdropOpen={setbackdropOpen}
-          userName={userName}
           setIsOpen={setIsOpen}
           modalIsOpen={modalIsOpen}
           userId={Context.userId}
