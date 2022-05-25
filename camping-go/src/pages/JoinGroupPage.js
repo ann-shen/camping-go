@@ -41,13 +41,14 @@ import CampSupplies from "../component/CampSupplies";
 import Footer from "../component/Footer";
 import SecondHandSection from "../component/joinGroup_component/SecondHandSection";
 
-import { Box, Tooltip, IconButton } from "@mui/material";
+import { Box, Tooltip, IconButton, Backdrop } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 
 import location from "../image/location.png";
 import alert from "../image/alert.png";
 import tentColor from "../image/tentColor.png";
+import loading from "../image/loading.gif";
 
 import { v4 as uuidv4 } from "uuid";
 import Swal from "sweetalert2/dist/sweetalert2.js";
@@ -434,7 +435,6 @@ function JoinGroupPage({ userName }) {
 
     let secondTargetTentId = e.target.getAttribute("data-key");
     setAlreadyTentId(secondTargetTentId);
-    console.log("前一頂帳篷", currentTentId);
   };
 
   const drop = async (e) => {
@@ -450,7 +450,6 @@ function JoinGroupPage({ userName }) {
       return;
     }
     onDragOver(e);
-    console.log("drop");
     let id = e.dataTransfer.getData("text");
     e.target.appendChild(document.querySelector("#" + id));
     e.target.style = "backgroundColor:white ; border:4px solid #f5f4e8;";
@@ -503,7 +502,6 @@ function JoinGroupPage({ userName }) {
   };
 
   const onDragLeave = async (e) => {
-    console.log("leave");
     e.target.style.backgroundColor = "#f5f4e8";
     e.target.style.transform = "scale(1)";
   };
@@ -664,6 +662,13 @@ function JoinGroupPage({ userName }) {
     <div>
       <div>
         <Header ContextByUserId={ContextByUserId} />
+        {homePageCampGroup == ""  && (
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={true}>
+            <Img src={loading}></Img>
+          </Backdrop>
+        )}
 
         <Box
           sx={{
@@ -1128,7 +1133,6 @@ function JoinGroupPage({ userName }) {
             {thisGroupMember.map((item) => (
               <Alink href={`/profile/${item.info.user_id}`}>
                 <MemberWrap>
-                  {console.log(thisGroupMember)}
                   <ProfileImgWrap>
                     <ProfileImg src={item.profile_img} />
                   </ProfileImgWrap>

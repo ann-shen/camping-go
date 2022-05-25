@@ -2,7 +2,6 @@ import styled, { keyframes } from "styled-components";
 import { useState, useContext } from "react";
 import { UserContext } from "../utils/userContext";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 
 import {
   setDoc,
@@ -43,7 +42,6 @@ import alertIcon from "../image/alert.png";
 import Modal from "react-modal";
 import FindGroup from "../pages/FindGroup";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-
 
 const Alink = styled.a`
   text-decoration: none;
@@ -98,7 +96,6 @@ const SelectTag = styled.div`
 
 const GroupWrap = styled.div`
   display: flex;
-  /* flex-direction: column; */
   width: 100%;
   display: flex;
   justify-content: start;
@@ -112,13 +109,6 @@ const GroupWrap = styled.div`
   @media (max-width: 580px) {
     margin-left: 5%;
   }
-`;
-
-const LinkPrivate = styled(Link)`
-  text-decoration: none;
-  margin: 5px 5px;
-  font-size: 14px;
-  color: gray;
 `;
 
 const LinkOpen = styled.a`
@@ -194,7 +184,7 @@ function IsModal({
   };
 
   const checkPassword = (e) => {
-    if (value == currentPosts[index].password) {
+    if (value === currentPosts[index].password) {
       joinThisGroup(
         index,
         currentPosts[index].header_name,
@@ -247,7 +237,7 @@ function IsModal({
                   ))}
               </AnnouncementFontWrap>
 
-              {currentPosts[index].privacy == "公開" && (
+              {currentPosts[index].privacy === "公開" && (
                 <Display>
                   <Button
                     width='200px'
@@ -275,7 +265,7 @@ function IsModal({
                 </Display>
               )}
 
-              {currentPosts[index].privacy == "私人" && (
+              {currentPosts[index].privacy === "私人" && (
                 <>
                   <TextField
                     required
@@ -324,7 +314,6 @@ function IsModal({
 }
 
 function Recommend({ recommendIsOpen, setRecommendIsOpen, joinThisGroup }) {
-  const Context = useContext(UserContext);
   return (
     <Modal
       isOpen={recommendIsOpen}
@@ -352,7 +341,6 @@ function Recommend({ recommendIsOpen, setRecommendIsOpen, joinThisGroup }) {
 
 export default function ReviewCard({
   currentPosts,
-  setbackdropOpen,
   setIsOpen,
   modalIsOpen,
   setGroupId,
@@ -385,7 +373,7 @@ export default function ReviewCard({
   let loadingArr = [1, 2, 3];
 
   const popUpAlertWithcheckIsHeader = (header_name, userName) => {
-    if (header_name == userName) {
+    if (header_name === userName) {
       Swal.fire({
         position: "center",
         icon: "warning",
@@ -395,10 +383,6 @@ export default function ReviewCard({
       });
       navigate("/");
     }
-  };
-
-  const isBackdropOpen = () => {
-    setbackdropOpen(true);
   };
 
   const popUpAlertWithisFullGroup = () => {
@@ -488,7 +472,7 @@ export default function ReviewCard({
     current_number,
     cardData
   ) => {
-    if (header_name == Context.userName) {
+    if (header_name === Context.userName) {
       popUpAlertWithcheckIsHeader(header_name, Context.userName);
       return;
     }
@@ -496,13 +480,19 @@ export default function ReviewCard({
       popUpAlertWithisFullGroup(current_number);
       return;
     }
-    isBackdropOpen();
     setGroupId(cardData[index].group_id.toString());
     addNewMemberInfo(index, cardData);
     updateUserJoinGroupList(index, cardData);
     updateCurrentMemberNumber(index, cardData);
     addAlertToThisGroupHeader(index, cardData);
     navigate(`/joinGroup/${cardData[index].group_id}`);
+  };
+
+  const splitDate = (start, end) => {
+    let newDate = `${new Date(start * 1000).toLocaleString().split(" ")[0]}~ ${
+      new Date(end * 1000).toLocaleString().split(" ")[0]
+    }`;
+    return <>{newDate}</>;
   };
 
   return (
@@ -598,17 +588,7 @@ export default function ReviewCard({
                 {item.group_title}
               </Font>
               <Font fontSize='14px' m='0px 0px 16px 0px'>
-                {
-                  new Date(item.start_date.seconds * 1000)
-                    .toLocaleString()
-                    .split(" ")[0]
-                }
-                ~
-                {
-                  new Date(item.end_date.seconds * 1000)
-                    .toLocaleString()
-                    .split(" ")[0]
-                }
+                {splitDate(item.start_date.seconds, item.end_date.seconds)}
               </Font>
               <Display justifyContent='space-between'>
                 <Display>

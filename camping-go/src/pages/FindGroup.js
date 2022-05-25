@@ -3,12 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { UserContext } from "../utils/userContext";
 import { Link } from "react-router-dom";
 
-import {
-  doc,
-  collection,
-  getDocs,
-  getDoc,
-} from "firebase/firestore";
+import { doc, collection, getDocs, getDoc } from "firebase/firestore";
 import { db } from "../utils/firebase";
 
 import { Card, CardMedia, CardContent, CardActions } from "@mui/material";
@@ -81,8 +76,6 @@ const breatheAnimation = keyframes`
 100% { opacity: 1;
   transform: scale(1)    }
 `;
-
-
 
 const GroupWrap = styled.div`
   display: flex;
@@ -200,7 +193,6 @@ function FindGroup({ setRecommendIsOpen, joinThisGroup }) {
   const [allGroupInfo, setAllGroupInfo] = useState([]);
   const [allGroupSelectArr, setAllGroupSelectArr] = useState([]);
   const [findIndex, setFindIndex] = useState("");
-  const [backdropOpen, setbackdropOpen] = useState(false);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [recommendCardIsOpen, setRecommendCardIsOpen] = useState(true);
   const Context = useContext(UserContext);

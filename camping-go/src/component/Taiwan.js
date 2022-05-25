@@ -4,7 +4,7 @@ import { db } from "../utils/firebase";
 import styled, { keyframes } from "styled-components";
 import { getDocs, collection, query, where } from "firebase/firestore";
 import tent from "../image/tent.png";
-
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { Font, Img, Display } from "../css/style";
 import { Link } from "react-router-dom";
 
@@ -35,10 +35,8 @@ const CityWrap = styled.div`
   margin: 0px auto;
   border-radius: 60px;
   animation: ${fadeIn} 0.5s ease-in-out;
-  @media (max-width: 768px) {
-    width: 60px;
-    height: 60px;
-    border-radius: 30px;
+  @media (max-width: 1280px) {
+    left: ${(props) => props.mobile_left || "0px"};
   }
 `;
 
@@ -51,14 +49,46 @@ const Releate = styled.div`
     display: flex;
     justify-content: start;
   }
-
 `;
 
+const MobileTentNumber = styled.div`
+  width: 60%;
+  height: 150px;
+  position: absolute;
+  bottom: -200px;
+  left: 15%;
+  background-color: #f8f7f1;
+  border: 2px solid #cfc781;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 25px;
+  margin: 0px auto;
+  border-radius: 60px;
+`;
+
+function CampingNumberOfCity({ targetCity, targetCityAmount }) {
+  return (
+    <>
+      <Font fontSize='20px'>{targetCity}</Font>
+      <Display m='10px 20px 20px 20px' alignItems='end'>
+        <Img width='50px' mb='5px' src={tent} alt='' />
+        <Font m='0px 3px 5px 0px'>x</Font>
+        <Font fontSize='35px'>{targetCityAmount}</Font>
+      </Display>
+      <Font fontSize='14px' letterSpacing='3px'>
+        目前開團數
+      </Font>
+    </>
+  );
+}
+
 function Taiwan() {
-  const callPath = useRef();
   const [targetCity, setTargetCity] = useState("");
   const [targetCityAmount, setTargetCityAmount] = useState("");
   const [position, setPosition] = useState("");
+  const matches = useMediaQuery("(max-width:1024px)");
 
   var place_data = [
     {
@@ -295,70 +325,49 @@ function Taiwan() {
   return (
     <Releate>
       <>
-        {position == "middle" && (
-          <CityWrap top='180px' left='30%'>
-            <Font fontSize='20px'>{targetCity}</Font>
-            <Display m='10px 20px 20px 20px' alignItems='end'>
-              <Img width='50px' mb='5px' src={tent} alt='' />
-              <Font m='0px 3px 5px 0px'>x</Font>
-              <Font fontSize='35px'>{targetCityAmount}</Font>
-            </Display>
-            <Font fontSize='14px' letterSpacing='3px'>
-              目前開團數
-            </Font>
-          </CityWrap>
-        )}
-        {position == "north" && (
-          <CityWrap top='70px' left='33%'>
-            <Font fontSize='20px'>{targetCity}</Font>
-            <Display m='10px 20px 20px 20px' alignItems='end'>
-              <Img width='50px' mb='5px' src={tent} alt='' />
-              <Font m='0px 3px 5px 0px'>x</Font>
-              <Font fontSize='35px'>{targetCityAmount}</Font>
-            </Display>
-            <Font fontSize='14px' letterSpacing='3px'>
-              目前開團數
-            </Font>
-          </CityWrap>
-        )}
-        {position == "northEast" && (
-          <CityWrap top='50px' left='73%'>
-            <Font fontSize='20px'>{targetCity}</Font>
-            <Display m='10px 20px 20px 20px' alignItems='end'>
-              <Img width='50px' mb='5px' src={tent} alt='' />
-              <Font m='0px 3px 5px 0px'>x</Font>
-              <Font fontSize='35px'>{targetCityAmount}</Font>
-            </Display>
-            <Font fontSize='14px' letterSpacing='3px'>
-              目前開團數
-            </Font>
-          </CityWrap>
-        )}
-        {position == "east" && (
-          <CityWrap top='300px' left='65%'>
-            <Font fontSize='20px'>{targetCity}</Font>
-            <Display m='10px 20px 20px 20px' alignItems='end'>
-              <Img width='50px' mb='5px' src={tent} alt='' />
-              <Font m='0px 3px 5px 0px'>x</Font>
-              <Font fontSize='35px'>{targetCityAmount}</Font>
-            </Display>
-            <Font fontSize='14px' letterSpacing='3px'>
-              目前開團數
-            </Font>
-          </CityWrap>
-        )}
-        {position == "south" && (
-          <CityWrap top='400px' left='24%'>
-            <Font fontSize='20px'>{targetCity}</Font>
-            <Display m='10px 20px 20px 20px' alignItems='end'>
-              <Img width='50px' mb='5px' src={tent} alt='' />
-              <Font m='0px 3px 5px 0px'>x</Font>
-              <Font fontSize='35px'>{targetCityAmount}</Font>
-            </Display>
-            <Font fontSize='14px' letterSpacing='3px'>
-              目前開團數
-            </Font>
-          </CityWrap>
+        {!matches && (
+          <>
+            {position == "middle" && (
+              <CityWrap top='180px' left='25%' mobile_left='18%'>
+                <CampingNumberOfCity
+                  targetCity={targetCity}
+                  targetCityAmount={targetCityAmount}
+                />
+              </CityWrap>
+            )}
+            {position == "north" && (
+              <CityWrap top='70px' left='33%' mobile_left='16%'>
+                <CampingNumberOfCity
+                  targetCity={targetCity}
+                  targetCityAmount={targetCityAmount}
+                />
+              </CityWrap>
+            )}
+            {position == "northEast" && (
+              <CityWrap top='50px' left='73%' mobile_left='16%'>
+                <CampingNumberOfCity
+                  targetCity={targetCity}
+                  targetCityAmount={targetCityAmount}
+                />
+              </CityWrap>
+            )}
+            {position == "east" && (
+              <CityWrap top='300px' left='65%' mobile_left='75%'>
+                <CampingNumberOfCity
+                  targetCity={targetCity}
+                  targetCityAmount={targetCityAmount}
+                />
+              </CityWrap>
+            )}
+            {position == "south" && (
+              <CityWrap top='400px' left='24%' mobile_left='16%'>
+                <CampingNumberOfCity
+                  targetCity={targetCity}
+                  targetCityAmount={targetCityAmount}
+                />
+              </CityWrap>
+            )}
+          </>
         )}
       </>
       <svg
@@ -579,6 +588,19 @@ function Taiwan() {
         <g id='b4580596-7aaa-48a3-92ab-b42140cb045a' data-name='g4342'></g>
         <g id='13520621-f1ed-4c7b-8b5d-1a169d9bf935' data-name='g4313'></g>
       </svg>
+      {matches && (
+        <MobileTentNumber>
+          <Font fontSize='20px'>{targetCity}</Font>
+          <Display m='10px 20px 20px 20px' alignItems='end'>
+            <Img width='50px' mb='5px' src={tent} alt='' />
+            <Font m='0px 3px 5px 0px'>x</Font>
+            <Font fontSize='35px'>{targetCityAmount}</Font>
+          </Display>
+          <Font fontSize='14px' letterSpacing='3px'>
+            目前開團數
+          </Font>
+        </MobileTentNumber>
+      )}
     </Releate>
   );
 }

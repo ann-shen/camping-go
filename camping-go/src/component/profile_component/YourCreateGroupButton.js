@@ -136,7 +136,6 @@ export function CheckCommentFromMember({ groupId }) {
   const checkComment = async () => {
     setCommentIsOpen(true);
     firebase.getCocsFeedback(groupId).then((res) => {
-      console.log(res);
       setComment(res);
     });
   };

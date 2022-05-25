@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
 import { UserContext } from "../utils/userContext";
 import styled from "styled-components";
 import {
-  Display,
   Cloumn,
   Button,
   Wrap,
@@ -13,6 +11,7 @@ import {
   Tag,
   allSecondHandSuppliesByProfile,
 } from "../css/style";
+import React, { useState, useEffect, useContext } from "react";
 import { TextField, Box } from "@mui/material";
 import { updateDoc, doc, arrayUnion, onSnapshot } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -120,7 +119,7 @@ const ChoseYourSuppliesToChangeWrap = styled.div`
   }
 `;
 
-const LetChosenSuppliesAddBorder = (index, buyerArr) => {
+const letChosenSuppliesAddBorder = (index, buyerArr) => {
   buyerArr.map((item) => {
     {
       item.border = "none";
@@ -129,14 +128,15 @@ const LetChosenSuppliesAddBorder = (index, buyerArr) => {
   buyerArr[index].border = "3px solid #CFC781";
 };
 
-const ChangeSuppliesArrFromBuyer = (data, setBuyerArr) => {
+
+const changeSuppliesArrFromBuyer = (data) => {
   let buyerArr = [];
   data.second_hand.map((item) => {
     if (item.change_status == false) {
       buyerArr.push(item);
     }
   });
-  setBuyerArr(buyerArr);
+  return buyerArr;
 };
 
 function SecondHand({ userName, userId }) {
@@ -175,7 +175,6 @@ function SecondHand({ userName, userId }) {
 
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
-    console.log(e.target.files[0].name);
   };
 
   useEffect(() => {
@@ -193,7 +192,6 @@ function SecondHand({ userName, userId }) {
       .then(() => {
         getDownloadURL(imageRef)
           .then((url) => {
-            console.log(url);
             setSuppliesInfo((prevState) => ({
               ...prevState,
               picture: url,
@@ -238,16 +236,16 @@ function SecondHand({ userName, userId }) {
     }));
   };
 
-  const changeInvite = async (index) => {
+  const changeInvite = (index) => {
     firebase.getDocJoinGroupOfMember(buyerId).then((res) => {
-      ChangeSuppliesArrFromBuyer(res, setBuyerArr);
+      setBuyerArr(changeSuppliesArrFromBuyer(res));
     });
     setShowBuyerSection(true);
     setInviteIndex(index);
   };
 
   const choseSuppliesToChange = (index) => {
-    LetChosenSuppliesAddBorder(index, buyerArr);
+    letChosenSuppliesAddBorder(index, buyerArr);
     setBuyerIndex(index);
     setChoseSupplies(buyerArr[index]);
     allSupplies[inviteIndex].inviteSupplies_index = index;
@@ -267,10 +265,6 @@ function SecondHand({ userName, userId }) {
     await updateDoc(docRef, { second_hand: allSupplies });
   };
 
-  // const updateSecondHandByBuyer = async (buyerArr) => {
-  //   buyerArr[buyerIndex].waiting_reply = true;
-  //   await updateDoc(doc(db, "joinGroup", buyerId), { second_hand: buyerArr });
-  // };
 
   const comfirmChange = async () => {
     setAlertOpen(true);

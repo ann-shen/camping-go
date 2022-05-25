@@ -294,11 +294,9 @@ export default function Profile({ userName, userId }) {
   const [yourParticipateGroup, setYourParticipateGroup] = useState([]);
   const [withDrawGrop, setWithDrawGrop] = useState(false);
   const [inviteIsOpen, setInviteIsOpen] = useState(false);
-  const [showBuyerSection, setShowBuyerSection] = useState(false);
-  const [backdropOpen, setbackdropOpen] = useState(true);
   const [inviteInfo, setInviteInfo] = useState("");
   const [inviteInfoIndex, setInviteInfoIndex] = useState("");
-  const [paramsInfo, setParamsInfo] = useState("");
+  // const [paramsInfo, setParamsInfo] = useState("");
   
   const auth = getAuth();
   const ContextByUserId = useContext(UserContext);
@@ -315,6 +313,7 @@ export default function Profile({ userName, userId }) {
           }
         });
       });
+      return () => unsub()
     }
   }, []);
 
@@ -329,7 +328,6 @@ export default function Profile({ userName, userId }) {
       Arr.push(doc.data());
     });
     setYourCreateGroup(Arr);
-    setbackdropOpen(false);
   }, []);
 
   useEffect(async () => {
@@ -389,12 +387,12 @@ export default function Profile({ userName, userId }) {
     });
   }, []);
 
-  useEffect(async () => {
-    const paramIdProfile = await getDoc(doc(db, "joinGroup", params.id));
-    if (paramIdProfile.exists()) {
-      setParamsInfo(paramIdProfile.data());
-    }
-  }, []);
+  // useEffect(async () => {
+  //   const paramIdProfile = await getDoc(doc(db, "joinGroup", params.id));
+  //   if (paramIdProfile.exists()) {
+  //     setParamsInfo(paramIdProfile.data());
+  //   }
+  // }, []);
 
   async function sweatAlertTowithDrawGrop(id, userId, index) {
     Swal.fire({
@@ -452,6 +450,7 @@ export default function Profile({ userName, userId }) {
 
   const memberWithdrawGroup = async (id, userId, index) => {
     sweatAlertTowithDrawGrop(id, userId, index);
+    
   };
 
   const handleChange = (event, newValue) => {
@@ -475,12 +474,10 @@ export default function Profile({ userName, userId }) {
       {inviteIsOpen && (
         <SecondHandInvitation
           setInviteIsOpen={setInviteIsOpen}
-          setShowBuyerSection={setShowBuyerSection}
           inviteIsOpen={inviteIsOpen}
           inviteInfo={inviteInfo}
           inviteInfoIndex={inviteInfoIndex}
-          userId={userId}
-          ></SecondHandInvitation>
+          userId={userId}></SecondHandInvitation>
       )}
       <InfoSection />
       <Box sx={BoxWrap}>
@@ -554,18 +551,12 @@ export default function Profile({ userName, userId }) {
                 )}
               </>
             ) : (
-              <SecondHand
-                userId={params.id}
-                userName={userName}
-              />
+              <SecondHand userId={params.id} userName={userName} />
             )}
           </TabPanel>
           <TabPanel value={value} index={2} dir={theme.direction}>
             {userId == params.id && (
-              <SecondHand
-                userId={userId}
-                userName={userName}
-              />
+              <SecondHand userId={userId} userName={userName} />
             )}
           </TabPanel>
         </SwipeableViews>

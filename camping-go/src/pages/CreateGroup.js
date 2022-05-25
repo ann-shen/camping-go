@@ -51,17 +51,6 @@ const CreateLabel = styled.label`
   letter-spacing: 2px;
   color: #605f56;
 `;
-const Input = styled.input`
-  font-size: 16px;
-  width: 150px;
-  height: 30px;
-  margin: 10px 0px;
-`;
-const Select = styled.select`
-  width: 150px;
-  height: 30px;
-  margin-top: 10px;
-`;
 
 const Title = styled.p`
   font-size: 35px;
@@ -132,36 +121,6 @@ const Form = styled.form`
 
 const options = ["公開", "私人"];
 
-const PriviewImg = styled.img`
-  width: 100%;
-`;
-
-const PriviewImgWrap = styled.div`
-  width: 250px;
-  height: 150px;
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
-  margin-right: 20px;
-`;
-
-const PriviewDeleteImgButton = styled.button`
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  overflow: hidden;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: white;
-  background-color: gray;
-  border: none;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-`;
 
 const MeetingTimeWrap = styled.div`
   width: 50%;
@@ -266,75 +225,9 @@ function MaterialUIPickers({ setTime }) {
   );
 }
 
-function Multiple({ setUpLoadFile }) {
-  const [file, setFile] = useState([]);
 
-  function uploadSingleFile(e) {
-    setFile([...file, URL.createObjectURL(e.target.files[0])]);
-  }
 
-  function upload(e) {
-    e.preventDefault();
-    setUpLoadFile((prevState) => ({
-      ...prevState,
-      detail_picture: file,
-    }));
-  }
-
-  function deleteFile(e) {
-    const s = file.filter((item, index) => index !== e);
-    setFile(s);
-  }
-
-  return (
-    <form>
-      <Display>
-        <CreateLabel>細節照片</CreateLabel>
-        <div className='form-group'>
-          <FileLabel>
-            上傳
-            <FileInput
-              required
-              type='file'
-              accept='image/*'
-              disabled={file.length === 5}
-              className='form-control'
-              onChange={uploadSingleFile}></FileInput>
-          </FileLabel>
-        </div>
-        <Button
-          height='30px'
-          width='100px'
-          type='button'
-          className='btn btn-primary btn-block'
-          onClick={upload}>
-          Upload
-        </Button>
-      </Display>
-      <div className='form-group preview'>
-        <Display>
-          {file.length > 0 &&
-            file.map((item, index) => {
-              return (
-                <Display key={item}>
-                  <PriviewImgWrap>
-                    <PriviewImg src={item} alt='' />
-                    <PriviewDeleteImgButton
-                      type='button'
-                      onClick={() => deleteFile(index)}>
-                      x
-                    </PriviewDeleteImgButton>
-                  </PriviewImgWrap>
-                </Display>
-              );
-            })}
-        </Display>
-      </div>
-    </form>
-  );
-}
-
-function CreateGroup({ userId, userName, allMemberArr }) {
+function CreateGroup({ userId, }) {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [state, setState] = useState({
@@ -403,7 +296,6 @@ function CreateGroup({ userId, userName, allMemberArr }) {
 
   let path = window.location.pathname;
 
-  console.log(Context.personName);
 
   const addNewGroup = async (e) => {
     e.preventDefault();
@@ -454,8 +346,8 @@ function CreateGroup({ userId, userName, allMemberArr }) {
     const docRef = doc(db, "CreateCampingGroup", groupId);
     await setDoc(docRef, {
       group_id: groupId,
-      header_id: userId,
-      header_name: userName,
+      header_id: Context.userId,
+      header_name: Context.userName,
       start_date: startDate,
       end_date: endDate,
       meeting_time: time,
@@ -484,8 +376,8 @@ function CreateGroup({ userId, userName, allMemberArr }) {
         doc(db, "CreateCampingGroup", groupId, "tent", ondocRefNewTent.id),
         {
           tent_id: ondocRefNewTent.id,
-          member: allMemberArr,
-          who_create: userName,
+          member: [],
+          who_create: Context.userName,
         }
       );
     });
@@ -503,7 +395,6 @@ function CreateGroup({ userId, userName, allMemberArr }) {
       );
     });
 
-    //supplies
     const docRefObject = await doc(
       db,
       "CreateCampingGroup",
@@ -516,7 +407,6 @@ function CreateGroup({ userId, userName, allMemberArr }) {
       supplies_id: docRefObject.id,
     });
 
-    //member
     const docRefMember = await doc(
       db,
       "CreateCampingGroup",
@@ -526,21 +416,13 @@ function CreateGroup({ userId, userName, allMemberArr }) {
     );
     setDoc(docRefMember, {
       role: "header",
-      member_name: userName,
-      member_id: userId,
+      member_name: Context.userName,
+      member_id: Context.userId,
     });
 
     navigate("/");
   };
 
-  // useEffect(async () => {
-  //   console.log(upload.url);
-  //   if (thisGroupId) {
-  //     updateDoc(doc(db, "CreateCampingGroup", thisGroupId), {
-  //       picture: upload.url,
-  //     });
-  //   }
-  // }, [upload.url]);
 
   const addNewTent = (e) => {
     e.preventDefault();
@@ -553,7 +435,7 @@ function CreateGroup({ userId, userName, allMemberArr }) {
       max_number: "",
       current_number: 0,
       seat: "",
-      who_create: userName,
+      who_create: Context.userName,
     }));
   };
 
@@ -584,7 +466,6 @@ function CreateGroup({ userId, userName, allMemberArr }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("SUBMIT", e);
   };
 
   return (
@@ -593,7 +474,6 @@ function CreateGroup({ userId, userName, allMemberArr }) {
       <Form onSubmit={handleSubmit}>
         <RockImg src={landingPage04} alt='' />
         <Title>創建你的露營團</Title>
-        {/* <CreateLabel>露營團名稱</CreateLabel> */}
         <TextField
           size='small'
           sx={{ width: "100%", marginBottom: "30px" }}
@@ -604,7 +484,6 @@ function CreateGroup({ userId, userName, allMemberArr }) {
           onChange={handleChange}></TextField>
         <TextField
           sx={{ width: "100%", marginRight: "20px", marginBottom: "30px" }}
-          // helperText='Incorrect entry.'
           size='small'
           label='最多幾人'
           name='max_member_number'
@@ -814,9 +693,6 @@ function CreateGroup({ userId, userName, allMemberArr }) {
             </Cloumn>
           </SecondSection>
         )}
-        {/* <Button width='20%' type='submit' variant='outlined'>
-          Validate
-        </Button> */}
       </Form>
       <Footer />
     </>

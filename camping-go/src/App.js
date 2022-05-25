@@ -1,36 +1,34 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import "react-date-range/dist/styles.css"; // main style file
-import "react-date-range/dist/theme/default.css"; // theme css file
+import { UserContext } from "./utils/userContext";
 import { useState, useEffect } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
+
 import CreateGroup from "./pages/CreateGroup";
 import JoinGroupPage from "./pages/JoinGroupPage";
 import CampingGroup from "./pages/CampingGroup";
 import Login from "./pages/Login";
-import GoogleMapBasic from "./component/GoogleMapBasic";
-import Member from "./component/Member";
 import Profile from "./pages/Profile";
 import CityCamping from "./pages/CityCamping";
-import { UserContext } from "./utils/userContext";
 import FindGroup from "./pages/FindGroup";
 import SecondHand from "./pages/SecondHand";
+
 import ScrollToTop from "./component/ScrollToTop";
+import GoogleMapBasic from "./component/GoogleMapBasic";
 
 function App() {
   const [userName, setUserName] = useState("");
   const [groupId, setGroupId] = useState("");
   const [userId, setUserId] = useState("");
-  const [allMemberArr, setAllMemberArr] = useState([]);
   const auth = getAuth();
-
-  console.log(groupId);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUserName(user.displayName);
         setUserId(user.uid);
-        console.log("yes");
+        console.log("login");
       } else {
         console.log("logout");
       }
@@ -54,24 +52,15 @@ function App() {
                 element={
                   <CreateGroup
                     userId={userId}
-                    setUserName={setUserName}
                     userName={userName}
-                    allMemberArr={allMemberArr}
                   />
                 }></Route>
               <Route
                 path='/'
-                element={
-                  <CampingGroup
-                    setGroupId={setGroupId}
-                  />
-                }></Route>
-              <Route path='/member' element={<Member />}></Route>
+                element={<CampingGroup setGroupId={setGroupId} />}></Route>
               <Route
                 path='joinGroup/:id'
-                element={
-                  <JoinGroupPage userName={userName} userId={userId} />
-                }></Route>
+                element={<JoinGroupPage userName={userName} />}></Route>
               <Route
                 path='profile/:id'
                 element={
@@ -98,9 +87,7 @@ function App() {
               <Route
                 path='googlemap_basic'
                 element={<GoogleMapBasic />}></Route>
-              <Route
-                path='find_group'
-                element={<FindGroup userId={userId} />}></Route>
+              <Route path='find_group' element={<FindGroup />}></Route>
               <Route
                 path='second_hand'
                 element={

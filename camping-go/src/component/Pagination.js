@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Font, Display, Img, Button } from "../css/style";
+import { Display } from "../css/style";
 
 const PageWrap = styled.div`
   width: 92%;

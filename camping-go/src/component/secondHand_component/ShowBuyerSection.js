@@ -61,7 +61,6 @@ function ShowBuyerSection({
 
   const comfirmChange = async () => {
     setAlertOpen(true);
-console.log(allSupplies);
     allSupplies[inviteIndex].buyer_name = buyerName;
     allSupplies[inviteIndex].buyer_id = buyerId;
     allSupplies[inviteIndex].change_status = false;

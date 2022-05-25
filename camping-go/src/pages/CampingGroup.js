@@ -1,9 +1,6 @@
 import styled from "styled-components";
 import { useState, useEffect, useContext, useRef } from "react";
 import { UserContext } from "../utils/userContext";
-import useMediaQuery from "@mui/material/useMediaQuery";
-
-
 import {
   doc,
   getDocs,
@@ -15,13 +12,11 @@ import {
 import { db } from "../utils/firebase";
 
 
-import { Font, Display, Img, Hr } from "../css/style";
-import Backdrop from "@mui/material/Backdrop";
+import { Font, Display, Hr } from "../css/style";
 
 import location_big from "../image/location_big.png";
 import group_people from "../image/group_people.png";
 import landingpage from "../image/landingpage10-01.png";
-import loading from "../image/loading.gif";
 
 import Modal from "react-modal";
 import Taiwan from "../component/Taiwan";
@@ -84,7 +79,6 @@ const LandingImgWrap = styled.div`
   height: 80%;
   overflow: hidden;
   z-index: -1;
-  /* margin-top: -180px; */
 `;
 
 const Section = styled.div`
@@ -176,11 +170,9 @@ const Title = styled.p`
 `;
 
 function CampingGroup({ setGroupId }) {
-  const [backdropOpen, setbackdropOpen] = useState(false);
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
   const Context = useContext(UserContext);
-  const matches = useMediaQuery("(max-width:860px)");
 
   const [pagination, setPaagination] = useState({
     loading: false,
@@ -202,7 +194,6 @@ function CampingGroup({ setGroupId }) {
       currentPage: pageNumber,
     }));
 
-  //render all camping group
   useEffect(async () => {
     let arr = [];
     const citiesRef = collection(db, "CreateCampingGroup");
@@ -249,13 +240,6 @@ function CampingGroup({ setGroupId }) {
   return (
     <>
       <HeaderSection>
-        <Backdrop
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={backdropOpen}
-          // onClick={handleClose}
-        >
-          <Img src={loading}></Img>
-        </Backdrop>
         <NavBar userId={Context.userId} />
         <LandingSubTitleWrap>
           <Font fontSize='14px'>揪團去露營。</Font>
@@ -284,7 +268,6 @@ function CampingGroup({ setGroupId }) {
 
         <ReviewCard
           currentPosts={currentPosts}
-          setbackdropOpen={setbackdropOpen}
           setIsOpen={setIsOpen}
           modalIsOpen={modalIsOpen}
           userId={Context.userId}

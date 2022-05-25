@@ -51,7 +51,7 @@ function SecondHandSection({ thisGroupMember }) {
     });
     if (second_hand_Arr.length !== 0) {
       second_hand_Arr.map((item) => {
-        item.map((obj, index) => {
+        item.map((obj) => {
           if (obj.change_status == true) {
             if (obj.inviteSupplies_index !== "") {
               objArr.push(obj);
@@ -63,7 +63,6 @@ function SecondHandSection({ thisGroupMember }) {
     }
   }, [thisGroupMember]);
 
-  console.log(sucessSecondChange);
   return (
     <>
       {sucessSecondChange && (

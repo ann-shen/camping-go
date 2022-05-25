@@ -16,13 +16,12 @@ import {
 import { db } from "../utils/firebase";
 
 function subCollectionOfMember(groupId) {
-  let subCollection;
-  return (subCollection = collection(
+  return collection(
     db,
     "CreateCampingGroup",
     groupId,
     "member"
-  ));
+  );
 }
 
 function joinGroupOfuserID(memberId) {
@@ -96,7 +95,6 @@ const firebase = {
   async updateDocIncrementTentOfMember(groupId, memberName) {
     const querySnapshot = await getDocs(queryTentOfMember(groupId, memberName));
     querySnapshot.forEach((item) => {
-      console.log(item.id, " => ", item.data());
       updateDoc(doc(db, "CreateCampingGroup", groupId, "tent", item.id), {
         current_number: increment(-1),
         member: arrayRemove(memberName),
@@ -109,7 +107,6 @@ const firebase = {
       querySuppliesOfMember(groupId, memberName)
     );
     querySupplies.forEach((item) => {
-      console.log(item.id, " => ", item.data());
       updateDoc(doc(db, "CreateCampingGroup", groupId, "supplies", item.id), {
         bring_person: "",
       });
@@ -128,7 +125,6 @@ const firebase = {
   async getDocJoinGroupOfMember(userId) {
     const paramIdProfile = await getDoc(joinGroupOfuserID(userId));
     if (paramIdProfile.exists()) {
-      console.log(paramIdProfile.data());
       return paramIdProfile.data();
     }
   },

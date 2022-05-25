@@ -97,7 +97,6 @@ function YourCreateGroup() {
   }, []);
 
   const deleteThisGroup = async (id) => {
-    console.log(id);
     Swal.fire({
       title: "確定要刪除此團？",
       icon: "question",

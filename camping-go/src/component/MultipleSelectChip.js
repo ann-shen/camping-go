@@ -46,7 +46,7 @@ function getStyles(name, personName, theme) {
   };
 }
 
-export default function MultipleSelectChip({ userId, condiion }) {
+export default function MultipleSelectChip({ userId, condition }) {
   const theme = useTheme();
   const [personName, setPersonName] = useState([]);
   const matches = useMediaQuery("(max-width:1024px)");
@@ -54,7 +54,7 @@ export default function MultipleSelectChip({ userId, condiion }) {
 
 
   useEffect(async () => {
-    if (condiion !== "create") {
+    if (condition !== "create") {
       const docRef = doc(db, "joinGroup", userId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
@@ -67,7 +67,7 @@ export default function MultipleSelectChip({ userId, condiion }) {
     const value = event.target.value;
     setPersonName(value, value.toString().split(",")[value.length - 1]);
     Context.personName = value;
-    if (condiion !== "create") {
+    if (condition !== "create") {
       await updateDoc(doc(db, "joinGroup", userId), {
         select_tag: arrayUnion(value.toString().split(",")[value.length - 1]),
       });
@@ -76,7 +76,7 @@ export default function MultipleSelectChip({ userId, condiion }) {
 
   let formControlStyle;
 
-  if (condiion !== "create") {
+  if (condition !== "create") {
     formControlStyle = { ml: 2, mt: 1, width: "400px" };
   }
   if (matches) {
@@ -84,7 +84,7 @@ export default function MultipleSelectChip({ userId, condiion }) {
   }
   return (
     <FormControl sx={formControlStyle} size='small'>
-      {condiion !== "create" ? (
+      {condition !== "create" ? (
         <InputLabel id='demo-multiple-chip-label' sx={{ zIndex: "0" }}>
           喜愛
         </InputLabel>

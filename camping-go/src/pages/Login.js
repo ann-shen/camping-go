@@ -10,44 +10,12 @@ import {
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { db } from "../utils/firebase";
-
+import "../css/login.css"
 import { Font, Wrap } from "../css/style";
 import PropTypes from "prop-types";
 import SwipeableViews from "react-swipeable-views";
 import { useTheme } from "@mui/material/styles";
 import { AppBar, Tabs, Tab, Typography, Box } from "@mui/material/";
-
-
-const Title = styled.div`
-  color: #333;
-  font-size: 15px;
-  letter-spacing: 0px;
-`;
-const Input = styled.input`
-  height: 30px;
-  width: 250px;
-  margin-left: 10px;
-  margin-bottom: 10px;
-`;
-const LoginButton = styled.button`
-  height: 35px;
-  width: 157px;
-  margin: 10px 10px 0px 0px;
-  padding: 3px;
-  font-size: 18px;
-  border-radius: 15px;
-  border: none;
-  color: #333;
-  &:hover {
-    background-color: #333;
-    color: #999;
-  }
-`;
-
-const LoginWrap = styled.div`
-  margin-left: 10%;
-  width: 30%;
-`;
 
 function TabPanel(props) {
   const { children, value, index, setUserName, ...other } = props;
@@ -89,7 +57,7 @@ function Login({ setUserId, setUserName, userName }) {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (event, newValue) => {
+  const handleChange = ( newValue) => {
     setValue(newValue);
   };
 
@@ -101,14 +69,12 @@ function Login({ setUserId, setUserName, userName }) {
     const auth = getAuth();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed in
         navigate("/");
         const user = userCredential.user;
         updateProfile(auth.currentUser, {
           displayName: user.displayName,
         });
         setUserName(user.displayName);
-        // ...
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -157,8 +123,6 @@ function Login({ setUserId, setUserName, userName }) {
       })
       .catch((error) => {
         console.log(error);
-        const errorCode = error.code;
-        const errorMessage = error.message;
         switch (error.code) {
           case "auth/email-already-in-use":
             setErrorMessage("信箱已存在");

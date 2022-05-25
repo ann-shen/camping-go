@@ -106,7 +106,6 @@ function SecondHandInvitation({
   inviteInfo,
   inviteInfoIndex,
   userId,
-  setShowBuyerSection,
 }) {
   const rejectInvite = async () => {
     inviteInfo[inviteInfoIndex].buyer_name = "";
@@ -148,7 +147,6 @@ function SecondHandInvitation({
       Arr[findIndex].buyer_id = inviteInfo[inviteInfoIndex].seller_id;
       Arr[findIndex].change_supplies = inviteInfo[inviteInfoIndex].name;
 
-      console.log(Arr);
 
       updateDoc(inviteDocRef, {
         second_hand: Arr,
@@ -167,7 +165,6 @@ function SecondHandInvitation({
       timer: 1500,
     });
     setInviteIsOpen(false);
-    setShowBuyerSection(false);
   };
   return (
     <>
