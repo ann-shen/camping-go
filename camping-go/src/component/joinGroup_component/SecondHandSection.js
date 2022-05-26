@@ -2,15 +2,13 @@ import { useState, useEffect } from "react";
 import {
   Img,
   Cloumn,
-  Wrap,
   Hr,
-  ImgWrap,
   secondHandSectionByJoinGroup,
   Font,
 } from "../../css/style";
 import { Box } from "@mui/material";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 
 const SecondHandImgWrap = styled.div`
   width: 150px;
@@ -49,6 +47,7 @@ function SecondHandSection({ thisGroupMember }) {
         return;
       }
     });
+
     if (second_hand_Arr.length !== 0) {
       second_hand_Arr.map((item) => {
         item.map((obj) => {
@@ -65,14 +64,14 @@ function SecondHandSection({ thisGroupMember }) {
 
   return (
     <>
-      {sucessSecondChange && (
+      <Cloumn>
+        <Font fontSize='20px' m='50px 0px 0px 0px'>
+          二手交換成功組合
+        </Font>
+        <Hr width='100%'></Hr>
+      </Cloumn>
+      {sucessSecondChange.length !== 0 ? (
         <>
-          <Cloumn>
-            <Font fontSize='20px' m='50px 0px 0px 0px'>
-              二手交換成功組合
-            </Font>
-            <Hr width='100%'></Hr>
-          </Cloumn>
           {sucessSecondChange.map((item, index) => (
             <SecondHandSectionWrap key={index}>
               <Box sx={secondHandSectionByJoinGroup}>
@@ -100,6 +99,8 @@ function SecondHandSection({ thisGroupMember }) {
             </SecondHandSectionWrap>
           ))}
         </>
+      ) : (
+        <Font m="30px 0px 0px 0px" fontSize="16px">快上傳你的二手露營用品跟團員們交換吧！</Font>
       )}
     </>
   );

@@ -25,14 +25,7 @@ import {
 import { signOut, getAuth } from "firebase/auth";
 import { db } from "../utils/firebase";
 
-import {
-  Font,
-  Img,
-  Button,
-  Hr,
-  BoxWrap,
-  Cloumn
-} from "../css/style";
+import { Font, Img, Button, Hr, BoxWrap, Cloumn } from "../css/style";
 import Modal from "react-modal";
 import "../css/modal.css";
 import {
@@ -55,12 +48,11 @@ import initial from "../image/initial-09.png";
 import InfoSection from "../component/profile_component/InfoSection";
 import YourCreateGroup from "../component/profile_component/YourCreateGroup";
 import YourParticipateGroup from "../component/profile_component/YourParticipateGroup";
-import SecondHandInvitation from "../component/profile_component/SecondHamdInvitation"
+import SecondHandInvitation from "../component/profile_component/SecondHamdInvitation";
 import Swal from "sweetalert2/dist/sweetalert2.js";
+import firebase from "../utils/firebaseConfig";
 
 Modal.setAppElement("#root");
-
-
 
 const SendCommentWrap = styled.div`
   width: 100%;
@@ -98,11 +90,11 @@ const Span = styled.span`
 `;
 
 const DefaultWrap = styled.div`
-width: 100%;
-display:flex;
-flex-direction:column;
-align-items: center;
-`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -285,8 +277,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
   );
 }
 
-
-export default function Profile({ userName, userId }) {
+export default function Profile({ userName }) {
   let params = useParams();
   const theme = useTheme();
   const [value, setValue] = useState(0);
@@ -296,15 +287,14 @@ export default function Profile({ userName, userId }) {
   const [inviteIsOpen, setInviteIsOpen] = useState(false);
   const [inviteInfo, setInviteInfo] = useState("");
   const [inviteInfoIndex, setInviteInfoIndex] = useState("");
-  // const [paramsInfo, setParamsInfo] = useState("");
-  
+
   const auth = getAuth();
-  const ContextByUserId = useContext(UserContext);
+  const Context = useContext(UserContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (userId) {
-      const unsub = onSnapshot(doc(db, "joinGroup", userId), (doc) => {
+    if (Context.userId) {
+      const unsub = onSnapshot(doc(db, "joinGroup", Context.userId), (doc) => {
         setInviteInfo(doc.data().second_hand);
         doc.data().second_hand.map((item, index) => {
           if (item.invite == true) {
@@ -313,7 +303,7 @@ export default function Profile({ userName, userId }) {
           }
         });
       });
-      return () => unsub()
+      return () => unsub();
     }
   }, []);
 
@@ -387,13 +377,6 @@ export default function Profile({ userName, userId }) {
     });
   }, []);
 
-  // useEffect(async () => {
-  //   const paramIdProfile = await getDoc(doc(db, "joinGroup", params.id));
-  //   if (paramIdProfile.exists()) {
-  //     setParamsInfo(paramIdProfile.data());
-  //   }
-  // }, []);
-
   async function sweatAlertTowithDrawGrop(id, userId, index) {
     Swal.fire({
       text: "確定要退團？",
@@ -404,40 +387,17 @@ export default function Profile({ userName, userId }) {
       confirmButtonText: "確定退團",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await updateDoc(doc(db, "joinGroup", userId), {
-          group: arrayRemove(id),
-        });
-        await updateDoc(doc(db, "CreateCampingGroup", id), {
-          current_number: increment(-1),
-        });
-        await deleteDoc(doc(db, "CreateCampingGroup", id, "member", userId));
-        updateDoc(doc(db, "joinGroup", yourParticipateGroup[index].header_id), {
-          alert: arrayUnion({
-            alert_content: `${userName}已退出「${yourParticipateGroup[index].group_title}」`,
-            is_read: false,
-          }),
-        });
-        const q = query(
-          collection(db, "CreateCampingGroup", id, "tent"),
-          where("member", "array-contains", userName)
+        firebase.updateDocUserGroupId(userId, id);
+        firebase.updateDocIncrementCurrentOfMember(id);
+        firebase.deleteMemberOfGroup(id, userId);
+        firebase.updateDocAlertToHeaderOfGroup(
+          yourParticipateGroup[index].header_id,
+          Context.userName,
+          yourParticipateGroup[index].group_title
         );
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((item) => {
-          updateDoc(doc(db, "CreateCampingGroup", id, "tent", item.id), {
-            current_number: increment(-1),
-            member: arrayRemove(userName),
-          });
-        });
-        const getSupplies = query(
-          collection(db, "CreateCampingGroup", id, "supplies"),
-          where("bring_person", "==", userName)
-        );
-        const querySupplies = await getDocs(getSupplies);
-        querySupplies.forEach((item) => {
-          updateDoc(doc(db, "CreateCampingGroup", id, "supplies", item.id), {
-            bring_person: "",
-          });
-        });
+        firebase.updateDocIncrementTentOfMember(id,userName)
+        firebase.updateDocSuppliesOfMember(id,userName)
+        
         setWithDrawGrop(true);
         Swal.fire({
           icon: "success",
@@ -450,7 +410,6 @@ export default function Profile({ userName, userId }) {
 
   const memberWithdrawGroup = async (id, userId, index) => {
     sweatAlertTowithDrawGrop(id, userId, index);
-    
   };
 
   const handleChange = (event, newValue) => {
@@ -470,14 +429,14 @@ export default function Profile({ userName, userId }) {
 
   return (
     <>
-      <Header ContextByUserId={ContextByUserId} />
+      <Header ContextByUserId={Context} />
       {inviteIsOpen && (
         <SecondHandInvitation
           setInviteIsOpen={setInviteIsOpen}
           inviteIsOpen={inviteIsOpen}
           inviteInfo={inviteInfo}
           inviteInfoIndex={inviteInfoIndex}
-          userId={userId}></SecondHandInvitation>
+          userId={Context.userId}></SecondHandInvitation>
       )}
       <InfoSection />
       <Box sx={BoxWrap}>
@@ -498,7 +457,7 @@ export default function Profile({ userName, userId }) {
               {...a11yProps(0)}
               sx={{ fontSize: "20px", letterSpacing: "px" }}
             />
-            {userId == params.id && (
+            {Context.userId == params.id && (
               <Tab
                 label='加入'
                 {...a11yProps(1)}
@@ -529,7 +488,7 @@ export default function Profile({ userName, userId }) {
             )}
           </TabPanel>
           <TabPanel value={value} index={1} dir={theme.direction}>
-            {userId == params.id ? (
+            {Context.userId == params.id ? (
               <>
                 {yourParticipateGroup.length !== 0 ? (
                   <YourParticipateGroup
@@ -555,8 +514,8 @@ export default function Profile({ userName, userId }) {
             )}
           </TabPanel>
           <TabPanel value={value} index={2} dir={theme.direction}>
-            {userId == params.id && (
-              <SecondHand userId={userId} userName={userName} />
+            {Context.userId == params.id && (
+              <SecondHand userId={Context.userId} userName={userName} />
             )}
           </TabPanel>
         </SwipeableViews>

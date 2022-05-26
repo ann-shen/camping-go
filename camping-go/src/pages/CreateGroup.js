@@ -251,7 +251,7 @@ function CreateGroup({ userId, }) {
     header_id: userId,
     header_name: "",
     status: "",
-    privacy: "",
+    privacy: "公開",
     password: "",
     group_title: "",
     site: "",
@@ -470,7 +470,7 @@ function CreateGroup({ userId, }) {
 
   return (
     <>
-      <Header ContextByUserId={Context.userId} />
+      <Header ContextByUserId={Context} />
       <Form onSubmit={handleSubmit}>
         <RockImg src={landingPage04} alt='' />
         <Title>創建你的露營團</Title>

@@ -16,21 +16,15 @@ import {
 import { db } from "../utils/firebase";
 
 function subCollectionOfMember(groupId) {
-  return collection(
-    db,
-    "CreateCampingGroup",
-    groupId,
-    "member"
-  );
+  return collection(db, "CreateCampingGroup", groupId, "member");
 }
 
 function joinGroupOfuserID(memberId) {
-  return  doc(db, "joinGroup", memberId)
+  return doc(db, "joinGroup", memberId);
 }
 
 function CreateCampingGroupOfGroupID(groupId) {
-  let group;
-  return (group = doc(db, "CreateCampingGroup", groupId));
+  return doc(db, "CreateCampingGroup", groupId);
 }
 
 function CreateCampingGroupOfFeedBack(groupId) {
@@ -86,6 +80,12 @@ const firebase = {
     });
   },
 
+  async updateDocUserGroupId(userId, groupId) {
+    await updateDoc(doc(db, "joinGroup", userId), {
+      group: arrayRemove(groupId),
+    });
+  },
+
   async updateDocIncrementCurrentOfMember(groupId) {
     await updateDoc(CreateCampingGroupOfGroupID(groupId), {
       current_number: increment(-1),
@@ -113,6 +113,20 @@ const firebase = {
     });
   },
 
+  async updateDocAlertToHeaderOfGroup(userId,userName,GroupTitle){
+    updateDoc(doc(db, "joinGroup", userId), {
+      alert: arrayUnion({
+        alert_content: `${userName}已退出「${GroupTitle}」`,
+        is_read: false,
+      }),
+    });
+
+  },
+
+  async deleteMemberOfGroup(groupId, userId) {
+    await deleteDoc(doc(db, "CreateCampingGroup", groupId, "member", userId));
+  },
+
   async getCocsFeedback(groupId) {
     let commentArr = [];
     const querySnapshot = await getDocs(CreateCampingGroupOfFeedBack(groupId));
@@ -128,7 +142,6 @@ const firebase = {
       return paramIdProfile.data();
     }
   },
-  
 };
 
 export default firebase;

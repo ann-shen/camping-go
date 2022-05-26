@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../utils/userContext";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import {
@@ -124,25 +124,18 @@ const GroupWrap = styled.div`
   }
 `;
 
-function IsModal({
-  modalIsOpen,
-  setIsOpen,
-  currentPosts,
-  index,
-  header_name,
-  userName,
-  userId,
-}) {
+function IsModal({ modalIsOpen, setIsOpen, currentPosts, index, userId }) {
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState(false);
   const navigate = useNavigate();
+  const Context = useContext(UserContext);
 
   const handleChange = (event) => {
     setValue(event.target.value);
   };
 
   const checkPassword = (e) => {
-    if (value == currentPosts[index].password) {
+    if (value === currentPosts[index].password) {
       joinThisGroup(
         index,
         currentPosts[index].header_name,
@@ -160,14 +153,15 @@ function IsModal({
     max_member_number,
     current_number
   ) => {
-    if (header_name == userName) {
+    if (header_name === Context.userName) {
       Swal.fire({
         position: "center",
         icon: "warning",
         text: "你是此團團長，不能加入唷！請至我的露營團-開團，查看頁面",
         showConfirmButton: false,
-        timer: 2500,
+        timer: 1500,
       });
+      setIsOpen(false);
       return;
     }
 
@@ -210,14 +204,14 @@ function IsModal({
     });
     updateDoc(doc(db, "joinGroup", currentPosts[index].header_id), {
       alert: arrayUnion({
-        alert_content: `${userName}已加入「${currentPosts[index].group_title}」`,
+        alert_content: `${Context.userName}已加入「${currentPosts[index].group_title}」`,
         is_read: false,
       }),
     });
 
     setDoc(docRefMember, {
       role: "member",
-      member_name: userName,
+      member_name: Context.userName,
       member_id: userId,
       member_select: userSelect,
     }).then(async () => {
@@ -351,13 +345,13 @@ function IsModal({
   );
 }
 
-function CityCamping({ userName, groupId, userId }) {
+function CityCamping({ userId }) {
   const [targetCity, setTargetCity] = useState("");
   const [targetCityArr, setTargetCityArr] = useState([]);
   const ContextByUserId = useContext(UserContext);
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [groupPassword, setGroupPassword] = useState("");
   const [targetIndex, setTargetIndex] = useState("");
+  const Context = useContext(UserContext);
 
   let params = useParams();
   let navigate = useNavigate();
@@ -542,7 +536,7 @@ function CityCamping({ userName, groupId, userId }) {
 
   useEffect(() => {
     let result = place_data.filter((obj) => {
-      return obj.tag == params.city;
+      return obj.tag === params.city;
     });
     setTargetCity(result[0].place);
   }, []);
@@ -563,7 +557,7 @@ function CityCamping({ userName, groupId, userId }) {
   }, [targetCity]);
 
   const confirmJoinThisGroup = (index) => {
-    if (!userName) {
+    if (!Context.userName) {
       Swal.fire({
         title: "尚未登入",
         icon: "warning",
@@ -699,7 +693,7 @@ function CityCamping({ userName, groupId, userId }) {
                     </Button>
                   )}
 
-                  {item.status == "已結束" && (
+                  {item.status === "已結束" && (
                     <Button
                       width='90%'
                       margin='auto'
@@ -712,12 +706,8 @@ function CityCamping({ userName, groupId, userId }) {
                 <IsModal
                   modalIsOpen={modalIsOpen}
                   setIsOpen={setIsOpen}
-                  groupId={groupId}
-                  index={targetIndex}
-                  groupPassword={groupPassword}
-                  header_name={item.header_name}
                   currentPosts={targetCityArr}
-                  userName={userName}
+                  index={targetIndex}
                   userId={userId}
                 />
                 <CardActions disableSpacing>

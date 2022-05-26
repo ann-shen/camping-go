@@ -208,14 +208,6 @@ const FontDetail = styled.p`
   color: #797659;
 `;
 
-const TentIndexNumber = styled.p`
-  font-size: 16px;
-  color: #797659;
-  position: absolute;
-  top: 30px;
-  left: 30px;
-`;
-
 const TentSectionWrap = styled.div`
   width: 100%;
   display: flex;
@@ -371,15 +363,6 @@ const Supplies = styled.div`
   width: 20%;
 `;
 
-const BringPersonFont = styled.p`
-  font-size: 20px;
-  color: #f4f4ee;
-  margin-left: 32%;
-  @media (max-width: 1024px) {
-    margin-left: 17%;
-  }
-`;
-
 const BringPerson = styled.div`
   width: 25%;
   margin-left: 28%;
@@ -489,7 +472,7 @@ function JoinGroupPage({ userName }) {
 
   const onDragEnter = (e) => {
     let targetTentId = e.target.getAttribute("data-key");
-    if (targetTentId == alreadyTentId) {
+    if (targetTentId === alreadyTentId) {
       return;
     }
     e.target.style.transform = "scale(1.2)";
@@ -512,22 +495,25 @@ function JoinGroupPage({ userName }) {
     });
   }, []);
 
-  useEffect(async () => {
-    const q = query(
-      collection(db, "joinGroup"),
-      where("group", "array-contains", params.id)
-    );
-    const querySnapshot = await getDocs(q);
-    let thisGroupMemberArr = [];
-    querySnapshot.forEach((doc) => {
-      thisGroupMemberArr.push(doc.data());
-    });
-    const docRef = doc(db, "joinGroup", homePageCampGroup.header_id);
-    const getHeaderInfo = await getDoc(docRef);
-    if (getHeaderInfo.exists()) {
-      thisGroupMemberArr.push(getHeaderInfo.data());
-    }
-    setThisGroupMember(thisGroupMemberArr);
+  useEffect(() => {
+    const fetchData = async () => {
+      const q = query(
+        collection(db, "joinGroup"),
+        where("group", "array-contains", params.id)
+      );
+      const querySnapshot = await getDocs(q);
+      let thisGroupMemberArr = [];
+      querySnapshot.forEach((doc) => {
+        thisGroupMemberArr.push(doc.data());
+      });
+      const docRef = doc(db, "joinGroup", homePageCampGroup.header_id);
+      const getHeaderInfo = await getDoc(docRef);
+      if (getHeaderInfo.exists()) {
+        thisGroupMemberArr.push(getHeaderInfo.data());
+      }
+      setThisGroupMember(thisGroupMemberArr);
+    };
+    fetchData();
   }, [allTentArr, homePageCampGroup]);
 
   useEffect(() => {
@@ -573,7 +559,8 @@ function JoinGroupPage({ userName }) {
     querySnapshot.forEach((doc) => {
       setIsMemberInTheTent(true);
     });
-  }, []);
+  }, [homePageCampGroup]);
+  console.log(isMemberInTheTent);
 
   const takeAway = async (id) => {
     await updateDoc(doc(db, "CreateCampingGroup", params.id, "supplies", id), {
@@ -662,7 +649,7 @@ function JoinGroupPage({ userName }) {
     <div>
       <div>
         <Header ContextByUserId={ContextByUserId} />
-        {homePageCampGroup == ""  && (
+        {homePageCampGroup == "" && (
           <Backdrop
             sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={true}>

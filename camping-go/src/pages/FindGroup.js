@@ -1,7 +1,6 @@
 import styled, { keyframes } from "styled-components";
 import { useState, useEffect, useContext } from "react";
 import { UserContext } from "../utils/userContext";
-import { Link } from "react-router-dom";
 
 import { doc, collection, getDocs, getDoc } from "firebase/firestore";
 import { db } from "../utils/firebase";
@@ -79,20 +78,12 @@ const breatheAnimation = keyframes`
 
 const GroupWrap = styled.div`
   display: flex;
-  /* flex-direction: column; */
   width: 450px;
   display: flex;
   justify-content: center;
   margin: 50px auto;
   align-items: start;
   animation: ${breatheAnimation} 700ms ease-in-out;
-`;
-
-const LinkPrivate = styled(Link)`
-  text-decoration: none;
-  margin: 5px 5px;
-  font-size: 14px;
-  color: gray;
 `;
 
 const LinkOpen = styled.a`
@@ -150,7 +141,7 @@ function IsModal({
                   ))}
               </AnnouncementFontWrap>
 
-              {allGroupInfo[index].privacy == "公開" && (
+              {allGroupInfo[index].privacy ==="公開" && (
                 <Display>
                   <Button
                     width='200px'
@@ -252,6 +243,13 @@ function FindGroup({ setRecommendIsOpen, joinThisGroup }) {
     setFindIndex(index);
   }, [allGroupSelectArr, allGroupInfo]);
 
+  const splitDate = (start, end) => {
+    let newDate = `${new Date(start * 1000).toLocaleString().split(" ")[0]}~ ${
+      new Date(end * 1000).toLocaleString().split(" ")[0]
+    }`;
+    return <>{newDate}</>;
+  };
+
   return (
     <div>
       <IsModal
@@ -301,19 +299,10 @@ function FindGroup({ setRecommendIsOpen, joinThisGroup }) {
                     {allGroupInfo[findIndex].group_title}
                   </Font>
                   <Font fontSize='16px' m='0px 0px 16px 0px'>
-                    {
-                      new Date(
-                        allGroupInfo[findIndex].start_date.seconds * 1000
-                      )
-                        .toLocaleString()
-                        .split(" ")[0]
-                    }
-                    ~
-                    {
-                      new Date(allGroupInfo[findIndex].end_date.seconds * 1000)
-                        .toLocaleString()
-                        .split(" ")[0]
-                    }
+                    {splitDate(
+                      allGroupInfo[findIndex].start_date.seconds,
+                      allGroupInfo[findIndex].end_date.seconds
+                    )}
                   </Font>
                   <Display justifyContent='space-between'>
                     <Display>
@@ -329,7 +318,6 @@ function FindGroup({ setRecommendIsOpen, joinThisGroup }) {
                     </Display>
                   </Display>
                 </CardContent>
-
                 <ButtonWrap>
                   <Button
                     width='90%'
@@ -345,7 +333,6 @@ function FindGroup({ setRecommendIsOpen, joinThisGroup }) {
                         Context.userName && <LinkOpen>我要加入</LinkOpen>}
                   </Button>
                 </ButtonWrap>
-
                 <CardActions disableSpacing>
                   {allGroupInfo[findIndex].select_tag
                     .map((obj) => <SelectTag>{obj}</SelectTag>)

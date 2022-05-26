@@ -498,8 +498,8 @@ export default function ReviewCard({
   return (
     <>
       <GroupWrap>
-        {currentPosts.length == 0 && (
-          <Wrap width='80%' justifyContent='space-between'>
+        {currentPosts.length === 0 && (
+          <Wrap width='80%' justifyContent='space-between' display="wrap" flexWrap="wrap">
             {loadingArr.map((_, index) => (
               <Stack spacing={2} style={{ marginRight: 30 }} key={index}>
                 <Skeleton
@@ -566,7 +566,7 @@ export default function ReviewCard({
                 image={item.picture}
                 alt='Paella dish'
               />
-              {item.privacy == "私人" && <PrivicyTag>私</PrivicyTag>}
+              {item.privacy === "私人" && <PrivicyTag>私</PrivicyTag>}
             </ImgWrap>
             <CardContent
               sx={{
@@ -605,7 +605,7 @@ export default function ReviewCard({
             </CardContent>
 
             <ButtonWrap>
-              {item.status == ("進行中" || "") && (
+              {item.status === ("進行中" || "") && (
                 <Button
                   width='90%'
                   margin='auto'
@@ -618,7 +618,7 @@ export default function ReviewCard({
                 </Button>
               )}
 
-              {item.status == "已結束" && (
+              {item.status === "已結束" && (
                 <Button
                   width='90%'
                   margin='auto'
