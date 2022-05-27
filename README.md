@@ -37,7 +37,7 @@ upload second-hand camping supplies to exchanges with your group members.
 - **Choose your purpose city to go**
 <br>
 Which city do you want to go ?  according to the city to find your favorite camping group.
- ![purpose_city.gif) 
+ ![./read_img_purpose_city.gif) 
 - Paired with kicking member out of the group or quit the group by yourself. 
 
 # Technologies
