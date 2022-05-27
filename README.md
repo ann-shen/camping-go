@@ -1,6 +1,8 @@
- <div style="display:flex ; justify-content:center; margin:30px;">
-  <img src="./camping-go/src/image/logoColor2.png" style= "width: 150px;">
+ <div style="display:flex;">
+  <img src="./camping-go/src/image/logoColor2.png" style= "width: 350px;">
  </div>
+ 
+ <br>
 
 [Camping Go][1],
 A group camping platform that allows you to find a like-minded group and start your camping career easily! Features include efficient tent arrangement planning, and second-hand camping supplies exchanges.
