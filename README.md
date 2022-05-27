@@ -30,11 +30,13 @@ select the tent with drag and drop, claim necessary camping supplies of the grou
 
 </br>
 
+
 - **second-hand camping supplies exchanges.**
 upload second-hand camping supplies to exchanges with your group members.
 
 
 - **personal recommendation**
+
  No idea to find your favorite camping group? 
  
  Personalized recommendation with the camping group that suits you best.
