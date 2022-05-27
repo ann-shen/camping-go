@@ -1,29 +1,46 @@
-// import { styled } from "@mui/material/styles";
 import styled, { keyframes } from "styled-components";
-import Card from "@mui/material/Card";
-import CardMedia from "@mui/material/CardMedia";
-import CardContent from "@mui/material/CardContent";
-import CardActions from "@mui/material/CardActions";
+import { useState, useContext } from "react";
+import { UserContext } from "../utils/userContext";
+import { useNavigate } from "react-router-dom";
+
+import {
+  setDoc,
+  doc,
+  getDoc,
+  getDocs,
+  collection,
+  updateDoc,
+  arrayUnion,
+} from "firebase/firestore";
+import { db } from "../utils/firebase";
+
 import {
   Font,
   Display,
   Img,
   Button,
   Hr,
-  Cloumn,
   Wrap,
   Tag,
+  CardByGroup,
 } from "../css/style";
+import {
+  TextField,
+  Alert,
+  Stack,
+  Skeleton,
+  Card,
+  CardMedia,
+  CardContent,
+  CardActions,
+} from "@mui/material";
+
 import location from "../image/location.png";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Modal from "react-modal";
-import { TextField, Alert, Stack, Skeleton } from "@mui/material";
-import { Link } from "react-router-dom";
-import FindGroup from "../pages/FindGroup";
-import landingpage04 from "../image/landingpage-04.png";
 import landingpage03 from "../image/landingpage-03.png";
 import alertIcon from "../image/alert.png";
+
+import Modal from "react-modal";
+import FindGroup from "../pages/FindGroup";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 
 const Alink = styled.a`
@@ -79,19 +96,19 @@ const SelectTag = styled.div`
 
 const GroupWrap = styled.div`
   display: flex;
-  /* flex-direction: column; */
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: start;
   margin: 10px auto;
   align-items: start;
-`;
-
-const LinkPrivate = styled(Link)`
-  text-decoration: none;
-  margin: 5px 5px;
-  font-size: 14px;
-  color: gray;
+  flex-wrap: wrap;
+  margin-left: 6%;
+  @media (max-width: 1280px) {
+    margin-left: 3%;
+  }
+  @media (max-width: 580px) {
+    margin-left: 5%;
+  }
 `;
 
 const LinkOpen = styled.a`
@@ -118,7 +135,6 @@ const FindGroupButton = styled.button`
   border: none;
   background-color: #eae5be;
   letter-spacing: 3px;
-  /* border: 2px solid #cfc781; */
   font-size: 14px;
   padding: 3px;
   margin-top: 40px;
@@ -142,36 +158,44 @@ const AnnouncementFontWrap = styled.div`
   margin-bottom: 20px;
 `;
 
+const TentImg = styled.img`
+  width: 280px;
+  @media (max-width: 768px) {
+    width: 200px;
+    margin-top: 30px;
+    margin-right: -30px;
+  }
+  @media (max-width: 580px) {
+    display: none;
+  }
+`;
+
 function IsModal({
   modalIsOpen,
   setIsOpen,
   currentPosts,
   index,
   joinThisGroup,
-  header_name,
 }) {
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState(false);
-
-  const navigate = useNavigate();
-
   const handleChange = (event) => {
     setValue(event.target.value);
   };
 
   const checkPassword = (e) => {
-    if (value == currentPosts[index].password) {
+    if (value === currentPosts[index].password) {
       joinThisGroup(
         index,
         currentPosts[index].header_name,
         currentPosts[index].max_member_number,
-        currentPosts[index].current_number
+        currentPosts[index].current_number,
+        currentPosts
       );
     } else {
       setAlert(true);
     }
   };
-  // console.log(currentPosts[index]);
 
   return (
     <div className='App'>
@@ -190,7 +214,7 @@ function IsModal({
         }}
         closeTimeoutMS={500}>
         <Display direction='column'>
-          {currentPosts[index] ? (
+          {currentPosts[index] && (
             <>
               <Font letterSpacing='3px'>介紹-即將加入露營團</Font>
               <Hr width='80%' m='10px 0px 20px 0px'></Hr>
@@ -203,8 +227,8 @@ function IsModal({
               <Hr width='80%' m='10px 0px 20px 0px'></Hr>
               <AnnouncementFontWrap>
                 {currentPosts[index].notice.length !== 0 &&
-                  currentPosts[index].notice.map((item) => (
-                    <Display mb='15px' alignItems='start'>
+                  currentPosts[index].notice.map((item, index) => (
+                    <Display mb='15px' alignItems='start' key={index}>
                       <Img src={alertIcon} width='30px'></Img>
                       <Font fontSize='14px' marginLeft='10px'>
                         {item}
@@ -213,7 +237,7 @@ function IsModal({
                   ))}
               </AnnouncementFontWrap>
 
-              {currentPosts[index].privacy == "公開" && (
+              {currentPosts[index].privacy === "公開" && (
                 <Display>
                   <Button
                     width='200px'
@@ -232,7 +256,8 @@ function IsModal({
                         index,
                         currentPosts[index].header_name,
                         currentPosts[index].max_member_number,
-                        currentPosts[index].current_number
+                        currentPosts[index].current_number,
+                        currentPosts
                       );
                     }}>
                     確認加入
@@ -240,7 +265,7 @@ function IsModal({
                 </Display>
               )}
 
-              {currentPosts[index].privacy == "私人" ? (
+              {currentPosts[index].privacy === "私人" && (
                 <>
                   <TextField
                     required
@@ -249,7 +274,7 @@ function IsModal({
                     defaultValue=''
                     onChange={handleChange}
                     size='small'
-                    type="password"
+                    type='password'
                     helperText='此為私人團，請輸入密碼'
                     sx={{ marginTop: "0px", width: "200px" }}
                   />
@@ -279,12 +304,8 @@ function IsModal({
                     </Button>
                   </Display>
                 </>
-              ) : (
-                <></>
               )}
             </>
-          ) : (
-            <></>
           )}
         </Display>
       </Modal>
@@ -292,16 +313,7 @@ function IsModal({
   );
 }
 
-function Recommend({
-  recommendIsOpen,
-  setRecommendIsOpen,
-  groupId,
-  joinThisGroup,
-  userName,
-  Expanded,
-  userId,
-  setGroupId,
-}) {
+function Recommend({ recommendIsOpen, setRecommendIsOpen, joinThisGroup }) {
   return (
     <Modal
       isOpen={recommendIsOpen}
@@ -320,9 +332,6 @@ function Recommend({
       <Display direction='column'>
         <FindGroup
           joinThisGroup={joinThisGroup}
-          userName={userName}
-          userId={userId}
-          setGroupId={setGroupId}
           setRecommendIsOpen={setRecommendIsOpen}
         />
       </Display>
@@ -332,19 +341,17 @@ function Recommend({
 
 export default function ReviewCard({
   currentPosts,
-  joinThisGroup,
-  userName,
   setIsOpen,
   modalIsOpen,
-  userId,
   setGroupId,
 }) {
   const [recommendIsOpen, setRecommendIsOpen] = useState(false);
   const [targetIndex, setTargetIndex] = useState("");
-
+  const Context = useContext(UserContext);
   const navigate = useNavigate();
+
   const confirmJoinThisGroup = (index) => {
-    if (!userId) {
+    if (!Context.userId) {
       Swal.fire({
         text: "尚未登入",
         icon: "warning",
@@ -355,29 +362,146 @@ export default function ReviewCard({
       }).then((result) => {
         if (result.isConfirmed) {
           navigate("/login");
-          // Swal.fire("Deleted!", "Your file has been deleted.", "success");
         }
       });
       return;
     }
-    console.log(index);
     setTargetIndex(index);
     setIsOpen(true);
   };
 
-  if (window.location.pathname !== "/") {
-    console.log("ohya");
-  }
-
   let loadingArr = [1, 2, 3];
+
+  const popUpAlertWithcheckIsHeader = (header_name, userName) => {
+    if (header_name === userName) {
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        text: "你是此團團長，不能加入唷！請至我的露營團-開團，查看頁面",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+      navigate("/");
+    }
+  };
+
+  const popUpAlertWithisFullGroup = () => {
+    Swal.fire({
+      position: "center",
+      icon: "warning",
+      text: "已滿團",
+      showConfirmButton: false,
+      timer: 800,
+    });
+    setIsOpen(false);
+  };
+
+  const addMemberSelectTag = async () => {
+    let userSelect;
+    const docRefJoinGroup = doc(db, "joinGroup", Context.userId);
+    const docMemberInfo = await getDoc(docRefJoinGroup);
+    if (docMemberInfo.exists()) {
+      userSelect = docMemberInfo.data().select_tag;
+    }
+    return userSelect;
+  };
+
+  const addNewMemberInfo = async (index, cardData) => {
+    const docRefMember = doc(
+      db,
+      "CreateCampingGroup",
+      cardData[index].group_id.toString(),
+      "member",
+      Context.userId
+    );
+
+    addMemberSelectTag().then(async (res) => {
+      setDoc(docRefMember, {
+        role: "member",
+        member_name: Context.userName,
+        member_id: Context.userId,
+        member_select: res,
+      });
+    });
+  };
+
+  const updateCurrentMemberNumber = async (index, cardData) => {
+    const docRef = doc(
+      db,
+      "CreateCampingGroup",
+      cardData[index].group_id.toString()
+    );
+
+    const querySnapshot = await getDocs(
+      collection(
+        db,
+        "CreateCampingGroup",
+        cardData[index].group_id.toString(),
+        "member"
+      )
+    );
+    let memberArrLength = [];
+    querySnapshot.forEach((doc) => {
+      memberArrLength.push(doc.data());
+    });
+    await updateDoc(docRef, {
+      current_number: memberArrLength.length,
+    });
+  };
+
+  const addAlertToThisGroupHeader = async (index, cardData) => {
+    updateDoc(doc(db, "joinGroup", cardData[index].header_id), {
+      alert: arrayUnion({
+        alert_content: `${Context.userName}已加入「${cardData[index].group_title}」`,
+        is_read: false,
+      }),
+    });
+  };
+
+  const updateUserJoinGroupList = async (index, cardData) => {
+    const docRefJoinGroup = doc(db, "joinGroup", Context.userId);
+    updateDoc(docRefJoinGroup, {
+      group: arrayUnion(cardData[index].group_id),
+    });
+  };
+
+  const joinThisGroup = async (
+    index,
+    header_name,
+    max_member_number,
+    current_number,
+    cardData
+  ) => {
+    if (header_name === Context.userName) {
+      popUpAlertWithcheckIsHeader(header_name, Context.userName);
+      return;
+    }
+    if (current_number + 1 > max_member_number) {
+      popUpAlertWithisFullGroup(current_number);
+      return;
+    }
+    setGroupId(cardData[index].group_id.toString());
+    addNewMemberInfo(index, cardData);
+    updateUserJoinGroupList(index, cardData);
+    updateCurrentMemberNumber(index, cardData);
+    addAlertToThisGroupHeader(index, cardData);
+    navigate(`/joinGroup/${cardData[index].group_id}`);
+  };
+
+  const splitDate = (start, end) => {
+    let newDate = `${new Date(start * 1000).toLocaleString().split(" ")[0]}~ ${
+      new Date(end * 1000).toLocaleString().split(" ")[0]
+    }`;
+    return <>{newDate}</>;
+  };
 
   return (
     <>
       <GroupWrap>
-        {currentPosts.length == 0 && (
-          <Wrap width='80%' justifyContent='space-between'>
-            {loadingArr.map((load) => (
-              <Stack spacing={2} style={{ marginRight: 30 }}>
+        {currentPosts.length === 0 && (
+          <Wrap width='80%' justifyContent='space-between' display="wrap" flexWrap="wrap">
+            {loadingArr.map((_, index) => (
+              <Stack spacing={2} style={{ marginRight: 30 }} key={index}>
                 <Skeleton
                   variant='rectangular'
                   width={290}
@@ -413,12 +537,24 @@ export default function ReviewCard({
               margin: 4,
               marginTop: 0,
               backgroundColor: "#F4F4EE",
-
               "&:hover": {
                 transition: "0.7s",
                 opacity: "0.7",
               },
-            }}>
+              "@media (max-width: 1280px)": {
+                width: "27%",
+                margin: 2,
+              },
+              "@media (max-width: 860px)": {
+                width: "40%",
+                margin: 2,
+              },
+              "@media (max-width: 580px)": {
+                width: "80%",
+                margin: 2,
+              },
+            }}
+            key={index}>
             <ImgWrap>
               <CardMedia
                 sx={{
@@ -430,7 +566,7 @@ export default function ReviewCard({
                 image={item.picture}
                 alt='Paella dish'
               />
-              {item.privacy == "私人" && <PrivicyTag>私</PrivicyTag>}
+              {item.privacy === "私人" && <PrivicyTag>私</PrivicyTag>}
             </ImgWrap>
             <CardContent
               sx={{
@@ -452,17 +588,7 @@ export default function ReviewCard({
                 {item.group_title}
               </Font>
               <Font fontSize='14px' m='0px 0px 16px 0px'>
-                {
-                  new Date(item.start_date.seconds * 1000)
-                    .toLocaleString()
-                    .split(" ")[0]
-                }
-                ~
-                {
-                  new Date(item.end_date.seconds * 1000)
-                    .toLocaleString()
-                    .split(" ")[0]
-                }
+                {splitDate(item.start_date.seconds, item.end_date.seconds)}
               </Font>
               <Display justifyContent='space-between'>
                 <Display>
@@ -479,7 +605,7 @@ export default function ReviewCard({
             </CardContent>
 
             <ButtonWrap>
-              {item.status == ("進行中" || "") && (
+              {item.status === ("進行中" || "") && (
                 <Button
                   width='90%'
                   margin='auto'
@@ -491,19 +617,8 @@ export default function ReviewCard({
                   <LinkOpen>我要加入</LinkOpen>
                 </Button>
               )}
-              {/* {item.status == "" && (
-                <Button
-                  width='90%'
-                  margin='auto'
-                  group_id={item.group_id}
-                  variant='outlined'
-                  onClick={() => {
-                    confirmJoinThisGroup(index);
-                  }}>
-                  <LinkOpen>我要加入</LinkOpen>
-                </Button>
-              )} */}
-              {item.status == "已結束" && (
+
+              {item.status === "已結束" && (
                 <Button
                   width='90%'
                   margin='auto'
@@ -523,46 +638,22 @@ export default function ReviewCard({
             />
             <CardActions disableSpacing>
               {item.select_tag
-                .map((obj) => <SelectTag>{obj}</SelectTag>)
+                .map((obj, index) => <SelectTag key={index}>{obj}</SelectTag>)
                 .slice(0, 3)}
             </CardActions>
           </Card>
         ))}
       </GroupWrap>
-      {/* <Wrap
-        width='90%'
-        m='120px 0px 30px 8%'
-        direction='column'
-        alignItems='start'>
-        <Img src={landingpage04} width='120px'></Img> 
-        <Hr width='90%' m='0px'></Hr>
-      </Wrap> */}
+
       <GroupWrap>
-        <Card
-          sx={{
-            width: "80%",
-            height: "150px",
-            boxShadow:
-              "0.8rem 0.8rem 1.8rem #E2E1D3 , -0.5rem -0.5rem 0.7rem #ffffff",
-            borderRadius: 5,
-            padding: 1,
-            margin: 4,
-            marginTop: 15,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#F8F8F2",
-            border: "1px solid #CFC781 ",
-          }}>
-          <Font letterSpacing='3px' fontSize='16px'>
+        <Card sx={CardByGroup}>
+          <Font letterSpacing='1px' fontSize='16px'>
             找不到喜愛的？一鍵找尋你的最佳推薦露營團
           </Font>
           <FindGroupButton
             onClick={() => {
-              if (!userId) {
+              if (!Context.userId) {
                 Swal.fire({
-                  // title: "尚未登入",
                   text: "尚未登入",
                   icon: "warning",
                   showCancelButton: true,
@@ -572,7 +663,6 @@ export default function ReviewCard({
                 }).then((result) => {
                   if (result.isConfirmed) {
                     navigate("/login");
-                    // Swal.fire("Deleted!", "Your file has been deleted.", "success");
                   }
                 });
                 return;
@@ -583,17 +673,13 @@ export default function ReviewCard({
           </FindGroupButton>
         </Card>
       </GroupWrap>
-
       <Recommend
         recommendIsOpen={recommendIsOpen}
         setRecommendIsOpen={setRecommendIsOpen}
         joinThisGroup={joinThisGroup}
-        userName={userName}
-        userId={userId}
-        setGroupId={setGroupId}
       />
       <Wrap width='95%' justifyContent='end' m=' -160px 00px 0px 0px'>
-        <Img src={landingpage03} width='280px'></Img>
+        <TentImg src={landingpage03} />
       </Wrap>
     </>
   );

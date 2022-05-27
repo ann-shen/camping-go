@@ -1,8 +1,31 @@
 * {
   font-family: 'Fjalla One'; }
 
-svg {
-  height: 80vh; }
+#taiwan_svg {
+  height: 80vh; 
+width: 90%
+}
+
+@media (max-width: 768px) {
+  #taiwan_svg {
+    width: 100%;
+    margin-left: -20px;
+  }
+}
+@media (max-width: 600px) {
+  #taiwan_svg {
+    width: 100%;
+    margin-left: -20px;
+    margin-top: -20px;
+  }
+}
+@media (max-width: 400px) {
+  #taiwan_svg {
+    width: 100%;
+    margin-left: -20px;
+    margin-top: -80px;
+  }
+}
 
 .taiwan {
   stroke: #CDC789;
@@ -73,3 +96,4 @@ svg {
   fill: #FFFEF0;
   
 }
+

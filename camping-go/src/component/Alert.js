@@ -104,7 +104,6 @@ function Alert({ userId }) {
     setIsRedDot(false);
     const getAlertRef = await getDoc(doc(db, "joinGroup", userId));
     if (getAlertRef.exists()) {
-      // console.log(getAlertRef.data().alert);
       let Arr = [];
       getAlertRef.data().alert.map((item) => {
         Arr.push(item);
@@ -114,7 +113,6 @@ function Alert({ userId }) {
         Arr.map((item) => {
           item.is_read = true;
         });
-        // Arr[0].is_read = true;
         updateDoc(doc(db, "joinGroup", userId), {
           alert: Arr,
         });

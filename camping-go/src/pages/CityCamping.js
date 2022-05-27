@@ -1,33 +1,40 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
+import { UserContext } from "../utils/userContext";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+
 import {
   getDocs,
   collection,
   query,
   where,
   updateDoc,
-  increment,
   doc,
   arrayUnion,
   getDoc,
   setDoc,
 } from "firebase/firestore";
-import { Font, Display, Img, Button, Wrap, Hr,Tag } from "../css/style";
-import location from "../image/location.png";
 import { db } from "../utils/firebase";
-import { Link, useNavigate } from "react-router-dom";
-import { UserContext } from "../utils/userContext";
-import Header from "../component/Header";
-import styled from "styled-components";
-import Card from "@mui/material/Card";
-import CardMedia from "@mui/material/CardMedia";
-import CardContent from "@mui/material/CardContent";
-import CardActions from "@mui/material/CardActions";
-import Modal from "react-modal";
-import { TextField, Alert, AlertTitle, Stack } from "@mui/material";
+
+import { Font, Display, Img, Button, Wrap, Hr, Tag } from "../css/style";
+import {
+  TextField,
+  Alert,
+  Stack,
+  Card,
+  CardMedia,
+  CardContent,
+  CardActions,
+} from "@mui/material";
+
 import location_big from "../image/location_big.png";
-import Swal from "sweetalert2/dist/sweetalert2.js";
 import alertIcon from "../image/alert.png";
+import location from "../image/location.png";
+
+import Header from "../component/Header";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+import Modal from "react-modal";
 
 const Alink = styled.a`
   text-decoration: none;
@@ -53,8 +60,6 @@ const ImgWrap = styled.div`
   overflow: hidden;
 `;
 
-
-
 const SelectTag = styled.div`
   width: auto;
   height: 25px;
@@ -65,23 +70,6 @@ const SelectTag = styled.div`
 
   background-color: #ebebeb;
   color: #797659;
-`;
-
-const GroupWrap = styled.div`
-  display: flex;
-  /* flex-direction: column; */
-  width: 90%;
-  display: flex;
-  justify-content: center;
-  margin: 50px auto;
-  align-items: start;
-`;
-
-const LinkPrivate = styled(Link)`
-  text-decoration: none;
-  margin: 5px 5px;
-  font-size: 14px;
-  color: gray;
 `;
 
 const LinkOpen = styled.a`
@@ -119,25 +107,35 @@ const PrivicyTag = styled.div`
   text-align: center;
 `;
 
-function IsModal({
-  modalIsOpen,
-  setIsOpen,
-  currentPosts,
-  index,
-  header_name,
-  userName,
-  userId,
-}) {
+const GroupWrap = styled.div`
+  display: flex;
+  width: 100%;
+  display: flex;
+  justify-content: start;
+  margin: 10px auto;
+  align-items: start;
+  flex-wrap: wrap;
+  margin-left: 6%;
+  @media (max-width: 1280px) {
+    margin-left: 3%;
+  }
+  @media (max-width: 580px) {
+    margin-left: 5%;
+  }
+`;
+
+function IsModal({ modalIsOpen, setIsOpen, currentPosts, index, userId }) {
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState(false);
   const navigate = useNavigate();
+  const Context = useContext(UserContext);
 
   const handleChange = (event) => {
     setValue(event.target.value);
   };
 
   const checkPassword = (e) => {
-    if (value == currentPosts[index].password) {
+    if (value === currentPosts[index].password) {
       joinThisGroup(
         index,
         currentPosts[index].header_name,
@@ -155,22 +153,19 @@ function IsModal({
     max_member_number,
     current_number
   ) => {
-    console.log(current_number);
-
-    if (header_name == userName) {
-      console.log("nono");
+    if (header_name === Context.userName) {
       Swal.fire({
         position: "center",
         icon: "warning",
         text: "你是此團團長，不能加入唷！請至我的露營團-開團，查看頁面",
         showConfirmButton: false,
-        timer: 2500,
+        timer: 1500,
       });
+      setIsOpen(false);
       return;
     }
 
     if (current_number + 1 > max_member_number) {
-      console.log(current_number + 1);
       Swal.fire({
         position: "center",
         icon: "warning",
@@ -181,13 +176,13 @@ function IsModal({
       return;
     }
 
-    const docRef = await doc(
+    const docRef = doc(
       db,
       "CreateCampingGroup",
       currentPosts[index].group_id.toString()
     );
 
-    const docRefMember = await doc(
+    const docRefMember = doc(
       db,
       "CreateCampingGroup",
       currentPosts[index].group_id.toString(),
@@ -201,7 +196,6 @@ function IsModal({
     const docMemberInfo = await getDoc(docRefJoinGroup);
 
     if (docMemberInfo.exists()) {
-      console.log(docMemberInfo.data().select_tag);
       userSelect = docMemberInfo.data().select_tag;
     }
 
@@ -210,14 +204,14 @@ function IsModal({
     });
     updateDoc(doc(db, "joinGroup", currentPosts[index].header_id), {
       alert: arrayUnion({
-        alert_content: `${userName}已加入「${currentPosts[index].group_title}」`,
+        alert_content: `${Context.userName}已加入「${currentPosts[index].group_title}」`,
         is_read: false,
       }),
     });
 
     setDoc(docRefMember, {
       role: "member",
-      member_name: userName,
+      member_name: Context.userName,
       member_id: userId,
       member_select: userSelect,
     }).then(async () => {
@@ -231,16 +225,12 @@ function IsModal({
       );
       let memberArrLength = [];
       querySnapshot.forEach((doc) => {
-        // console.log(doc.id, " => ", doc.data());
         memberArrLength.push(doc.data());
       });
-      console.log(memberArrLength.length);
       await updateDoc(docRef, {
         current_number: memberArrLength.length,
       });
     });
-
-    console.log(currentPosts[index].group_id);
 
     navigate(`/joinGroup/${currentPosts[index].group_id}`);
   };
@@ -262,7 +252,7 @@ function IsModal({
         }}
         closeTimeoutMS={500}>
         <Display direction='column'>
-          {currentPosts[index] ? (
+          {currentPosts[index] && (
             <>
               <Font letterSpacing='3px'>介紹-即將加入露營團</Font>
               <Hr width='80%' m='10px 0px 20px 0px'></Hr>
@@ -277,7 +267,6 @@ function IsModal({
                 {currentPosts[index].notice.length !== 0 &&
                   currentPosts[index].notice.map((item) => (
                     <Display mb='15px'>
-                      {console.log(item)}
                       <Img src={alertIcon} width='30px'></Img>
                       <Font fontSize='14px' marginLeft='10px'>
                         {item}
@@ -311,7 +300,7 @@ function IsModal({
                 </Display>
               )}
 
-              {currentPosts[index].privacy == "私人" ? (
+              {currentPosts[index].privacy == "私人" && (
                 <>
                   <TextField
                     required
@@ -347,12 +336,8 @@ function IsModal({
                     </Button>
                   </Display>
                 </>
-              ) : (
-                <></>
               )}
             </>
-          ) : (
-            <></>
           )}
         </Display>
       </Modal>
@@ -360,13 +345,13 @@ function IsModal({
   );
 }
 
-function CityCamping({ userName, groupId, userId }) {
+function CityCamping({ userId }) {
   const [targetCity, setTargetCity] = useState("");
   const [targetCityArr, setTargetCityArr] = useState([]);
   const ContextByUserId = useContext(UserContext);
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [groupPassword, setGroupPassword] = useState("");
   const [targetIndex, setTargetIndex] = useState("");
+  const Context = useContext(UserContext);
 
   let params = useParams();
   let navigate = useNavigate();
@@ -549,11 +534,9 @@ function CityCamping({ userName, groupId, userId }) {
     },
   ];
 
-  console.log(targetCity);
-
   useEffect(() => {
     let result = place_data.filter((obj) => {
-      return obj.tag == params.city;
+      return obj.tag === params.city;
     });
     setTargetCity(result[0].place);
   }, []);
@@ -567,16 +550,14 @@ function CityCamping({ userName, groupId, userId }) {
       const querySnapshot = await getDocs(q);
       let Arr = [];
       querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
         Arr.push(doc.data());
       });
-      console.log(Arr);
       setTargetCityArr(Arr);
     }
   }, [targetCity]);
 
   const confirmJoinThisGroup = (index) => {
-    if (!userName) {
+    if (!Context.userName) {
       Swal.fire({
         title: "尚未登入",
         icon: "warning",
@@ -587,14 +568,19 @@ function CityCamping({ userName, groupId, userId }) {
       }).then((result) => {
         if (result.isConfirmed) {
           navigate("/login");
-          // Swal.fire("Deleted!", "Your file has been deleted.", "success");
         }
       });
       return;
     }
-    console.log(index);
     setTargetIndex(index);
     setIsOpen(true);
+  };
+
+  const splitDate = (start, end) => {
+    let newDate = `${new Date(start * 1000).toLocaleString().split(" ")[0]}~ ${
+      new Date(end * 1000).toLocaleString().split(" ")[0]
+    }`;
+    return <>{newDate}</>;
   };
 
   return (
@@ -612,26 +598,43 @@ function CityCamping({ userName, groupId, userId }) {
           </Font>
         </Wrap>
         <Hr width='80%' m='0px 0px 0px 4%'></Hr>
-        <Wrap alignItems='start' justifyContent='start' width='90%'>
+        <GroupWrap>
           {targetCityArr.length !== 0 ? (
             targetCityArr.map((item, index) => (
               <Card
                 sx={{
-                  width: "27%",
+                  width: "23%",
                   height: "auto",
                   boxShadow:
                     "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-                  borderRadius: 7.5,
+                  borderRadius: 5,
                   padding: 1,
                   margin: 4,
-                  marginTop: 2,
+                  marginTop: 0,
                   backgroundColor: "#F4F4EE",
-                }}>
+                  "&:hover": {
+                    transition: "0.7s",
+                    opacity: "0.7",
+                  },
+                  "@media (max-width: 1280px)": {
+                    width: "27%",
+                    margin: 2,
+                  },
+                  "@media (max-width: 860px)": {
+                    width: "40%",
+                    margin: 2,
+                  },
+                  "@media (max-width: 580px)": {
+                    width: "80%",
+                    margin: 2,
+                  },
+                }}
+                key={index}>
                 <ImgWrap>
                   <CardMedia
                     sx={{
                       width: "100%",
-                      height: "230px",
+                      height: "200px",
                     }}
                     component='img'
                     height='194'
@@ -655,25 +658,16 @@ function CityCamping({ userName, groupId, userId }) {
                       團長｜{item.header_name}
                     </Tag>
                   </Alink>
+
                   <Font fontSize='20px' m='6px 0px 6px 0px'>
                     {item.group_title}
                   </Font>
                   <Font fontSize='14px' m='0px 0px 16px 0px'>
-                    {
-                      new Date(item.start_date.seconds * 1000)
-                        .toLocaleString()
-                        .split(" ")[0]
-                    }
-                    ~
-                    {
-                      new Date(item.end_date.seconds * 1000)
-                        .toLocaleString()
-                        .split(" ")[0]
-                    }
+                    {splitDate(item.start_date.seconds, item.end_date.seconds)}
                   </Font>
                   <Display justifyContent='space-between'>
                     <Display>
-                      <Img src={location} width='20px'></Img>{" "}
+                      <Img src={location} width='20px'></Img>
                       <Span>{item.city}</Span>
                     </Display>
                     <Display>
@@ -698,7 +692,8 @@ function CityCamping({ userName, groupId, userId }) {
                       <LinkOpen>我要加入</LinkOpen>
                     </Button>
                   )}
-                  {item.status == "已結束" && (
+
+                  {item.status === "已結束" && (
                     <Button
                       width='90%'
                       margin='auto'
@@ -711,17 +706,15 @@ function CityCamping({ userName, groupId, userId }) {
                 <IsModal
                   modalIsOpen={modalIsOpen}
                   setIsOpen={setIsOpen}
-                  groupId={groupId}
-                  index={targetIndex}
-                  groupPassword={groupPassword}
-                  header_name={item.header_name}
                   currentPosts={targetCityArr}
-                  userName={userName}
+                  index={targetIndex}
                   userId={userId}
                 />
                 <CardActions disableSpacing>
                   {item.select_tag
-                    .map((obj) => <SelectTag>{obj}</SelectTag>)
+                    .map((obj, index) => (
+                      <SelectTag key={index}>{obj}</SelectTag>
+                    ))
                     .slice(0, 3)}
                 </CardActions>
               </Card>
@@ -731,7 +724,7 @@ function CityCamping({ userName, groupId, userId }) {
               m='100px 0px 0px 0px'
               fontSize='16px'>{`此縣市尚無露營團，就等你來${targetCity}創建！`}</Font>
           )}
-        </Wrap>
+        </GroupWrap>
       </Section>
     </div>
   );

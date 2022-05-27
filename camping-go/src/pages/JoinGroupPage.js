@@ -20,9 +20,9 @@ import {
 import { useState, useEffect, useRef, useContext } from "react";
 import { useParams } from "react-router-dom";
 import "../utils/data";
+import { UserContext } from "../utils/userContext";
 import {
   Label,
-  AddButton,
   Font,
   Img,
   Display,
@@ -31,22 +31,28 @@ import {
   Wrap,
   Tag,
   Hr,
-  ImgWrap,
+  suppliesSectionByJoinGroup,
 } from "../css/style";
+import "../css/member.css";
+
 import Tent from "../component/Tent";
 import Header from "../component/Header";
-import { Box, Tooltip, IconButton } from "@mui/material";
+import CampSupplies from "../component/CampSupplies";
+import Footer from "../component/Footer";
+import SecondHandSection from "../component/joinGroup_component/SecondHandSection";
+
+import { Box, Tooltip, IconButton, Backdrop } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
+
 import location from "../image/location.png";
 import alert from "../image/alert.png";
 import tentColor from "../image/tentColor.png";
+import loading from "../image/loading.gif";
+
 import { v4 as uuidv4 } from "uuid";
-import { UserContext } from "../utils/userContext";
-import CampSupplies from "../component/CampSupplies";
-import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
-import Footer from "../component/Footer";
+
 
 const Alink = styled.a`
   text-decoration: none;
@@ -135,6 +141,7 @@ const HeaderName = styled.div`
   padding-top: 3px;
   background-color: #426765;
   color: white;
+  text-align: center;
 `;
 
 const ImagesWrap = styled.div`
@@ -146,6 +153,10 @@ const ImagesWrap = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  @media (max-width: 800px) {
+    margin: 40px 0px;
+    height: auto;
+  }
 `;
 
 const GroupImg = styled.img`
@@ -187,6 +198,9 @@ const AllMemberWrap = styled.div`
   justify-content: start;
   align-items: center;
   padding: 10px;
+  @media (max-width: 600px) {
+    justify-content: center;
+  }
 `;
 
 const FontDetail = styled.p`
@@ -195,19 +209,14 @@ const FontDetail = styled.p`
   color: #797659;
 `;
 
-const TentIndexNumber = styled.p`
-  font-size: 16px;
-  color: #797659;
-  position: absolute;
-  top: 30px;
-  left: 30px;
-`;
-
 const TentSectionWrap = styled.div`
   width: 100%;
   display: flex;
-  /* justify-content:center; */
   flex-wrap: wrap;
+  @media (max-width: 768px) {
+    align-items: center;
+    justify-content: center;
+  }
 `;
 
 const IsMemberInTheTentFont = styled.p`
@@ -226,6 +235,9 @@ const SuppliesWrap = styled.div`
   margin: 10px 0px 0px 6%;
   border-bottom: 1px dashed #f3ea98;
   padding-bottom: 20px;
+  @media (max-width: 800px) {
+    border-bottom: none;
+  }
 `;
 
 const SuppliesNotAllowedButton = styled.button`
@@ -259,6 +271,13 @@ const DeleteTentButton = styled.button`
   }
 `;
 
+const LocationIcon = styled.img`
+  width: 20px;
+  @media (max-width: 500px) {
+    margin-left: 18px;
+  }
+`;
+
 const Span = styled.span`
   font-size: 14px;
   color: #cfc781;
@@ -267,7 +286,105 @@ const Span = styled.span`
   letter-spacing: 1px;
 `;
 
-function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
+const GroupInfoWrap = styled.div`
+  display: flex;
+  margin: 20px 0px;
+  width: 100%;
+  justify-content: start;
+  align-items: center;
+  @media (max-width: 500px) {
+    flex-direction: column;
+    align-items: start;
+  }
+`;
+
+const HeaderTagWrap = styled.div`
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  @media (max-width: 500px) {
+    flex-direction: column;
+  }
+`;
+
+const GroupLocationMeetingTimeWrap = styled.div`
+  display: flex;
+  width: 100%;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const NoticeWrap = styled.div`
+  height: auto;
+  display: flex;
+  flex-direction: column;
+`;
+
+const AnnouncementNoticeWrap = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: start;
+  }
+`;
+const TentSeatWrap = styled.div`
+  display: flex;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+`;
+
+const YourTentSeatWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: -15px 10px 0px 0px;
+`;
+
+const SuppliesNote = styled.div`
+  width: 30%;
+  margin-left: 11%;
+  @media (max-width: 1024px) {
+    margin-left: 17%;
+  }
+  @media (max-width: 800px) {
+    margin-left: 20%;
+  }
+  @media (max-width: 600px) {
+    margin-left: 12%;
+  }
+`;
+
+const Supplies = styled.div`
+  width: 20%;
+`;
+
+const BringPerson = styled.div`
+  width: 25%;
+  margin-left: 28%;
+  @media (max-width: 1024px) {
+    margin-left: 17%;
+  }
+`;
+
+const SuppliesSection = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  @media (max-width: 800px) {
+    flex-direction: column;
+    align-items: center;
+    border-bottom: 1px dashed #f3ea98;
+    padding-bottom: 30px;
+  }
+`;
+
+function JoinGroupPage({ userName }) {
   const [homePageCampGroup, setHomePageCampGroup] = useState("");
   const [allTentArr, setAllTentArr] = useState([]);
   const [allSupplies, setAllSupplies] = useState([]);
@@ -279,7 +396,8 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
     create_time: serverTimestamp(),
   });
   const [addNewTentSection, setAddNewTentSection] = useState(false);
-  const [IsMemberInTheTent, setRenderParticipateArr] = useState(false);
+  const [addNewSuppliesSection, setAddNewSuppliesSection] = useState(false);
+  const [isMemberInTheTent, setIsMemberInTheTent] = useState(false);
 
   const [currentTentId, setCurrentTentId] = useState("");
   const [alreadyTentId, setAlreadyTentId] = useState("");
@@ -289,11 +407,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
     note: "",
     supplies: "",
   });
-  const [suppliesArr, setSuppliesArr] = useState([]);
-  const [addNewSuppliesSection, setAddNewSuppliesSection] = useState(false);
-  const [sucessSecondChange, setSucessSecondChange] = useState([]);
-
-  //------------------------DND ------------------------//
 
   const dragSource = useRef();
   const dropTarget = useRef();
@@ -305,19 +418,12 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
     e.target.style = "drop-shadow(0px 0px 0px white)";
 
     let secondTargetTentId = e.target.getAttribute("data-key");
-    console.log(secondTargetTentId);
     setAlreadyTentId(secondTargetTentId);
-    console.log("dragStart");
-    console.log("前一頂帳篷", currentTentId);
   };
 
   const drop = async (e) => {
     let targetTentId = e.target.getAttribute("data-key");
-    //你目標要去的帳篷
-    console.log(targetTentId);
-    console.log(currentTentId);
     if (currentTentId === targetTentId) {
-      console.log("不能移動至同頂帳篷");
       Swal.fire({
         position: "center",
         icon: "warning",
@@ -328,11 +434,8 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
       return;
     }
     onDragOver(e);
-    console.log("drop");
-    //前一頂帳篷
     let id = e.dataTransfer.getData("text");
     e.target.appendChild(document.querySelector("#" + id));
-
     e.target.style = "backgroundColor:white ; border:4px solid #f5f4e8;";
 
     await updateDoc(
@@ -341,49 +444,16 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
         current_number: increment(1),
         member: arrayUnion(userName),
       }
-    ).then(async () => {
-      let tentsArr = [];
-      const citiesRef = collection(db, "CreateCampingGroup", params.id, "tent");
-      const q = query(citiesRef, orderBy("create_time", "desc"));
-      const querySnapshot = await getDocs(
-        collection(db, "CreateCampingGroup", params.id, "tent")
-      );
-      querySnapshot.forEach((doc) => {
-        // console.log(doc.id, " => ", doc.data());
-        tentsArr.push(doc.data());
-      });
-      setAllTentArr(tentsArr);
-    });
-    //設定前一頂帳篷進state
+    );
     setCurrentTentId(targetTentId);
-
-    if (currentTentId == " ") {
-      console.log("minus");
+    if (currentTentId === " ") {
       await updateDoc(
         doc(db, "CreateCampingGroup", params.id, "tent", currentTentId),
         {
           current_number: increment(-1),
           member: arrayRemove(userName),
         }
-      ).then(async () => {
-        console.log("+1");
-        let tentsArr = [];
-        const citiesRef = collection(
-          db,
-          "CreateCampingGroup",
-          params.id,
-          "tent"
-        );
-        const q = query(citiesRef, orderBy("create_time", "desc"));
-        const querySnapshot = await getDocs(
-          collection(db, "CreateCampingGroup", params.id, "tent")
-        );
-        querySnapshot.forEach((doc) => {
-          // console.log(doc.id, " => ", doc.data());
-          tentsArr.push(doc.data());
-        });
-        setAllTentArr(tentsArr);
-      });
+      );
     } else if (alreadyTentId) {
       await updateDoc(
         doc(db, "CreateCampingGroup", params.id, "tent", alreadyTentId),
@@ -391,25 +461,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
           current_number: increment(-1),
           member: arrayRemove(userName),
         }
-      ).then(async () => {
-        console.log("+1");
-        let tentsArr = [];
-        const citiesRef = collection(
-          db,
-          "CreateCampingGroup",
-          params.id,
-          "tent"
-        );
-        const q = query(citiesRef, orderBy("create_time", "desc"));
-        const querySnapshot = await getDocs(
-          collection(db, "CreateCampingGroup", params.id, "tent")
-        );
-        querySnapshot.forEach((doc) => {
-          // console.log(doc.id, " => ", doc.data());
-          tentsArr.push(doc.data());
-        });
-        setAllTentArr(tentsArr);
-      });
+      );
     } else return;
   };
 
@@ -420,15 +472,10 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   };
 
   const onDragEnter = (e) => {
-    console.log("enter");
     let targetTentId = e.target.getAttribute("data-key");
-    //你目標要去的帳篷
-
-    if (targetTentId == alreadyTentId) {
-      console.log("不能移動至同頂帳篷");
+    if (targetTentId === alreadyTentId) {
       return;
     }
-    console.log("continute");
     e.target.style.transform = "scale(1.2)";
     e.target.style.backgroundColor = "#EAE5BE";
     e.target.style.transition =
@@ -439,91 +486,44 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   };
 
   const onDragLeave = async (e) => {
-    console.log("leave");
     e.target.style.backgroundColor = "#f5f4e8";
     e.target.style.transform = "scale(1)";
-    // e.target.style.border = "3px dotted #426765";
   };
 
-  //render all camping group
   useEffect(() => {
-    const unsub = onSnapshot(
-      doc(db, "CreateCampingGroup", params.id),
-      (doc) => {
-        // console.log("Current data: ", doc.data().meeting_time.seconds);
-        setHomePageCampGroup(doc.data());
-      }
-    );
+    onSnapshot(doc(db, "CreateCampingGroup", params.id), (doc) => {
+      setHomePageCampGroup(doc.data());
+    });
   }, []);
 
-  //getGroupMember
-  useEffect(async () => {
-    const q = query(
-      collection(db, "joinGroup"),
-      where("group", "array-contains", params.id)
-    );
-
-    const querySnapshot = await getDocs(q);
-    let thisGroupMemberArr = [];
-    querySnapshot.forEach((doc) => {
-      thisGroupMemberArr.push(doc.data());
-    });
-
-    const docRef = doc(db, "joinGroup", homePageCampGroup.header_id);
-    const getHeaderInfo = await getDoc(docRef);
-    if (getHeaderInfo.exists()) {
-      thisGroupMemberArr.push(getHeaderInfo.data());
-    }
-
-    setThisGroupMember(thisGroupMemberArr);
+  useEffect(() => {
+    const fetchData = async () => {
+      const q = query(
+        collection(db, "joinGroup"),
+        where("group", "array-contains", params.id)
+      );
+      const querySnapshot = await getDocs(q);
+      let thisGroupMemberArr = [];
+      querySnapshot.forEach((doc) => {
+        thisGroupMemberArr.push(doc.data());
+      });
+      const docRef = doc(db, "joinGroup", homePageCampGroup.header_id);
+      const getHeaderInfo = await getDoc(docRef);
+      if (getHeaderInfo.exists()) {
+        thisGroupMemberArr.push(getHeaderInfo.data());
+      }
+      setThisGroupMember(thisGroupMemberArr);
+    };
+    fetchData();
   }, [allTentArr, homePageCampGroup]);
 
-  //getSecondChange status
   useEffect(() => {
-    let second_hand_Arr = [];
-    let objArr = [];
-    thisGroupMember.map((item) => {
-      if (item.second_hand) {
-        second_hand_Arr.push(item.second_hand);
-      } else {
-        return;
-      }
-    });
-    if (second_hand_Arr.length !== 0) {
-      second_hand_Arr.map((item) => {
-        item.map((obj, index) => {
-          if (obj.change_status == true) {
-            if (obj.inviteSupplies_index !== "") {
-              // console.log(obj);
-              objArr.push(obj);
-            }
-          }
-        });
-        setSucessSecondChange(objArr);
-      });
-    } else {
-      return;
-    }
-  }, [thisGroupMember]);
-
-  //getTentData
-
-  // useEffect(async () => {
-  //   let tentsArr = [];
-  //   const querySnapshot = await getDocs(
-  //     collection(db, "CreateCampingGroup", params.id, "tent")
-  //   );
-  //   querySnapshot.forEach((doc) => {
-  //     // console.log(doc.id, " => ", doc.data());
-  //     tentsArr.push(doc.data());
-  //   });
-  //   setAllTentArr(tentsArr);
-  // }, []);
-  useEffect(() => {
-    const eventListenerpage = query(
+    const eventListenertent = query(
       collection(db, "CreateCampingGroup", params.id, "tent")
     );
-    onSnapshot(eventListenerpage, (snapshot) => {
+    const q = query(eventListenertent, orderBy("create_time", "desc"));
+
+    onSnapshot(q, (snapshot) => {
       let tentsArr = [];
       snapshot.forEach((doc) => {
         tentsArr.push(doc.data());
@@ -531,8 +531,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
       setAllTentArr(tentsArr);
     });
   }, []);
-
-  //getSuppliesData
 
   useEffect(() => {
     const eventListenerpage = query(
@@ -560,35 +558,18 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
     );
     const querySnapshot = await getDocs(tent);
     querySnapshot.forEach((doc) => {
-      setRenderParticipateArr(true);
+      setIsMemberInTheTent(true);
     });
-  }, []);
+  }, [homePageCampGroup]);
+  console.log(isMemberInTheTent);
 
   const takeAway = async (id) => {
-    console.log(id);
-    console.log(userName);
-
     await updateDoc(doc(db, "CreateCampingGroup", params.id, "supplies", id), {
       bring_person: userName,
-    }).then(async () => {
-      let takeAwayArr = [];
-      const takeAwayRef = collection(
-        db,
-        "CreateCampingGroup",
-        params.id,
-        "supplies"
-      );
-      const querySnapshot = await getDocs(takeAwayRef);
-      querySnapshot.forEach((doc) => {
-        // console.log(doc.id, " => ", doc.data());
-        takeAwayArr.push(doc.data());
-      });
-      setAllSupplies(takeAwayArr);
     });
   };
 
   const addNewTent = async () => {
-    console.log(userName);
     const ondocRefNewTent = doc(
       collection(db, "CreateCampingGroup", params.id, "tent")
     );
@@ -597,25 +578,11 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
       doc(db, "CreateCampingGroup", params.id, "tent", ondocRefNewTent.id),
       {
         tent_id: ondocRefNewTent.id,
-        member: allMemberArr,
+        member: [],
         create_time: serverTimestamp(),
         who_create: userName,
       }
-    ).then(async () => {
-      let tentsArr = [];
-      const citiesRef = collection(db, "CreateCampingGroup", params.id, "tent");
-      const q = query(citiesRef, orderBy("create_time", "desc"));
-      const querySnapshot = await getDocs(
-        collection(db, "CreateCampingGroup", params.id, "tent")
-      );
-      querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
-        tentsArr.push(doc.data());
-      });
-      setAllTentArr(tentsArr);
-      console.log(tentsArr);
-    });
-    setAllMemberArr("");
+    );
   };
 
   const addSupplies = async () => {
@@ -644,8 +611,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
   };
 
   const deleteThisTent = async (index) => {
-    console.log(index);
-    console.log(allTentArr[index].tent_id);
     await deleteDoc(
       doc(
         db,
@@ -655,67 +620,89 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
         allTentArr[index].tent_id
       )
     );
-
     allTentArr.splice(index, 1);
-    console.log(allTentArr);
+  };
+
+  const splitDate = (start, end) => {
+    let newDate = `${new Date(start * 1000).toLocaleString().split(" ")[0]}~ ${
+      new Date(end * 1000).toLocaleString().split(" ")[0]
+    }`;
+    return <>{newDate}</>;
+  };
+
+  const splitMeetingTime = (meetingTime) => {
+    let newMeetingTime = new Date(meetingTime * 1000)
+      .toLocaleString()
+      .split(" ");
+    return (
+      <>
+        <Font>{newMeetingTime[0]}</Font>
+        <Font fontSize='35px'>
+          {`${newMeetingTime[1].split(":")[0]}:${
+            newMeetingTime[1].split(":")[1]
+          }`}
+        </Font>
+      </>
+    );
   };
 
   return (
     <div>
       <div>
         <Header ContextByUserId={ContextByUserId} />
+        {homePageCampGroup == "" && (
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={true}>
+            <Img src={loading}></Img>
+          </Backdrop>
+        )}
 
         <Box
           sx={{
             width: "70%",
             height: "auto",
-            // boxShadow:
-            //   "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
             borderRadius: 10,
             paddingTop: 8,
             margin: "auto",
             marginTop: "40px",
             marginBottom: 10,
+            "@media (max-width:800px)": {
+              width: "80%",
+            },
           }}>
           <GroupTitle>
-            <Display>
+            <HeaderTagWrap>
               <HeaderName> 團長：{homePageCampGroup.header_name}</HeaderName>
               <Display>
-                {homePageCampGroup.select_tag
-                  ? homePageCampGroup.select_tag.map((item) => (
-                      <>
-                        <Tag m='3px'>{item}</Tag>
-                      </>
-                    ))
-                  : ""}
+                {homePageCampGroup.select_tag &&
+                  homePageCampGroup.select_tag.map((item) => (
+                    <>
+                      <Tag m='3px'>{item}</Tag>
+                    </>
+                  ))}
               </Display>
-            </Display>
+            </HeaderTagWrap>
 
-            <Display alignItems='center' m='20px 0px '>
-              <Img src={location} width='20px'></Img>
+            <GroupInfoWrap>
+              <LocationIcon src={location} />
               {homePageCampGroup.city && (
                 <Font marginLeft='15px'>{homePageCampGroup.city} | </Font>
               )}
               <Label mt='0px'>
                 {homePageCampGroup && (
                   <Font fontSize='18px' letterSpacing='2px' marginLeft='15px'>
-                    {
-                      new Date(homePageCampGroup.start_date.seconds * 1000)
-                        .toLocaleString()
-                        .split(" ")[0]
-                    }
-                    ~
-                    {homePageCampGroup &&
-                      new Date(homePageCampGroup.end_date.seconds * 1000)
-                        .toLocaleString()
-                        .split(" ")[0]}
+                    {splitDate(
+                      homePageCampGroup.start_date.seconds,
+                      homePageCampGroup.end_date.seconds
+                    )}
                   </Font>
                 )}
               </Label>
-            </Display>
+            </GroupInfoWrap>
           </GroupTitle>
           <Display justifyContent='space-between'>
-            <Font fontSize='30px' letterSpacing='3px' m='10px 0px 0px 0px '>
+            <Font fontSize='30px' letterSpacing='3px'>
               {homePageCampGroup.group_title}
             </Font>
             <Font fontSize='30px' letterSpacing='3px'>
@@ -731,75 +718,66 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
               露營團基本資訊
             </Font>
           </Display>
-          <Display>
+          <GroupLocationMeetingTimeWrap>
             <Box
               sx={{
-                width: "50%",
-                height: "140px",
-                borderRadius: 15,
+                width: "88%",
+                height: "auto",
+                borderRadius: 10,
                 padding: 3,
-                paddingBottom: 8,
-                paddingLeft: 7,
                 marginTop: 3,
-                justifyContent: "start",
-                backgroundColor: "#426765",
+                justifyContent: "center",
                 alignItems: "center",
+                backgroundColor: "#426765",
+                "@media (max-width:800px)": {
+                  padding: 4,
+                  height: "auto",
+                },
               }}>
               <Cloumn>
-                <Font fontSize='20px' m='10px 0px' color='#F3EA98'></Font>
+                <Font fontSize='20px' m='10px 0px' color='#F3EA98'>
+                  地點
+                </Font>
                 <Font fontSize='16px' m='0px 0px 25px 0px' color='#F3EA98'>
                   {homePageCampGroup.position}
                 </Font>
               </Cloumn>
-              <Display>
+              <HeaderTagWrap>
                 <Cloumn>
                   <Font fontSize='20px' m='10px 0px' color='#F3EA98'>
                     營區網站
                   </Font>
-                  <Font fontSize='16px' color='#F3EA98'>
+                  <Font fontSize='16px' m='0px 0px 25px 0px' color='#F3EA98'>
                     {homePageCampGroup.site}
                   </Font>
                 </Cloumn>
-              </Display>
+              </HeaderTagWrap>
             </Box>
-
             <Box
               sx={{
                 width: "30%",
                 height: "140px",
-                borderRadius: 15,
+                borderRadius: 10,
                 border: "2px solid #CFC781",
                 padding: 5,
                 marginTop: 3,
                 marginLeft: 5,
                 justifyContent: "start",
+                "@media (max-width:800px)": {
+                  padding: 3,
+                  height: "auto",
+                  marginLeft: 2,
+                },
               }}>
               <Cloumn>
                 <Font fontSize='20px'>集合時間</Font>
-                <Hr width='280px'></Hr>
-                <Font fontSize='20px'>
-                  {homePageCampGroup &&
-                    new Date(homePageCampGroup.meeting_time.seconds * 1000)
-                      .toLocaleString()
-                      .split(" ")[0]}
-                </Font>
-                <Font fontSize='35px'>
-                  {homePageCampGroup &&
-                    new Date(homePageCampGroup.meeting_time.seconds * 1000)
-                      .toLocaleString()
-                      .split(" ")[1]
-                      .split(":")[0]}
-                  :
-                  {homePageCampGroup &&
-                    new Date(homePageCampGroup.meeting_time.seconds * 1000)
-                      .toLocaleString()
-                      .split(" ")[1]
-                      .split(":")[1]}
-                </Font>
+                <Hr width='90%'></Hr>
+                {homePageCampGroup &&
+                  splitMeetingTime(homePageCampGroup.meeting_time.seconds)}
               </Cloumn>
             </Box>
-          </Display>
-          <Display>
+          </GroupLocationMeetingTimeWrap>
+          <AnnouncementNoticeWrap>
             <Box
               sx={{
                 width: "60%",
@@ -808,43 +786,42 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                 marginBottom: 8,
                 justifyContent: "start",
                 textAlign: "start",
+                display: "flex",
+                flexDirection: "column",
+                "@media (max-width:768px)": {
+                  width: "100%",
+                  marginBottom: 3,
+                },
               }}>
-              <Cloumn>
-                <Font fontSize='20px'>介紹</Font>
-                <Hr width='100%'></Hr>
-                <FontDetail>{homePageCampGroup.announcement}</FontDetail>
-              </Cloumn>
+              <Font fontSize='20px'>介紹</Font>
+              <Hr width='100%'></Hr>
+              <FontDetail>{homePageCampGroup.announcement}</FontDetail>
             </Box>
             <Box
               sx={{
                 width: "38%",
-                height: "140px",
+                height: "auto",
                 marginLeft: 7,
                 justifyContent: "start",
                 textAlign: "start",
+                "@media (max-width:768px)": {
+                  marginLeft: 0,
+                  marginBottom: 5,
+                },
               }}>
-              <Cloumn>
-                <Display mb='20px'>
-                  <Img src={alert} alt='' width='40px' />
-                  <Font fontSize='16px' marginLeft='10px'>
-                    營區提供租借帳篷
-                  </Font>
-                </Display>
-                <Display mb='20px'>
-                  <Img src={alert} alt='' width='40px' />
-                  <Font fontSize='16px' marginLeft='10px'>
-                    自行準備晚餐/隔天早餐
-                  </Font>
-                </Display>
-                <Display mb='20px'>
-                  <Img src={alert} alt='' width='40px' />
-                  <Font fontSize='16px' marginLeft='10px'>
-                    營區提供租借帳篷
-                  </Font>
-                </Display>
-              </Cloumn>
+              <NoticeWrap>
+                {homePageCampGroup &&
+                  homePageCampGroup.notice.map((item, index) => (
+                    <Display key={index} mb='20px'>
+                      <Img src={alert} alt='' width='40px' />
+                      <Font fontSize='16px' marginLeft='10px'>
+                        {item}
+                      </Font>
+                    </Display>
+                  ))}
+              </NoticeWrap>
             </Box>
-          </Display>
+          </AnnouncementNoticeWrap>
 
           <Cloumn>
             <Font fontSize='20px'>加入帳篷</Font>
@@ -857,8 +834,8 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
             {allTentArr.map((item, index) => (
               <Box
                 sx={{
-                  width: "47%",
-                  height: "330px",
+                  width: "45%",
+                  height: "auto",
                   borderRadius: 15,
                   paddingTop: 2,
                   paddingBottom: 2,
@@ -866,16 +843,22 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                   marginLeft: 0,
                   border: "2px solid #CFC781",
                   position: "relative",
+                  "@media (max-width:768px)": {
+                    width: "100%",
+                    margin: 0,
+                    marginBottom: 3,
+                    marginTop: 3,
+                  },
                 }}>
-                <DeleteTentButton
-                  onClick={() => {
-                    deleteThisTent(index);
-                  }}>
-                  x
-                </DeleteTentButton>
-                {/* <Font fontSize='18px'>{index + 1}.</Font> */}
+                {userName === item.who_create && (
+                  <DeleteTentButton
+                    onClick={() => {
+                      deleteThisTent(index);
+                    }}>
+                    x
+                  </DeleteTentButton>
+                )}
                 <Font fontSize='14px'>{item.who_create} の 帳篷</Font>
-                {/* <TentIndexNumber>{index + 1}</TentIndexNumber> */}
                 <Display key={index} direction='column'>
                   <Img src={tentColor} width='200px'></Img>
                   <Label fontSize='35px'>
@@ -886,76 +869,72 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                     {Number(item.max_number) - Number(item.current_number)}
                     個位置
                   </Font>
-                  <Display m='20px 0px 0px 0px'>
-                    <Display>
-                      {item.member &&
-                        item.member.map((seat, index) => (
-                          <Display
-                            direction='column'
-                            justifyContent='center'
-                            alignItems='center'
-                            m='0px 20px 10px 0px'
-                            mb='20px'>
-                            <Font margin='10px' marginLeft='10px'>
-                              {seat !== userName && (
-                                <Font fontSize='18px' m='0px 0px 10px 0px'>
-                                  {seat}
-                                </Font>
-                              )}
-                              {seat === userName && (
-                                <IsMemberInTheTentFont>
-                                  {seat}
-                                </IsMemberInTheTentFont>
-                              )}
-                            </Font>
+                  <TentSeatWrap>
+                    {item.member &&
+                      item.member.map((seat, index) => (
+                        <YourTentSeatWrap
+                          direction='column'
+                          justifyContent='center'
+                          alignItems='center'
+                          m='0px 20px 10px 0px'
+                          mb='20px'>
+                          <Font margin='10px' marginLeft='10px'>
                             {seat !== userName && (
-                              <AccountCircleIcon
-                                key={index}
-                                fontSize='large'
-                                sx={{
-                                  color: "#CFC781",
-                                  marginBottom: "16px",
-                                  fontSize: "45px",
-                                }}></AccountCircleIcon>
+                              <Font fontSize='18px' m='0px 0px 10px 0px'>
+                                {seat}
+                              </Font>
                             )}
                             {seat === userName && (
-                              <PersonWrap
-                                data-key={item.tent_id}
-                                id='drag-source'
-                                draggable='true'
-                                onDragStart={dragStart}>
-                                <EmojiPeopleIcon
-                                  sx={{
-                                    pointerEvents: "none",
-                                    cursor: "not-allowed",
-                                    color: "#426765",
-                                    fontSize: "45px",
-                                  }}
-                                  fontSize='large'></EmojiPeopleIcon>
-                              </PersonWrap>
+                              <IsMemberInTheTentFont>
+                                {seat}
+                              </IsMemberInTheTentFont>
                             )}
-                          </Display>
-                        ))}
-                    </Display>
-                    <Display>
-                      {Array(
-                        Number(item.max_number) - Number(item.current_number)
-                      )
-                        .fill(null)
-                        .map(() => (
-                          <label key={uuidv4()}>
-                            <div
+                          </Font>
+                          {seat !== userName && (
+                            <AccountCircleIcon
+                              key={index}
+                              fontSize='large'
+                              sx={{
+                                color: "#CFC781",
+                                marginBottom: "16px",
+                                fontSize: "45px",
+                              }}></AccountCircleIcon>
+                          )}
+                          {seat === userName && (
+                            <PersonWrap
                               data-key={item.tent_id}
-                              style={TargetContainer}
-                              ref={dropTarget}
-                              onDrop={drop}
-                              onDragEnter={onDragEnter}
-                              onDragOver={onDragOver}
-                              onDragLeave={onDragLeave}></div>
-                          </label>
-                        ))}
-                    </Display>
-                  </Display>
+                              id='drag-source'
+                              draggable='true'
+                              onDragStart={dragStart}>
+                              <EmojiPeopleIcon
+                                sx={{
+                                  pointerEvents: "none",
+                                  cursor: "not-allowed",
+                                  color: "#426765",
+                                  fontSize: "45px",
+                                }}
+                                fontSize='large'></EmojiPeopleIcon>
+                            </PersonWrap>
+                          )}
+                        </YourTentSeatWrap>
+                      ))}
+                    {Array(
+                      Number(item.max_number) - Number(item.current_number)
+                    )
+                      .fill(null)
+                      .map(() => (
+                        <label key={uuidv4()}>
+                          <div
+                            data-key={item.tent_id}
+                            style={TargetContainer}
+                            ref={dropTarget}
+                            onDrop={drop}
+                            onDragEnter={onDragEnter}
+                            onDragOver={onDragOver}
+                            onDragLeave={onDragLeave}></div>
+                        </label>
+                      ))}
+                  </TentSeatWrap>
                 </Display>
               </Box>
             ))}
@@ -971,16 +950,12 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
             }}>
             <SourseContainer id='source-container' ref={dragSource}>
               <Display>
-                {!IsMemberInTheTent && (
+                {!isMemberInTheTent && (
                   <Tooltip title='請移至方格'>
                     <IconButton
                       id='drag-source'
                       draggable='true'
                       onDragStart={dragStart}>
-                      {/* <PersonWrap
-                        id='drag-source'
-                        draggable='true'
-                        onDragStart={dragStart}> */}
                       <EmojiPeopleIcon
                         sx={{
                           pointerEvents: "none",
@@ -990,7 +965,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                         }}
                         color='primary'
                         fontSize='large'></EmojiPeopleIcon>
-                      {/* </PersonWrap> */}
                     </IconButton>
                   </Tooltip>
                 )}
@@ -1022,38 +996,16 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
           </Box>
           <Wrap width='100%'>
             {addNewTentSection && (
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "auto",
-                  boxShadow:
-                    "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-                  borderRadius: 10,
-                  padding: 3,
-                  paddingLeft: 6,
-                  alignItems: "center",
-                  marginTop: 3,
-                  marginBottom: 5,
-                }}>
+              <Box sx={suppliesSectionByJoinGroup}>
                 <Font fontSize='20px' alignSelf='start' m='0px 0px 30px 0px'>
                   新增帳篷
                 </Font>
                 <Display justifyContent='center'>
-                  <Tent
-                    setTentInfo={setTentInfo}
-                    tentInfo={tentInfo}
-                    setAllMemberArr={setAllMemberArr}
-                    allMemberArr={allMemberArr}
-                  />
+                  <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
                   <Button width='100px' onClick={addNewTent}>
                     新增
                   </Button>
                 </Display>
-                {/* {tentArr.map((_, index) => (
-            <div key={index}>
-              <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
-            </div>
-          ))} */}
               </Box>
             )}
           </Wrap>
@@ -1076,38 +1028,30 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                 marginBottom: 5,
                 justifyContent: "start",
                 backgroundColor: "#426765",
+                "@media (max-width:768px)": {
+                  width: "100%",
+                  padding: 5,
+                },
               }}>
               <Box>
-                <Display justifyContent='start'>
-                  <Font color='#F4F4EE' marginLeft='7%'>
-                    項目
-                  </Font>
-                  <Font color='#F4F4EE' marginLeft='15%'>
-                    備註
-                  </Font>
-                  <Font color='#F4F4EE' marginLeft='32%'>
-                    認領
-                  </Font>
-                </Display>
                 {allSupplies.map((item, index) => (
-                  <Wrap width='100%' justifyContent='space-between'>
+                  <SuppliesSection>
                     <SuppliesWrap key={index}>
-                      <Wrap width='150px' justifyContent='start'>
-                        <Label fontSize='16px' color='#F3EA98' ml='5%'>
+                      <Supplies>
+                        <Font fontSize='16px' color='#F3EA98' ml='5%'>
                           {item.supplies}
-                        </Label>
-                      </Wrap>
-                      <Wrap
-                        width='250px'
-                        m='0px 0px 0px 5%'
-                        justifyContent='start'>
-                        <Label fontSize='16px' color='#F3EA98'>
+                        </Font>
+                      </Supplies>
+                      <SuppliesNote>
+                        <Font fontSize='16px' color='#F3EA98' ml='0px'>
                           {item.note}
-                        </Label>
-                      </Wrap>
-                      <Label ml='15%' color='#F3EA98'>
-                        {item.bring_person}
-                      </Label>
+                        </Font>
+                      </SuppliesNote>
+                      <BringPerson>
+                        <Font ml='15%' color='#F3EA98'>
+                          {item.bring_person}
+                        </Font>
+                      </BringPerson>
                     </SuppliesWrap>
 
                     {item.bring_person == "" ? (
@@ -1132,7 +1076,7 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
                         已認領
                       </SuppliesNotAllowedButton>
                     )}
-                  </Wrap>
+                  </SuppliesSection>
                 ))}
               </Box>
             </Box>
@@ -1154,33 +1098,13 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
             </Button>
           </Display>
           {addNewSuppliesSection && (
-            <Box
-              sx={{
-                width: "100%",
-                height: "auto",
-                boxShadow:
-                  "0.8rem 0.8rem 2.2rem #E2E1D3 , -0.5rem -0.5rem 1rem #ffffff",
-                borderRadius: 10,
-                padding: 3,
-                paddingLeft: 6,
-                alignItems: "center",
-                marginTop: 3,
-                marginBottom: 5,
-              }}>
+            <Box sx={suppliesSectionByJoinGroup}>
               <Font m='0px 0px 30px 0px'>新增需要團員們認領的物品</Font>
               <Display justifyContent='center' mb='30px'>
                 <CampSupplies
                   setCampSupplies={setCampSupplies}
                   campSupplies={campSupplies}
                 />
-                {suppliesArr.map((_, index) => (
-                  <div key={index}>
-                    <CampSupplies
-                      setCampSupplies={setCampSupplies}
-                      campSupplies={campSupplies}
-                    />
-                  </div>
-                ))}
               </Display>
               <Button onClick={addSupplies} width='100px'>
                 新增
@@ -1199,7 +1123,6 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
             {thisGroupMember.map((item) => (
               <Alink href={`/profile/${item.info.user_id}`}>
                 <MemberWrap>
-                  {console.log(thisGroupMember)}
                   <ProfileImgWrap>
                     <ProfileImg src={item.profile_img} />
                   </ProfileImgWrap>
@@ -1221,83 +1144,13 @@ function JoinGroupPage({ setAllMemberArr, allMemberArr, userName, userId }) {
               </Alink>
             ))}
           </AllMemberWrap>
-          {sucessSecondChange && (
-            <>
-              <Cloumn>
-                <Font fontSize='20px' m='50px 0px 0px 0px'>
-                  二手交換成功組合
-                </Font>
-                <Hr width='100%'></Hr>
-              </Cloumn>
-              {sucessSecondChange.map((item) => (
-                <div>
-                  <Wrap width='100%' justifyContent='space-around'>
-                    <Box
-                      sx={{
-                        width: "25%",
-                        height: "200px",
-                        boxShadow:
-                          "0.3rem 0.3rem 2.6rem #E2E1D3 , -1.0rem -1.0rem 0.7rem #ffffff",
-                        borderRadius: 6,
-                        padding: "10px",
-                        margin: "auto",
-                        marginTop: "60px",
-                        border: "1px solid #CFC781 ",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}>
-                      <Font m='0px 0px 20px 0px'>{item.buyer_name}</Font>
-                      <ImgWrap width='150px' height='100px' mb='10px'>
-                        <Img
-                          width='100%'
-                          src={item.change_supplies_picture}></Img>
-                      </ImgWrap>
-                      <Hr width='50%'></Hr>
-                      <Font color='#426765' fontSize='16px'>
-                        {item.change_supplies}
-                      </Font>
-                    </Box>
-
-                    <CompareArrowsIcon
-                      sx={{ fontSize: "50px", color: "#426765" }}
-                    />
-                    <Box
-                      sx={{
-                        width: "25%",
-                        height: "200px",
-                        boxShadow:
-                          "0.3rem 0.3rem 2.6rem #E2E1D3 , -1.0rem -1.0rem 0.7rem #ffffff",
-                        borderRadius: 6,
-                        padding: "10px",
-                        margin: "auto",
-                        marginTop: "60px",
-                        border: "1px solid #CFC781 ",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}>
-                      <Font m='0px 0px 20px 0px'>{item.seller_name}</Font>
-                      <ImgWrap width='150px' height='100px' mb='10px'>
-                        <Img width='100%' src={item.picture}></Img>
-                      </ImgWrap>
-                      <Hr width='50%'></Hr>
-                      <Font color='#426765' fontSize='16px'>
-                        {item.name}
-                      </Font>
-                    </Box>
-                  </Wrap>
-                </div>
-              ))}
-            </>
-          )}
+          <SecondHandSection thisGroupMember={thisGroupMember} />
         </Box>
       </div>
       <Footer />
     </div>
   );
 }
+
 
 export default JoinGroupPage;

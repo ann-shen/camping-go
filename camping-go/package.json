@@ -31,6 +31,10 @@
     "uuid": "^8.3.2",
     "web-vitals": "^2.1.4"
   },
+  "resolutions": {
+    "@types/react": "16.14.26",
+    "react": "^17.0.2"
+},
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -56,3 +60,5 @@
     ]
   }
 }
+
+

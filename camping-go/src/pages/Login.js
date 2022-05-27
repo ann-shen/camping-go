@@ -1,56 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { setDoc, doc } from "firebase/firestore";
 import styled from "styled-components";
-import { db } from "../utils/firebase";
+
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import login from "../css/login.css";
-import { Display, Font, Wrap } from "../css/style";
-import * as React from "react";
+import { setDoc, doc } from "firebase/firestore";
+import { db } from "../utils/firebase";
+import "../css/login.css"
+import { Font, Wrap } from "../css/style";
 import PropTypes from "prop-types";
 import SwipeableViews from "react-swipeable-views";
 import { useTheme } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-
-const Title = styled.div`
-  color: #333;
-  font-size: 15px;
-  letter-spacing: 0px;
-`;
-const Input = styled.input`
-  height: 30px;
-  width: 250px;
-  margin-left: 10px;
-  margin-bottom: 10px;
-`;
-const LoginButton = styled.button`
-  height: 35px;
-  width: 157px;
-  margin: 10px 10px 0px 0px;
-  padding: 3px;
-  font-size: 18px;
-  border-radius: 15px;
-  border: none;
-  color: #333;
-  &:hover {
-    background-color: #333;
-    color: #999;
-  }
-`;
-
-const LoginWrap = styled.div`
-  margin-left: 10%;
-  width: 30%;
-`;
+import { AppBar, Tabs, Tab, Typography, Box } from "@mui/material/";
 
 function TabPanel(props) {
   const { children, value, index, setUserName, ...other } = props;
@@ -84,15 +49,15 @@ function a11yProps(index) {
   };
 }
 
-function Login({setUserId, setUserName, userName}) {
+function Login({ setUserId, setUserName, userName }) {
   const theme = useTheme();
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
   const [email, setEmail] = useState("moon@gmail.com");
   const [password, setPassword] = useState("moonmo");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (event, newValue) => {
+  const handleChange = ( newValue) => {
     setValue(newValue);
   };
 
@@ -104,15 +69,12 @@ function Login({setUserId, setUserName, userName}) {
     const auth = getAuth();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed in
         navigate("/");
         const user = userCredential.user;
-        console.log(user.displayName);
         updateProfile(auth.currentUser, {
           displayName: user.displayName,
         });
         setUserName(user.displayName);
-        // ...
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -140,12 +102,6 @@ function Login({setUserId, setUserName, userName}) {
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
         const user = userCredential.user;
-        console.log(user);
-        console.log(user.uid);
-        console.log(userName);
-
-        // setUserId(user.uid);
-
         updateProfile(auth.currentUser, {
           displayName: userName,
         });
@@ -164,12 +120,9 @@ function Login({setUserId, setUserName, userName}) {
           alert: [],
         });
         navigate("/");
-        // console.log(user.email);
       })
       .catch((error) => {
         console.log(error);
-        const errorCode = error.code;
-        const errorMessage = error.message;
         switch (error.code) {
           case "auth/email-already-in-use":
             setErrorMessage("信箱已存在");
@@ -187,8 +140,6 @@ function Login({setUserId, setUserName, userName}) {
         }
       });
   };
-
-  console.log(userName);
 
   return (
     <Box
@@ -268,7 +219,6 @@ function Login({setUserId, setUserName, userName}) {
             <input
               type='text'
               onChange={(e) => {
-                console.log(e.target.value);
                 setUserName(e.target.value);
               }}
             />
@@ -287,14 +237,6 @@ function Login({setUserId, setUserName, userName}) {
                 setPassword(e.target.value);
               }}
             />
-            {/* <label htmlFor=''>Confirm Password</label>
-            <input
-              type='password'
-              name='password'
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-            /> */}
             <div className='btnWrap'>
               <button onClick={register}>Sign up</button>
             </div>
@@ -304,182 +246,5 @@ function Login({setUserId, setUserName, userName}) {
     </Box>
   );
 }
-
-// function Login({ setUserId, setUserName, userName }) {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [errorMessage, setErrorMessage] = useState("");
-//   const navigate = useNavigate();
-//   const [loginStatus, setLoginStatus] = useState(true);
-
-//   // useEffect(() => {
-//   //   setPathName(window.location.pathname);
-//   // }, []);
-
-//   function handellogin() {
-//     const auth = getAuth();
-//     signInWithEmailAndPassword(auth, email, password)
-//       .then((userCredential) => {
-//         // Signed in
-//         const user = userCredential.user;
-//         console.log(user.displayName);
-//         updateProfile(auth.currentUser, {
-//           displayName: user.displayName,
-//         });
-//         setUserName(user.displayName);
-//         navigate("/");
-//         // ...
-//       })
-//       .catch((error) => {
-//         const errorCode = error.code;
-//         const errorMessage = error.message;
-//         switch (error.code) {
-//           case "auth/invalid-email":
-//             setErrorMessage("信箱格式不正確");
-//             alert("信箱格式不正確");
-//             break;
-//           case "auth/user-not-found":
-//             setErrorMessage("信箱不存在");
-//             alert("信箱不存在");
-//             break;
-//           case "auth/wrong-password":
-//             setErrorMessage("密碼錯誤");
-//             alert("密碼錯誤");
-//             break;
-//           default:
-//         }
-//       });
-//   }
-
-//   function register() {
-//     const auth = getAuth();
-//     createUserWithEmailAndPassword(auth, email, password)
-//       .then(async (userCredential) => {
-//         const user = userCredential.user;
-//         setUserId(user.uid);
-//         updateProfile(auth.currentUser, {
-//           displayName: userName,
-//         });
-//         const newUserRef = doc(db, "joinGroup", user.uid);
-//         await setDoc(newUserRef, {
-//           info: {
-//             email: user.email,
-//             user_name: userName,
-//           },
-//           select_tag: [],
-//           group: [
-//             {
-//               group_id: "",
-//             },
-//           ],
-//         });
-//         navigate("/");
-//         // console.log(user.email);
-//       })
-//       .catch((error) => {
-//         const errorCode = error.code;
-//         const errorMessage = error.message;
-//         switch (error.code) {
-//           case "auth/email-already-in-use":
-//             setErrorMessage("信箱已存在");
-//             alert("信箱已存在");
-//             break;
-//           case "auth/invalid-email":
-//             setErrorMessage("信箱格式不正確");
-//             alert("信箱格式不正確");
-//             break;
-//           case "auth/weak-password":
-//             setErrorMessage("密碼強度不足");
-//             alert("密碼強度不足");
-//             break;
-//           default:
-//         }
-//       });
-//   }
-
-//   return (
-//     <>
-//       <div className='login_wrap'>
-//         <section id='login'></section>
-//         <br />
-//         <section className='orderListWrapn'>
-//           <div className='top_wrap'>
-//             <p>Don't you have an account?</p>
-//             {/* <a href='#signup'>
-//               <button onClick={()=>{setLoginStatus(false)}}>Sign Up</button>
-//             </a> */}
-//           </div>
-//           <h1>歡迎來到 camping go</h1>
-//           <h5>請登入您的帳號</h5>
-//           <label htmlFor=''>UserEmail</label>
-//           <input
-//             type='text'
-//             onChange={(e) => {
-//               setEmail(e.target.value);
-//             }}
-//           />
-//           <label htmlFor=''>Password</label>
-//           <input
-//             type='password'
-//             name='password'
-//             onChange={(e) => {
-//               setPassword(e.target.value);
-//             }}
-//           />
-//           <div className='btnWrap'>
-//             <button onClick={handellogin}>Login In</button>
-//             <br />
-//           </div>
-//         </section>
-//         {loginStatus && (
-//           <section className='orderListWrapn' id='signup'>
-//             <div className='top_wrap'>
-//               <p>already have an account?</p>
-//               <a href='#login'>
-//                 <button>Sign In</button>
-//               </a>
-//             </div>
-//             <h1>歡迎來到 camping go</h1>
-//             <h5>註冊成為會員</h5>
-//             <label htmlFor=''>Username</label>
-//             <input
-//               type='text'
-//               onChange={(e) => {
-//                 setUserName(e.target.value);
-//               }}
-//             />
-//             <label htmlFor=''>Email</label>
-//             <input
-//               type='text'
-//               onChange={(e) => {
-//                 setEmail(e.target.value);
-//               }}
-//             />
-//             <label htmlFor=''>Password</label>
-//             <input
-//               type='password'
-//               name='password'
-//               value={password}
-//               onChange={(e) => {
-//                 setPassword(e.target.value);
-//               }}
-//             />
-//             <label htmlFor=''>Confirm Password</label>
-//             <input
-//               type='password'
-//               name='password'
-//               onChange={(e) => {
-//                 setPassword(e.target.value);
-//               }}
-//             />
-//             <div className='btnWrap'>
-//               <button onClick={register}>Sign up</button>
-//             </div>
-//           </section>
-//         )}
-//       </div>
-//     </>
-//   );
-// }
 
 export default Login;

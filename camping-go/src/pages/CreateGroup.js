@@ -1,6 +1,10 @@
 import styled from "styled-components";
-import { db } from "../utils/firebase";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../utils/userContext";
+
+
+
 import {
   setDoc,
   doc,
@@ -9,25 +13,29 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { DateRange } from "react-date-range";
-import { useNavigate } from "react-router-dom";
-import Tent from "../component/Tent";
-import CampSupplies from "../component/CampSupplies";
-import { TextField, Box, Autocomplete, Stack } from "@mui/material";
+import { db } from "../utils/firebase";
+
+import { TextField, Autocomplete, Stack } from "@mui/material";
+import { Display, Cloumn, Button, Wrap, Img, Font } from "../css/style";
+
+import landingPage04 from "../image/landingpage-04.png";
+import tentColor from "../image/tentColor.png";
+import supplies from "../image/supplies.png";
+
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import GoogleMapBasic from "../component/GoogleMapBasic";
-import MultipleSelectChip from "../component/MultipleSelectChip";
+import { DateRange } from "react-date-range";
+import Tent from "../component/Tent";
 import Header from "../component/Header";
 import Footer from "../component/Footer";
-import { Display, Cloumn, Button, Wrap, Img, Font } from "../css/style";
-import landingPage04 from "../image/landingpage-04.png";
-import { v4 as uuidv4 } from "uuid";
+import CampSupplies from "../component/CampSupplies";
+import GoogleMapBasic from "../component/GoogleMapBasic";
+import MultipleSelectChip from "../component/MultipleSelectChip";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { UserContext } from "../utils/userContext";
-import tentColor from "../image/tentColor.png";
-import supplies from "../image/supplies.png";
+import { v4 as uuidv4 } from "uuid";
+
+
 
 const RockImg = styled.img`
   width: 150px;
@@ -42,17 +50,6 @@ const CreateLabel = styled.label`
   margin: 5px 0px;
   letter-spacing: 2px;
   color: #605f56;
-`;
-const Input = styled.input`
-  font-size: 16px;
-  width: 150px;
-  height: 30px;
-  margin: 10px 0px;
-`;
-const Select = styled.select`
-  width: 150px;
-  height: 30px;
-  margin-top: 10px;
 `;
 
 const Title = styled.p`
@@ -124,36 +121,6 @@ const Form = styled.form`
 
 const options = ["公開", "私人"];
 
-const PriviewImg = styled.img`
-  width: 100%;
-`;
-
-const PriviewImgWrap = styled.div`
-  width: 250px;
-  height: 150px;
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
-  margin-right: 20px;
-`;
-
-const PriviewDeleteImgButton = styled.button`
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  overflow: hidden;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: white;
-  background-color: gray;
-  border: none;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-`;
 
 const MeetingTimeWrap = styled.div`
   width: 50%;
@@ -215,7 +182,6 @@ function Calander({ setEndDate, setStartDate, startDate, endDate }) {
   // const [endDate, setEndDate] = useState(new Date());
 
   const handleSelect = (ranges) => {
-    console.log(ranges);
     setStartDate(ranges.selection.startDate);
     setEndDate(ranges.selection.endDate);
   };
@@ -244,7 +210,6 @@ function MaterialUIPickers({ setTime }) {
     setTime(newValue);
     setValue(newValue);
   };
-  // console.log(value);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -260,78 +225,9 @@ function MaterialUIPickers({ setTime }) {
   );
 }
 
-function Multiple({ setUpLoadFile }) {
-  const [file, setFile] = useState([]);
 
-  function uploadSingleFile(e) {
-    setFile([...file, URL.createObjectURL(e.target.files[0])]);
-    console.log("file", file);
-  }
 
-  function upload(e) {
-    e.preventDefault();
-    console.log(file);
-    setUpLoadFile((prevState) => ({
-      ...prevState,
-      detail_picture: file,
-    }));
-  }
-
-  function deleteFile(e) {
-    const s = file.filter((item, index) => index !== e);
-    setFile(s);
-    console.log(s);
-  }
-
-  return (
-    <form>
-      <Display>
-        <CreateLabel>細節照片</CreateLabel>
-        <div className='form-group'>
-          <FileLabel>
-            上傳
-            <FileInput
-              required
-              type='file'
-              accept='image/*'
-              disabled={file.length === 5}
-              className='form-control'
-              onChange={uploadSingleFile}></FileInput>
-          </FileLabel>
-        </div>
-        <Button
-          height='30px'
-          width='100px'
-          type='button'
-          className='btn btn-primary btn-block'
-          onClick={upload}>
-          Upload
-        </Button>
-      </Display>
-      <div className='form-group preview'>
-        <Display>
-          {file.length > 0 &&
-            file.map((item, index) => {
-              return (
-                <Display key={item}>
-                  <PriviewImgWrap>
-                    <PriviewImg src={item} alt='' />
-                    <PriviewDeleteImgButton
-                      type='button'
-                      onClick={() => deleteFile(index)}>
-                      x
-                    </PriviewDeleteImgButton>
-                  </PriviewImgWrap>
-                </Display>
-              );
-            })}
-        </Display>
-      </div>
-    </form>
-  );
-}
-
-function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
+function CreateGroup({ userId, }) {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [state, setState] = useState({
@@ -355,7 +251,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     header_id: userId,
     header_name: "",
     status: "",
-    privacy: "",
+    privacy: "公開",
     password: "",
     group_title: "",
     site: "",
@@ -396,9 +292,10 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
   const [personName, setPersonName] = useState([]);
   const [getAllTent, setGetAllTent] = useState([]);
   const [getAllSupplies, setGetAllSupplies] = useState([]);
-  const ContextByUserId = useContext(UserContext);
+  const Context = useContext(UserContext);
 
   let path = window.location.pathname;
+
 
   const addNewGroup = async (e) => {
     e.preventDefault();
@@ -407,7 +304,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(e.target.value);
     setGroupInfo((prevState) => ({
       ...prevState,
       [name]: value,
@@ -421,8 +317,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     e.preventDefault();
     setAddNotice((prev) => [...prev, groupInfo.notice]);
   };
-
-  console.log(groupInfo);
 
   const setUpGroup = async () => {
     let timerInterval;
@@ -442,22 +336,18 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
         clearInterval(timerInterval);
       },
     }).then((result) => {
-      /* Read more about handling dismissals below */
       if (result.dismiss === Swal.DismissReason.timer) {
-        console.log("I was closed by the timer");
       }
     });
-    // group
     const groupId = uuidv4();
-    console.log(groupId);
 
     setThisGroupID(groupId);
 
     const docRef = doc(db, "CreateCampingGroup", groupId);
     await setDoc(docRef, {
       group_id: groupId,
-      header_id: userId,
-      header_name: userName,
+      header_id: Context.userId,
+      header_name: Context.userName,
       start_date: startDate,
       end_date: endDate,
       meeting_time: time,
@@ -467,7 +357,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       detail_picture: upload.detail_picture,
       privacy: privacyValue,
       notice: addNotice,
-      select_tag: personName,
+      select_tag: Context.personName,
       current_number: 1,
       create_time: serverTimestamp(),
       status: "",
@@ -482,13 +372,12 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
         collection(db, "CreateCampingGroup", groupId, "tent")
       );
       await setDoc(ondocRefNewTent, item);
-      console.log(ondocRefNewTent.id);
       updateDoc(
         doc(db, "CreateCampingGroup", groupId, "tent", ondocRefNewTent.id),
         {
           tent_id: ondocRefNewTent.id,
-          member: allMemberArr,
-          who_create: userName,
+          member: [],
+          who_create: Context.userName,
         }
       );
     });
@@ -498,7 +387,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
         collection(db, "CreateCampingGroup", groupId, "supplies")
       );
       await setDoc(ondocRefNewSupplies, item);
-      console.log(ondocRefNewSupplies.id);
       updateDoc(
         doc(db, "CreateCampingGroup", groupId, "tent", ondocRefNewSupplies.id),
         {
@@ -507,7 +395,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       );
     });
 
-    //supplies
     const docRefObject = await doc(
       db,
       "CreateCampingGroup",
@@ -520,7 +407,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       supplies_id: docRefObject.id,
     });
 
-    //member
     const docRefMember = await doc(
       db,
       "CreateCampingGroup",
@@ -530,23 +416,14 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
     );
     setDoc(docRefMember, {
       role: "header",
-      member_name: userName,
-      member_id: userId,
+      member_name: Context.userName,
+      member_id: Context.userId,
     });
 
     navigate("/");
   };
 
-  // useEffect(async () => {
-  //   console.log(upload.url);
-  //   if (thisGroupId) {
-  //     updateDoc(doc(db, "CreateCampingGroup", thisGroupId), {
-  //       picture: upload.url,
-  //     });
-  //   }
-  // }, [upload.url]);
 
-  console.log(tentInfo);
   const addNewTent = (e) => {
     e.preventDefault();
     if (tentInfo.max_number == "") {
@@ -558,10 +435,9 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
       max_number: "",
       current_number: 0,
       seat: "",
-      who_create: userName,
+      who_create: Context.userName,
     }));
   };
-  console.log(getAllTent);
 
   const addSupplies = (e) => {
     e.preventDefault();
@@ -570,16 +446,13 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
 
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
-    console.log(e.target.files[0].name);
 
-    console.log(upload);
     const storage = getStorage();
     const imageRef = ref(storage, e.target.files[0].name);
     uploadBytes(imageRef, e.target.files[0])
       .then(() => {
         getDownloadURL(imageRef)
           .then((url) => {
-            console.log(url);
             setUpLoadFile((prevState) => ({ ...prevState, url: url }));
           })
           .catch((error) => {
@@ -593,16 +466,14 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("SUBMIT", e);
   };
 
   return (
     <>
-      <Header ContextByUserId={ContextByUserId} />
+      <Header ContextByUserId={Context} />
       <Form onSubmit={handleSubmit}>
         <RockImg src={landingPage04} alt='' />
         <Title>創建你的露營團</Title>
-        {/* <CreateLabel>露營團名稱</CreateLabel> */}
         <TextField
           size='small'
           sx={{ width: "100%", marginBottom: "30px" }}
@@ -613,7 +484,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
           onChange={handleChange}></TextField>
         <TextField
           sx={{ width: "100%", marginRight: "20px", marginBottom: "30px" }}
-          // helperText='Incorrect entry.'
           size='small'
           label='最多幾人'
           name='max_member_number'
@@ -736,7 +606,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
                 thisGroupId={thisGroupId}
                 setPersonName={setPersonName}
                 personName={personName}
-                
+                condiion="create"
               />
               <br></br>
               <br></br>
@@ -767,12 +637,7 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
                     justifyContent='end'
                     alignItems='end'
                     m=' 30px 0px 30px 0px'>
-                    <Tent
-                      setTentInfo={setTentInfo}
-                      tentInfo={tentInfo}
-                      setAllMemberArr={setAllMemberArr}
-                      allMemberArr={allMemberArr}
-                    />
+                    <Tent setTentInfo={setTentInfo} tentInfo={tentInfo} />
                     <AddButton onClick={addNewTent}>新增帳篷</AddButton>
                   </Display>
                   <Cloumn>
@@ -828,9 +693,6 @@ function CreateGroup({ userId, userName, allMemberArr, setAllMemberArr }) {
             </Cloumn>
           </SecondSection>
         )}
-        {/* <Button width='20%' type='submit' variant='outlined'>
-          Validate
-        </Button> */}
       </Form>
       <Footer />
     </>

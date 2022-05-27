@@ -6,10 +6,12 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Chip from "@mui/material/Chip";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { UserContext } from "../utils/userContext";
+
 import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../utils/firebase";
-
+import useMediaQuery from "@mui/material/useMediaQuery";
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -29,7 +31,6 @@ const names = [
   "泡湯",
   "雲海",
   "戲水池",
-  "可租裝配",
   "螢火蟲",
   "櫻花",
   "森林",
@@ -37,7 +38,6 @@ const names = [
 ];
 
 function getStyles(name, personName, theme) {
-  // console.log(personName,name)
   return {
     fontWeight:
       personName.indexOf(name) === -1
@@ -46,57 +46,50 @@ function getStyles(name, personName, theme) {
   };
 }
 
-export default function MultipleSelectChip({
-  userId,
-  path,
-  groupId,
-  personName,
-  setPersonName,
-}) {
+export default function MultipleSelectChip({ userId, condition }) {
   const theme = useTheme();
-  
-  
+  const [personName, setPersonName] = useState([]);
+  const matches = useMediaQuery("(max-width:1024px)");
+  const Context = useContext(UserContext);
+
 
   useEffect(async () => {
-    if (path !== "/create_group") {
+    if (condition !== "create") {
       const docRef = doc(db, "joinGroup", userId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         setPersonName(docSnap.data().select_tag);
-      } else {
-        console.log("No such document!");
       }
     }
   }, []);
 
-  
-
   const handleChange = async (event) => {
     const value = event.target.value;
     setPersonName(value, value.toString().split(",")[value.length - 1]);
-
-    if (path !== "/create_group") {
+    Context.personName = value;
+    if (condition !== "create") {
       await updateDoc(doc(db, "joinGroup", userId), {
         select_tag: arrayUnion(value.toString().split(",")[value.length - 1]),
       });
     }
   };
 
-
   let formControlStyle;
 
-  if (window.location.pathname !== "/create_group") {
+  if (condition !== "create") {
     formControlStyle = { ml: 2, mt: 1, width: "400px" };
-  }else{
-    formControlStyle = { ml: 0, mt: 0, width: "400px" };
   }
-
+  if (matches) {
+    formControlStyle = { ml: 2, mt: 1, width: "300px" };
+  }
   return (
     <FormControl sx={formControlStyle} size='small'>
-      {path !== "/create_group" ? (
-        <InputLabel id='demo-multiple-chip-label'>喜愛</InputLabel>
+      {condition !== "create" ? (
+        <InputLabel id='demo-multiple-chip-label' sx={{ zIndex: "0" }}>
+          喜愛
+        </InputLabel>
       ) : (
-        <InputLabel id='demo-multiple-chip-label'>添加露營團標籤</InputLabel>
+        <InputLabel id='demo-multiple-chip-label'>標籤</InputLabel>
       )}
 
       <Select
