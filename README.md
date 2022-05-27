@@ -26,7 +26,7 @@ Password: funfun
 - **efficient tent arrangement planning.**
 <br>
 select the tent with drag and drop, claim necessary camping supplies of the group.
-![](https://firebasestorage.googleapis.com/v0/b/camping-go-14942.appspot.com/o/tent%2Bsupplies.gif?alt=media&token=968aaccf-dab5-4a39-a6b5-93eaa0aed7bf) 
+![supplies](https://firebasestorage.googleapis.com/v0/b/camping-go-14942.appspot.com/o/tent%2Bsupplies.gif?alt=media&token=968aaccf-dab5-4a39-a6b5-93eaa0aed7bf "efficient tent arrangement planning") 
 - **second-hand camping supplies exchanges.**
 <br>
 upload second-hand camping supplies to exchanges with your group members.
