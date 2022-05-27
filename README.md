@@ -33,11 +33,11 @@ upload second-hand camping supplies to exchanges with your group members.
 - **personal recommendation**
 <br>
  No idea to find your favorite camping group? Personalized recommendation with the camping group that suits you best.
- ![](./read_img//recommendation.gif) 
+ ![recommendation](./read_img/recommendation.gif) 
 - **Choose your purpose city to go**
 <br>
 Which city do you want to go ?  according to the city to find your favorite camping group.
- ![](./read_img/purpose%20city.gif) 
+ ![purpose_city.gif) 
 - Paired with kicking member out of the group or quit the group by yourself. 
 
 # Technologies
