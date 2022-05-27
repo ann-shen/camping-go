@@ -298,7 +298,7 @@ function SecondHand({ userName, userId }) {
           {allSupplies.map((item, index) => (
             <Box sx={allSecondHandSuppliesByProfile}>
               <Cloumn>
-                {item.change_status == true && (
+                {item.change_status === true && (
                   <Tag fontSize='14px'>已交換</Tag>
                 )}
                 {item.change_status == false && (
@@ -331,7 +331,8 @@ function SecondHand({ userName, userId }) {
                   fontSize='14px'
                   mt='10px'
                   onClick={() => {
-                    if (item.waiting_reply) return;
+                    console.log(item.change_status);
+                    if (item.change_status === true) return;
                     changeInvite(index);
                   }}>
                   <GetStatus item={item} />

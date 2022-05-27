@@ -514,7 +514,7 @@ export default function Profile({ userName }) {
             )}
           </TabPanel>
           <TabPanel value={value} index={2} dir={theme.direction}>
-            {Context.userId == params.id && (
+            {Context.userId === params.id && (
               <SecondHand userId={Context.userId} userName={userName} />
             )}
           </TabPanel>

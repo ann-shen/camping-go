@@ -648,7 +648,6 @@ function CityCamping({ userId }) {
                     textAlign: "start",
                     height: "140px",
                   }}>
-                  <Alink href={`./profile/${item.header_id}`}>
                     <Tag
                       width='90px'
                       height='18px'
@@ -657,8 +656,6 @@ function CityCamping({ userId }) {
                       borderRadius='8px'>
                       團長｜{item.header_name}
                     </Tag>
-                  </Alink>
-
                   <Font fontSize='20px' m='6px 0px 6px 0px'>
                     {item.group_title}
                   </Font>
