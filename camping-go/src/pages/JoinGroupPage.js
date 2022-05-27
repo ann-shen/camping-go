@@ -53,6 +53,7 @@ import loading from "../image/loading.gif";
 import { v4 as uuidv4 } from "uuid";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 
+
 const Alink = styled.a`
   text-decoration: none;
 `;
@@ -445,7 +446,7 @@ function JoinGroupPage({ userName }) {
       }
     );
     setCurrentTentId(targetTentId);
-    if (currentTentId == " ") {
+    if (currentTentId === " ") {
       await updateDoc(
         doc(db, "CreateCampingGroup", params.id, "tent", currentTentId),
         {
@@ -849,12 +850,14 @@ function JoinGroupPage({ userName }) {
                     marginTop: 3,
                   },
                 }}>
-                <DeleteTentButton
-                  onClick={() => {
-                    deleteThisTent(index);
-                  }}>
-                  x
-                </DeleteTentButton>
+                {userName === item.who_create && (
+                  <DeleteTentButton
+                    onClick={() => {
+                      deleteThisTent(index);
+                    }}>
+                    x
+                  </DeleteTentButton>
+                )}
                 <Font fontSize='14px'>{item.who_create} の 帳篷</Font>
                 <Display key={index} direction='column'>
                   <Img src={tentColor} width='200px'></Img>
@@ -1148,5 +1151,6 @@ function JoinGroupPage({ userName }) {
     </div>
   );
 }
+
 
 export default JoinGroupPage;

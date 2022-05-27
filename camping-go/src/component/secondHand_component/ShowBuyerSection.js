@@ -1,11 +1,12 @@
 import styled from "styled-components";
 import { Button, Wrap, Img, Font } from "../../css/style";
 import React, { useState, useContext } from "react";
-import { TextField, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import { updateDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { UserContext } from "../../utils/userContext";
+import PropTypes from "prop-types";
 
 const ImgCursorWrap = styled.div`
   width: 150px;
@@ -46,10 +47,8 @@ function ShowBuyerSection({
   let buyerName = Context.userName;
 
   const choseSuppliesToChange = (e, index) => {
-    buyerArr.map((item) => {
-      {
-        item.border = "none";
-      }
+    buyerArr.forEach((item) => {
+      item.border = "none";
     });
     buyerArr[index].border = "3px solid #CFC781";
     setBuyerIndex(index);
@@ -74,8 +73,8 @@ function ShowBuyerSection({
     const getBuyerSupplies = await getDoc(doc(db, "joinGroup", buyerId));
     if (getBuyerSupplies.exists()) {
       let buyerArr = [];
-      getBuyerSupplies.data().second_hand.map((item) => {
-        if (item.change_status == false) {
+      getBuyerSupplies.data().second_hand.forEach((item) => {
+        if (item.change_status === false) {
           buyerArr.push(item);
         }
       });
@@ -138,5 +137,10 @@ function ShowBuyerSection({
     </Box>
   );
 }
-
+ShowBuyerSection.propTypes = {
+  current_userId: PropTypes.string,
+  buyerArr: PropTypes.array,
+  allSupplies: PropTypes.array,
+  inviteIndex: PropTypes.string,
+};
 export default ShowBuyerSection;

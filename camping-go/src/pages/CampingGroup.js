@@ -11,7 +11,6 @@ import {
 } from "firebase/firestore";
 import { db } from "../utils/firebase";
 
-
 import { Font, Display, Hr } from "../css/style";
 
 import location_big from "../image/location_big.png";
@@ -24,6 +23,7 @@ import PaginationBar from "../component/Pagination";
 import ReviewCard from "../component/ReviewCard";
 import NavBar from "../component/NavBar";
 import Footer from "../component/Footer";
+import PropTypes from "prop-types";
 
 Modal.setAppElement("#root");
 
@@ -172,15 +172,14 @@ const Title = styled.p`
 function CampingGroup({ setGroupId }) {
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
-  const Context = useContext(UserContext);
-
   const [pagination, setPaagination] = useState({
     loading: false,
     currentPage: 1,
     posts_per_page: 6,
   });
-  
+
   const immediatelyRef = useRef(null);
+  const Context = useContext(UserContext);
 
   const indexOfLastPost = pagination.currentPage * pagination.posts_per_page;
   const indexOfFirstPost = indexOfLastPost - pagination.posts_per_page;
@@ -194,42 +193,44 @@ function CampingGroup({ setGroupId }) {
       currentPage: pageNumber,
     }));
 
-  useEffect(async () => {
-    let arr = [];
-    const citiesRef = collection(db, "CreateCampingGroup");
-    const q = query(citiesRef, orderBy("start_date"));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((item) => {
-      arr.push(item.data());
-      if (
-        new Date().getTime() <
-        new Date(
-          new Date(item.data().end_date.seconds * 1000)
-            .toLocaleString()
-            .split(" ")[0]
-        ).getTime()
-      ) {
-        updateDoc(doc(db, "CreateCampingGroup", item.data().group_id), {
-          status: "進行中",
-        });
-      } else {
-        updateDoc(doc(db, "CreateCampingGroup", item.data().group_id), {
-          status: "已結束",
-        });
-      }
-    });
-    sethomePageCampGroup(arr);
-    setPaagination((prevState) => ({
-      ...prevState,
-      loading: false,
-    }));
+  useEffect(() => {
+    const updateGroupStatus = async () => {
+      let arr = [];
+      const citiesRef = collection(db, "CreateCampingGroup");
+      const q = query(citiesRef, orderBy("start_date"));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((item) => {
+        arr.push(item.data());
+        if (
+          new Date().getTime() <
+          new Date(
+            new Date(item.data().end_date.seconds * 1000)
+              .toLocaleString()
+              .split(" ")[0]
+          ).getTime()
+        ) {
+          updateDoc(doc(db, "CreateCampingGroup", item.data().group_id), {
+            status: "進行中",
+          });
+        } else {
+          updateDoc(doc(db, "CreateCampingGroup", item.data().group_id), {
+            status: "已結束",
+          });
+        }
+      });
+      sethomePageCampGroup(arr);
+      setPaagination((prevState) => ({
+        ...prevState,
+        loading: false,
+      }));
+    };
+    updateGroupStatus()
   }, []);
 
   const toTaiwanMap = () => {
     if (immediatelyRef.current) {
       window.scrollTo({
-        top: immediatelyRef.current.scrollHeight,
-        top: 1000,
+        top: 1600,
         behavior: "smooth",
       });
     } else {
@@ -299,4 +300,7 @@ function CampingGroup({ setGroupId }) {
   );
 }
 
+CampingGroup.propTypes = {
+  setGroupId: PropTypes.string,
+};
 export default CampingGroup;
