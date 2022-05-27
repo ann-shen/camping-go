@@ -12,11 +12,21 @@ A group camping platform that allows you to find a like-minded group and start y
 - received feedback from your group members, in order to optimize the process  next time.
 - create your camping group quickly and also can set private mode that have fun with friends.   
 
+# DEMO Link
+For your complete user experience, please login with the account provided below
+
+Web: https://camping-go-14942.web.app/
+
+User: fun@gmail.com
+
+Password: funfun
+
+
 # Features
 - **efficient tent arrangement planning.**
 <br>
 select the tent with drag and drop, claim necessary camping supplies of the group.
-![](https://firebasestorage.googleapis.com/v0/b/camping-go-14942.appspot.com/o/tent%2Bsupplies.gif?alt=media&token=968aaccf-dab5-4a39-a6b5-93eaa0aed7bf) 
+![supplies](https://firebasestorage.googleapis.com/v0/b/camping-go-14942.appspot.com/o/tent%2Bsupplies.gif?alt=media&token=968aaccf-dab5-4a39-a6b5-93eaa0aed7bf "efficient tent arrangement planning") 
 - **second-hand camping supplies exchanges.**
 <br>
 upload second-hand camping supplies to exchanges with your group members.
@@ -24,7 +34,10 @@ upload second-hand camping supplies to exchanges with your group members.
 <br>
  No idea to find your favorite camping group? Personalized recommendation with the camping group that suits you best.
  ![](https://firebasestorage.googleapis.com/v0/b/camping-go-14942.appspot.com/o/recommendation.gif?alt=media&token=3ffadf84-272e-4b5e-b6ba-b436fef52405) 
-> 
+- **Choose your purpose city to go**
+<br>
+Which city do you want to go ?  according to the city to find your favorite camping group.
+ ![](https://firebasestorage.googleapis.com/v0/b/camping-go-14942.appspot.com/o/purpose%20city.gif?alt=media&token=7245275a-6131-46fc-a2e9-68a8b5683f06) 
 - Paired with kicking member out of the group or quit the group by yourself. 
 
 # Technologies
