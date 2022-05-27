@@ -61,6 +61,7 @@ Personalized recommendation with the camping group that suits you best.
 
 ![recommendation](./read_img/recommendation.gif)
 
+
  <br>
 
 - **Choose your purpose city to go**
@@ -72,6 +73,7 @@ Which city do you want to go ? according to the city to find your favorite campi
 - Paired with kicking member out of the group or quit the group by yourself.
 
 ![recommendation](./read_img/remove.gif)
+
 
 # Technologies
 
