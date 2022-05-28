@@ -271,6 +271,7 @@ function CreateGroup({ userId, }) {
     bring_person: "",
     note: "",
     supplies: "",
+    supplies_id:"",
   });
   const [tentInfo, setTentInfo] = useState({
     current_number: 0,
@@ -382,30 +383,38 @@ function CreateGroup({ userId, }) {
       );
     });
 
+    console.log(getAllSupplies);
+
     getAllSupplies.map(async (item) => {
       const ondocRefNewSupplies = doc(
         collection(db, "CreateCampingGroup", groupId, "supplies")
       );
       await setDoc(ondocRefNewSupplies, item);
       updateDoc(
-        doc(db, "CreateCampingGroup", groupId, "tent", ondocRefNewSupplies.id),
+        doc(
+          db,
+          "CreateCampingGroup",
+          groupId,
+          "supplies",
+          ondocRefNewSupplies.id
+        ),
         {
           supplies_id: ondocRefNewSupplies.id,
         }
       );
     });
 
-    const docRefObject = await doc(
-      db,
-      "CreateCampingGroup",
-      groupId,
-      "supplies",
-      groupId
-    );
-    setDoc(docRefObject, campSupplies);
-    updateDoc(doc(db, "CreateCampingGroup", groupId, "supplies", groupId), {
-      supplies_id: docRefObject.id,
-    });
+    // const docRefObject = await doc(
+    //   db,
+    //   "CreateCampingGroup",
+    //   groupId,
+    //   "supplies",
+    //   groupId
+    // );
+    // setDoc(docRefObject, campSupplies);
+    // updateDoc(doc(db, "CreateCampingGroup", groupId, "supplies", groupId), {
+    //   supplies_id: docRefObject.id,
+    // });
 
     const docRefMember = await doc(
       db,

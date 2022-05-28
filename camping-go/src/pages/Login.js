@@ -10,12 +10,13 @@ import {
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { db } from "../utils/firebase";
-import "../css/login.css"
+import "../css/login.css";
 import { Font, Wrap } from "../css/style";
 import PropTypes from "prop-types";
 import SwipeableViews from "react-swipeable-views";
 import { useTheme } from "@mui/material/styles";
 import { AppBar, Tabs, Tab, Typography, Box } from "@mui/material/";
+import Swal from "sweetalert2/dist/sweetalert2.js";
 
 function TabPanel(props) {
   const { children, value, index, setUserName, ...other } = props;
@@ -57,7 +58,7 @@ function Login({ setUserId, setUserName, userName }) {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = ( newValue) => {
+  const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
@@ -82,15 +83,33 @@ function Login({ setUserId, setUserName, userName }) {
         switch (error.code) {
           case "auth/invalid-email":
             setErrorMessage("信箱格式不正確");
-            alert("信箱格式不正確");
+            Swal.fire({
+              position: "center",
+              icon: "error",
+              title: "信箱格式不正確",
+              showConfirmButton: false,
+              timer: 1500,
+            });
             break;
           case "auth/user-not-found":
             setErrorMessage("信箱不存在");
-            alert("信箱不存在");
+            Swal.fire({
+              position: "center",
+              icon: "error",
+              title: "信箱不存在",
+              showConfirmButton: false,
+              timer: 1500,
+            });
             break;
           case "auth/wrong-password":
             setErrorMessage("密碼錯誤");
-            alert("密碼錯誤");
+            Swal.fire({
+              position: "center",
+              icon: "error",
+              title: "密碼錯誤",
+              showConfirmButton: false,
+              timer: 1500,
+            });
             break;
           default:
         }
@@ -126,15 +145,34 @@ function Login({ setUserId, setUserName, userName }) {
         switch (error.code) {
           case "auth/email-already-in-use":
             setErrorMessage("信箱已存在");
-            alert("信箱已存在");
+            Swal.fire({
+              position: "center",
+              icon: "warning",
+              title: "信箱已存在",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            
             break;
           case "auth/invalid-email":
             setErrorMessage("信箱格式不正確");
-            alert("信箱格式不正確");
+            Swal.fire({
+              position: "center",
+              icon: "warning",
+              title: "信箱格式不正確",
+              showConfirmButton: false,
+              timer: 1500,
+            });
             break;
           case "auth/weak-password":
             setErrorMessage("密碼強度不足");
-            alert("密碼強度不足");
+            Swal.fire({
+              position: "center",
+              icon: "warning",
+              title: "密碼強度不足",
+              showConfirmButton: false,
+              timer: 1500,
+            });
             break;
           default:
         }

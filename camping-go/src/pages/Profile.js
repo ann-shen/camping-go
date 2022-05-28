@@ -13,19 +13,15 @@ import {
   query,
   where,
   doc,
-  deleteDoc,
   onSnapshot,
   updateDoc,
-  arrayRemove,
   setDoc,
-  increment,
   getDoc,
-  arrayUnion,
 } from "firebase/firestore";
 import { signOut, getAuth } from "firebase/auth";
 import { db } from "../utils/firebase";
 
-import { Font, Img, Button, Hr, BoxWrap, Cloumn } from "../css/style";
+import { Font, Img, Button, Hr, BoxWrap } from "../css/style";
 import Modal from "react-modal";
 import "../css/modal.css";
 import {
@@ -277,7 +273,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
   );
 }
 
-export default function Profile({ userName }) {
+export default function Profile() {
   let params = useParams();
   const theme = useTheme();
   const [value, setValue] = useState(0);
@@ -395,8 +391,8 @@ export default function Profile({ userName }) {
           Context.userName,
           yourParticipateGroup[index].group_title
         );
-        firebase.updateDocIncrementTentOfMember(id,userName)
-        firebase.updateDocSuppliesOfMember(id,userName)
+        firebase.updateDocIncrementTentOfMember(id,Context.userName)
+        firebase.updateDocSuppliesOfMember(id, Context.userName);
         
         setWithDrawGrop(true);
         Swal.fire({
@@ -488,7 +484,7 @@ export default function Profile({ userName }) {
             )}
           </TabPanel>
           <TabPanel value={value} index={1} dir={theme.direction}>
-            {Context.userId == params.id ? (
+            {Context.userId === params.id ? (
               <>
                 {yourParticipateGroup.length !== 0 ? (
                   <YourParticipateGroup
@@ -510,12 +506,12 @@ export default function Profile({ userName }) {
                 )}
               </>
             ) : (
-              <SecondHand userId={params.id} userName={userName} />
+              <SecondHand userId={params.id} userName={Context.userName} />
             )}
           </TabPanel>
           <TabPanel value={value} index={2} dir={theme.direction}>
             {Context.userId === params.id && (
-              <SecondHand userId={Context.userId} userName={userName} />
+              <SecondHand userId={Context.userId} userName={Context.userName} />
             )}
           </TabPanel>
         </SwipeableViews>

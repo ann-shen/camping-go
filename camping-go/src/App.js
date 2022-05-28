@@ -15,7 +15,7 @@ import FindGroup from "./pages/FindGroup";
 import SecondHand from "./pages/SecondHand";
 
 import ScrollToTop from "./component/ScrollToTop";
-import GoogleMapBasic from "./component/GoogleMapBasic";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const [userName, setUserName] = useState("");
@@ -46,53 +46,41 @@ function App() {
       <UserContext.Provider value={value}>
         <BrowserRouter>
           <ScrollToTop>
-            <Routes>
-              <Route
-                path='/create_group'
-                element={
-                  <CreateGroup
-                    userId={userId}
-                    userName={userName}
-                  />
-                }></Route>
-              <Route
-                path='/'
-                element={<CampingGroup setGroupId={setGroupId} />}></Route>
-              <Route
-                path='joinGroup/:id'
-                element={<JoinGroupPage userName={userName} />}></Route>
-              <Route
-                path='profile/:id'
-                element={
-                  <Profile userName={userName} userId={userId} />
-                }></Route>
-              <Route
-                path='login'
-                element={
-                  <Login
-                    setUserId={setUserId}
-                    setUserName={setUserName}
-                    userName={userName}
-                  />
-                }></Route>
-              <Route
-                path='/:city'
-                element={
-                  <CityCamping
-                    groupId={groupId}
-                    userId={userId}
-                  />
-                }></Route>
-              <Route
-                path='googlemap_basic'
-                element={<GoogleMapBasic />}></Route>
-              <Route path='find_group' element={<FindGroup />}></Route>
-              <Route
-                path='second_hand'
-                element={
-                  <SecondHand userName={userName} userId={userId} />
-                }></Route>
-            </Routes>
+          <Routes>
+            <Route
+              path='/create_group'
+              element={
+                <CreateGroup userId={userId} userName={userName} />
+              }></Route>
+            <Route
+              path='/'
+              element={<CampingGroup setGroupId={setGroupId} />}></Route>
+            <Route
+              path='joinGroup/:id'
+              element={<JoinGroupPage userName={userName} />}></Route>
+            <Route
+              path='profile/:id'
+              element={<Profile />}></Route>
+            <Route
+              path='login'
+              element={
+                <Login
+                  setUserId={setUserId}
+                  setUserName={setUserName}
+                  userName={userName}
+                />
+              }></Route>
+            <Route
+              path='/:city'
+              element={<CityCamping groupId={groupId} userId={userId} />}
+            />
+            <Route path='find_group' element={<FindGroup />} />
+            <Route
+              path='second_hand'
+              element={<SecondHand userName={userName} userId={userId} />}
+            />
+            <Route path='/*' element={<NotFound />} />
+          </Routes>
           </ScrollToTop>
         </BrowserRouter>
       </UserContext.Provider>

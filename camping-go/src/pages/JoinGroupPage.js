@@ -52,6 +52,8 @@ import loading from "../image/loading.gif";
 
 import { v4 as uuidv4 } from "uuid";
 import Swal from "sweetalert2/dist/sweetalert2.js";
+import PropTypes from "prop-types";
+
 
 
 const Alink = styled.a`
@@ -1151,6 +1153,10 @@ function JoinGroupPage({ userName }) {
     </div>
   );
 }
+
+JoinGroupPage.propTypes = {
+  userName: PropTypes.string,
+};
 
 
 export default JoinGroupPage;

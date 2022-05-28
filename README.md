@@ -11,29 +11,38 @@ A group camping platform that allows you to find a like-minded group and start y
 
 [1]: https://camping-go-14942.web.app/
 
-- You can choose any of your favorite camping groups to join on Camping GO .
+- chosen any of your favorite camping groups to join on Camping GO.
 - In the group, drag and drop to select the tent.
 - Upload your second hand supplies and exchange with your teammate.
+- sent comment to group og header.
 
 <br>
 
 > ### As a camping group of header
 
 - received feedback from your group members, in order to optimize the process next time.
-- create your camping group quickly and also can set private mode that have fun with friends.
+- created your camping group quickly and also can set private mode that have fun with friends.
 - received a notification when members withdraw from the group.
 
 <br>
 
 # Demo link
 
-For your complete user experience, please login with the account provided below
+For your complete user experience, please login with the account provided below.
 
 Web: https://camping-go-14942.web.app/
 
 User: fun@gmail.com
 
 Password: funfun
+
+<br>
+
+<br>
+
+
+# Flow Chart
+![](./read_img/Flowchart.jpg)
 
 <br>
 
@@ -51,7 +60,7 @@ select the tent with drag and drop, claim necessary camping supplies of the grou
 
 - **second-hand camping supplies exchanges.**
 
-upload second-hand camping supplies to exchanges with your group members.
+uploaded second-hand camping supplies to exchanges with your group members.
 
 ![second-hand camping supplies exchanges](./read_img/exchamge_supplies.gif)
 
@@ -89,10 +98,8 @@ Which city do you want to go ? according to the city to find your favorite campi
 
 - React
 - React router
-
 - Hooks
 - Styled-components
-
 - Material UI
 
 > Firebase
@@ -106,11 +113,10 @@ Which city do you want to go ? according to the city to find your favorite campi
 
 - react-select
 - react-google-places-autocomplete
--
 
 # Contact Me
 
-If you got any problem or suggestion with Re-Live, please feel free to contact with me via email.
+If you got any problem or suggestion with Camping Go, please feel free to contact with me via email.
 
 Author: Ann Shen 
 

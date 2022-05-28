@@ -19,6 +19,8 @@ import firebase from "../utils/firebaseConfig";
 import { db } from "../utils/firebase";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { v4 as uuidv4 } from "uuid";
+import PropTypes from "prop-types";
+
 
 const FileLabel = styled.label`
   &:hover {
@@ -120,14 +122,11 @@ const ChoseYourSuppliesToChangeWrap = styled.div`
 `;
 
 const letChosenSuppliesAddBorder = (index, buyerArr) => {
-  buyerArr.map((item) => {
-    {
-      item.border = "none";
-    }
+  buyerArr.forEach((item) => {
+    item.border = "none";
   });
   buyerArr[index].border = "3px solid #CFC781";
 };
-
 
 const changeSuppliesArrFromBuyer = (data) => {
   let buyerArr = [];
@@ -264,7 +263,6 @@ function SecondHand({ userName, userId }) {
     const docRef = doc(db, "joinGroup", userId);
     await updateDoc(docRef, { second_hand: allSupplies });
   };
-
 
   const comfirmChange = async () => {
     setAlertOpen(true);
@@ -488,5 +486,10 @@ function SecondHand({ userName, userId }) {
     </>
   );
 }
+
+SecondHand.propTypes = {
+  userId: PropTypes.string,
+  userName: PropTypes.string,
+};
 
 export default SecondHand;

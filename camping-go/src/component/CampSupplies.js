@@ -1,19 +1,8 @@
-import styled from "styled-components";
 import React from "react";
-import { Font, Cloumn, Wrap } from "../css/style";
+import { Wrap } from "../css/style";
 import { TextField } from "@mui/material";
 
-const Label = styled.label`
-  font-size: 16px;
-  margin-left: 30px;
-`;
 
-const Input = styled.input`
-  font-size: 16px;
-  width: 150px;
-  height: 30px;
-  margin: 20px;
-`;
 function CampSupplies({ setCampSupplies, campSupplies }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
