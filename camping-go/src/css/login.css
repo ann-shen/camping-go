@@ -77,6 +77,18 @@
   color: aliceblue;
   padding: 5px 5px;
 }
+
+#register_button{
+  border-radius: 20px;
+  width: 150px;
+  height: 40px;
+  margin-top: 40px;
+  margin-right: 20px;
+  margin-left: 25%;
+  border: none;
+  background-color: #EAE6C4;
+  color: #797659;
+}
 .top_wrap p{
   color: rgb(70, 70, 70);
 }
@@ -140,8 +152,8 @@ span.buttonText {
 
 @media screen and (max-width: 768px) {
   .orderListWrapn{
-    width: 300px;
-    margin: 60px auto;
+    width: 70%;
+    margin: 20px auto;
     padding: 10px 12px;
   }
   
@@ -157,6 +169,8 @@ span.buttonText {
   }
 
 }
+
+
 
 
 

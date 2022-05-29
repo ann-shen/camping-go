@@ -276,7 +276,9 @@ function Login({ setUserId, setUserName, userName }) {
               }}
             />
             <div className='btnWrap'>
-              <button onClick={register}>Sign up</button>
+              <button id='register_button' onClick={register}>
+                Sign up
+              </button>
             </div>
           </div>
         </TabPanel>
