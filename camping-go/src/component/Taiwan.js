@@ -317,7 +317,7 @@ function Taiwan() {
     e.persist();
     let tagname = e.target.getAttribute("data-name");
     let result = place_data.filter((obj) => {
-      return obj.tag == tagname;
+      return obj.tag === tagname;
     });
     setTargetCity(result[0].place);
   };

@@ -9,7 +9,7 @@ import firebase from "../../utils/firebaseConfig";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import styled from "styled-components";
-import { Font, Display, Button, Wrap, Tag } from "../../css/style";
+import { Font, Display, Wrap, Tag } from "../../css/style";
 
 const MatchesInfoWrap = styled.div`
   max-width: 1024px;
@@ -103,7 +103,7 @@ function InfoSection() {
           )}
         </Wrap>
       )}
-      {Context.userId == params.id && matches ? (
+      {Context.userId === params.id && matches ? (
         <>
           <MatchesInfoWrap>
             <ProfilePicture userId={Context.userId} />

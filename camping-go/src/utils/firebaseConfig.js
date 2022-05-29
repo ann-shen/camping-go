@@ -9,6 +9,7 @@ import {
   updateDoc,
   arrayRemove,
   setDoc,
+  orderBy,
   increment,
   getDoc,
   arrayUnion,
@@ -113,14 +114,13 @@ const firebase = {
     });
   },
 
-  async updateDocAlertToHeaderOfGroup(userId,userName,GroupTitle){
+  async updateDocAlertToHeaderOfGroup(userId, userName, GroupTitle) {
     updateDoc(doc(db, "joinGroup", userId), {
       alert: arrayUnion({
         alert_content: `${userName}已退出「${GroupTitle}」`,
         is_read: false,
       }),
     });
-
   },
 
   async deleteMemberOfGroup(groupId, userId) {
@@ -142,6 +142,48 @@ const firebase = {
       return paramIdProfile.data();
     }
   },
+
+  async getMemberList(groupId, header_id) {
+    const q = query(
+      collection(db, "joinGroup"),
+      where("group", "array-contains", groupId)
+    );
+    const querySnapshot = await getDocs(q);
+    let thisGroupMemberArr = [];
+    querySnapshot.forEach((doc) => {
+      thisGroupMemberArr.push(doc.data());
+    });
+    const docRef = doc(db, "joinGroup", header_id);
+    const getHeaderInfo = await getDoc(docRef);
+    if (getHeaderInfo.exists()) {
+      thisGroupMemberArr.push(getHeaderInfo.data());
+    }
+    return thisGroupMemberArr;
+  },
+
+  onGetTentArr(groupId,callback) {
+    const eventListenertent = query(
+      collection(db, "CreateCampingGroup", groupId, "tent")
+    );
+    const q = query(eventListenertent, orderBy("create_time", "desc"));
+    return onSnapshot(q), (doc) => callback;
+  },
+
+  async isUserInTheTent(groupId,userName){
+
+    const docRefTentMember =  collection(
+        db,
+        "CreateCampingGroup",
+        groupId,
+        "tent"
+      );
+      const tent = query(
+        docRefTentMember,
+        where("member", "array-contains", userName)
+      );
+      const querySnapshot = await getDocs(tent);
+      return querySnapshot
+  }
 };
 
 export default firebase;

@@ -7,14 +7,11 @@ import {
   query,
   updateDoc,
   setDoc,
-  getDocs,
   serverTimestamp,
   orderBy,
   arrayUnion,
   arrayRemove,
   increment,
-  where,
-  getDoc,
   deleteDoc,
 } from "firebase/firestore";
 import { useState, useEffect, useRef, useContext } from "react";
@@ -53,8 +50,7 @@ import loading from "../image/loading.gif";
 import { v4 as uuidv4 } from "uuid";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import PropTypes from "prop-types";
-
-
+import firebase from "../utils/firebaseConfig";
 
 const Alink = styled.a`
   text-decoration: none;
@@ -194,7 +190,7 @@ const MemberWrap = styled.div`
 `;
 
 const AllMemberWrap = styled.div`
-  width: 100%;
+  width: 110%;
   display: flex;
   flex-wrap: wrap;
   justify-content: start;
@@ -499,24 +495,11 @@ function JoinGroupPage({ userName }) {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const q = query(
-        collection(db, "joinGroup"),
-        where("group", "array-contains", params.id)
-      );
-      const querySnapshot = await getDocs(q);
-      let thisGroupMemberArr = [];
-      querySnapshot.forEach((doc) => {
-        thisGroupMemberArr.push(doc.data());
+    firebase
+      .getMemberList(params.id, homePageCampGroup.header_id)
+      .then((res) => {
+        setThisGroupMember(res);
       });
-      const docRef = doc(db, "joinGroup", homePageCampGroup.header_id);
-      const getHeaderInfo = await getDoc(docRef);
-      if (getHeaderInfo.exists()) {
-        thisGroupMemberArr.push(getHeaderInfo.data());
-      }
-      setThisGroupMember(thisGroupMemberArr);
-    };
-    fetchData();
   }, [allTentArr, homePageCampGroup]);
 
   useEffect(() => {
@@ -547,23 +530,15 @@ function JoinGroupPage({ userName }) {
     });
   }, []);
 
-  useEffect(async () => {
-    const docRefTentMember = await collection(
-      db,
-      "CreateCampingGroup",
-      params.id,
-      "tent"
-    );
-    const tent = query(
-      docRefTentMember,
-      where("member", "array-contains", userName)
-    );
-    const querySnapshot = await getDocs(tent);
-    querySnapshot.forEach((doc) => {
-      setIsMemberInTheTent(true);
+  useEffect(() => {
+    firebase.isUserInTheTent(params.id, userName).then((res) => {
+      res.forEach((doc) => {
+        setIsMemberInTheTent(true);
+      });
     });
   }, [homePageCampGroup]);
-  console.log(isMemberInTheTent);
+
+
 
   const takeAway = async (id) => {
     await updateDoc(doc(db, "CreateCampingGroup", params.id, "supplies", id), {
@@ -604,7 +579,6 @@ function JoinGroupPage({ userName }) {
         supplies_id: ondocRefNewSupplies.id,
       }
     );
-
     setCampSupplies((prevState) => ({ ...prevState, note: "", supplies: "" }));
   };
 
@@ -652,7 +626,7 @@ function JoinGroupPage({ userName }) {
     <div>
       <div>
         <Header ContextByUserId={ContextByUserId} />
-        {homePageCampGroup == "" && (
+        {homePageCampGroup === "" && (
           <Backdrop
             sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={true}>
@@ -1056,7 +1030,7 @@ function JoinGroupPage({ userName }) {
                       </BringPerson>
                     </SuppliesWrap>
 
-                    {item.bring_person == "" ? (
+                    {item.bring_person === "" ? (
                       <Button
                         width='180px'
                         fontSize='16px'
@@ -1157,6 +1131,5 @@ function JoinGroupPage({ userName }) {
 JoinGroupPage.propTypes = {
   userName: PropTypes.string,
 };
-
 
 export default JoinGroupPage;

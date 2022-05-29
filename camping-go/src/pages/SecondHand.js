@@ -251,6 +251,7 @@ function SecondHand({ userName, userId }) {
   };
 
   const updateSecondHandBySeller = async (data, index) => {
+    console.log(index);
     data[index].buyer_name = buyerName;
     data[index].buyer_id = buyerId;
     data[index].change_status = false;
@@ -280,7 +281,7 @@ function SecondHand({ userName, userId }) {
   function GetStatus({ item }) {
     return (
       <>
-        {item.waiting_reply == true ? (
+        {item.waiting_reply === true ? (
           "等待回覆中"
         ) : (
           <> {!item.change_status ? "提出交換邀請" : "已交換"}</>

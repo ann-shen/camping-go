@@ -1,6 +1,6 @@
 import { UserContext } from "./utils/userContext";
 import { useState, useEffect } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes,Navigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -22,6 +22,8 @@ function App() {
   const [groupId, setGroupId] = useState("");
   const [userId, setUserId] = useState("");
   const auth = getAuth();
+  console.log(userName);
+  
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -50,7 +52,7 @@ function App() {
             <Route
               path='/create_group'
               element={
-                <CreateGroup userId={userId} userName={userName} />
+                <CreateGroup />
               }></Route>
             <Route
               path='/'

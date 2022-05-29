@@ -138,7 +138,7 @@ function SecondHandInvitation({
       let findIndex = getInviteDocRef
         .data()
         .second_hand.findIndex(
-          (e) => e.supplies_id == inviteInfo[inviteInfoIndex].change_supplies_id
+          (e) => e.supplies_id === inviteInfo[inviteInfoIndex].change_supplies_id
         );
 
       let Arr = getInviteDocRef.data().second_hand;

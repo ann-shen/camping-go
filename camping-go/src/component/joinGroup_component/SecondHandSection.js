@@ -9,6 +9,7 @@ import {
 import { Box } from "@mui/material";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 
 const SecondHandImgWrap = styled.div`
   width: 150px;
@@ -40,7 +41,7 @@ function SecondHandSection({ thisGroupMember }) {
   useEffect(() => {
     let second_hand_Arr = [];
     let objArr = [];
-    thisGroupMember.map((item) => {
+    thisGroupMember.forEach((item) => {
       if (item.second_hand) {
         second_hand_Arr.push(item.second_hand);
       } else {
@@ -49,9 +50,9 @@ function SecondHandSection({ thisGroupMember }) {
     });
 
     if (second_hand_Arr.length !== 0) {
-      second_hand_Arr.map((item) => {
-        item.map((obj) => {
-          if (obj.change_status == true) {
+      second_hand_Arr.forEach((item) => {
+        item.forEach((obj) => {
+          if (obj.change_status === true) {
             if (obj.inviteSupplies_index !== "") {
               objArr.push(obj);
             }
@@ -61,6 +62,7 @@ function SecondHandSection({ thisGroupMember }) {
       });
     }
   }, [thisGroupMember]);
+  console.log(sucessSecondChange);
 
   return (
     <>
@@ -100,10 +102,16 @@ function SecondHandSection({ thisGroupMember }) {
           ))}
         </>
       ) : (
-        <Font m="30px 0px 0px 0px" fontSize="16px">快上傳你的二手露營用品跟團員們交換吧！</Font>
+        <Font m='30px 0px 0px 0px' fontSize='16px'>
+          快上傳你的二手露營用品跟團員們交換吧！
+        </Font>
       )}
     </>
   );
 }
+
+SecondHandSection.propTypes = {
+  thisGroupMember: PropTypes.array,
+};
 
 export default SecondHandSection;

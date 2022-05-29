@@ -227,7 +227,8 @@ function MaterialUIPickers({ setTime }) {
 
 
 
-function CreateGroup({ userId, }) {
+function CreateGroup() {
+  const Context = useContext(UserContext);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [state, setState] = useState({
@@ -248,7 +249,7 @@ function CreateGroup({ userId, }) {
   });
   const [thisGroupId, setThisGroupID] = useState("");
   const [groupInfo, setGroupInfo] = useState({
-    header_id: userId,
+    header_id: Context.userId,
     header_name: "",
     status: "",
     privacy: "公開",
@@ -293,7 +294,6 @@ function CreateGroup({ userId, }) {
   const [personName, setPersonName] = useState([]);
   const [getAllTent, setGetAllTent] = useState([]);
   const [getAllSupplies, setGetAllSupplies] = useState([]);
-  const Context = useContext(UserContext);
 
   let path = window.location.pathname;
 
@@ -309,7 +309,7 @@ function CreateGroup({ userId, }) {
       ...prevState,
       [name]: value,
     }));
-    if (value == "notice") {
+    if (value === "notice") {
       setAddNotice((prev) => [...prev, groupInfo.notice]);
     }
   };
@@ -383,7 +383,6 @@ function CreateGroup({ userId, }) {
       );
     });
 
-    console.log(getAllSupplies);
 
     getAllSupplies.map(async (item) => {
       const ondocRefNewSupplies = doc(
@@ -404,17 +403,6 @@ function CreateGroup({ userId, }) {
       );
     });
 
-    // const docRefObject = await doc(
-    //   db,
-    //   "CreateCampingGroup",
-    //   groupId,
-    //   "supplies",
-    //   groupId
-    // );
-    // setDoc(docRefObject, campSupplies);
-    // updateDoc(doc(db, "CreateCampingGroup", groupId, "supplies", groupId), {
-    //   supplies_id: docRefObject.id,
-    // });
 
     const docRefMember = await doc(
       db,
@@ -423,6 +411,8 @@ function CreateGroup({ userId, }) {
       "member",
       groupId
     );
+
+    
     setDoc(docRefMember, {
       role: "header",
       member_name: Context.userName,
@@ -435,7 +425,7 @@ function CreateGroup({ userId, }) {
 
   const addNewTent = (e) => {
     e.preventDefault();
-    if (tentInfo.max_number == "") {
+    if (tentInfo.max_number === "") {
       return;
     }
     setGetAllTent((prev) => [...prev, tentInfo]);
@@ -518,7 +508,7 @@ function CreateGroup({ userId, }) {
               />
             )}
           />
-          {privacyValue == "私人" && (
+          {privacyValue === "私人" && (
             <TextField
               sx={{ width: "100%", marginLeft: "20px", marginBottom: "30px" }}
               size='small'

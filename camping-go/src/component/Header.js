@@ -19,7 +19,7 @@ const Nav = styled.div`
   position: fixed;
   top: 15px;
 
-  z-index: 1;
+  z-index: 10;
   margin-top: -20px;
   margin-bottom: 40px;
 `;
@@ -119,6 +119,8 @@ const BackdropBcakGround = styled.div`
   animation: ${backgeoundFadeIn} 500ms ease-in-out;
   z-index: 3;
 `;
+
+
 
 function Header({ ContextByUserId }) {
   const matches = useMediaQuery("(max-width:766px)");

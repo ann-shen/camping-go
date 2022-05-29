@@ -288,12 +288,14 @@ export default function Profile() {
   const Context = useContext(UserContext);
   const navigate = useNavigate();
 
+  
+
   useEffect(() => {
     if (Context.userId) {
       const unsub = onSnapshot(doc(db, "joinGroup", Context.userId), (doc) => {
         setInviteInfo(doc.data().second_hand);
         doc.data().second_hand.map((item, index) => {
-          if (item.invite == true) {
+          if (item.invite === true) {
             setInviteInfoIndex(index);
             setInviteIsOpen(true);
           }
