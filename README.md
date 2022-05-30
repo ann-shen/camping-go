@@ -31,9 +31,9 @@ For your complete user experience, please login with the account provided below
 
 Web: https://camping-go-14942.web.app/
 
-User: fun@gmail.com
+User: moon@gmail.com
 
-Password: funfun
+Password: moonmo
 
 <br>
 
@@ -54,6 +54,9 @@ select the tent with drag and drop, claim necessary camping supplies of the grou
 upload second-hand camping supplies to exchanges with your group members.
 
 ![second-hand camping supplies exchanges](./read_img/exchamge_supplies.gif)
+
+ <br>
+
 
 - **personal recommendation**
 
