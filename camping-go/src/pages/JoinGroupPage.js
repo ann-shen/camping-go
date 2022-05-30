@@ -412,15 +412,22 @@ function JoinGroupPage({ userName }) {
   let params = useParams();
 
   const dragStart = async (e) => {
+    let targetTentId = e.target.getAttribute("data-key");
+    if (targetTentId){
+      setCurrentTentId(targetTentId);
+    }
     e.dataTransfer.setData("text/plain", e.target.id);
     e.target.style = "drop-shadow(0px 0px 0px white)";
 
     let secondTargetTentId = e.target.getAttribute("data-key");
     setAlreadyTentId(secondTargetTentId);
   };
+  console.log(currentTentId);
 
   const drop = async (e) => {
     let targetTentId = e.target.getAttribute("data-key");
+    console.log(targetTentId);
+    console.log(currentTentId);
     if (currentTentId === targetTentId) {
       Swal.fire({
         position: "center",
@@ -537,8 +544,6 @@ function JoinGroupPage({ userName }) {
       });
     });
   }, [homePageCampGroup]);
-
-
 
   const takeAway = async (id) => {
     await updateDoc(doc(db, "CreateCampingGroup", params.id, "supplies", id), {

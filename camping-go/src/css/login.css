@@ -57,11 +57,11 @@
   height: 40px;
   margin-top: 40px;
   margin-right: 20px;
+  margin-left: 25%;
   border: none;
   background-color: #EAE6C4;
   color: #797659;
-
-
+    cursor: pointer;
 }
 .top_wrap{
   display: flex;
@@ -88,6 +88,7 @@
   border: none;
   background-color: #EAE6C4;
   color: #797659;
+  cursor: pointer;
 }
 .top_wrap p{
   color: rgb(70, 70, 70);
@@ -150,6 +151,17 @@ span.buttonText {
   font-size: 14px;
 }
 
+
+@media screen and (max-width: 650px) {
+#register_button {
+  margin-left: 16%;
+}
+.orderListWrapn button {
+  margin-left: 16%;
+}
+
+}
+
 @media screen and (max-width: 768px) {
   .orderListWrapn{
     width: 70%;
@@ -169,9 +181,6 @@ span.buttonText {
   }
 
 }
-
-
-
 
 
 @media screen and (min-width: 1280px) {
