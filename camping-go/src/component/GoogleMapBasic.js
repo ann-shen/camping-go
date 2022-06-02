@@ -31,9 +31,6 @@ const MapWithAMarker = withScriptjs(
             lat: state.markerPosition.lat,
             lng: state.markerPosition.lng,
           }}>
-          <InfoWindow>
-            <div>{state.address}</div>
-          </InfoWindow>
         </Marker>
         <Autocomplete
           style={{
@@ -55,7 +52,9 @@ const MapWithAMarker = withScriptjs(
 function GoogleMapBasic({ state, setState }) {
   useEffect(() => {
     if (navigator.geolocation) {
+      console.log("get position");
       navigator.geolocation.getCurrentPosition((position) => {
+        console.log(position.coords.latitude);
         setState(
           {
             mapPosition: {

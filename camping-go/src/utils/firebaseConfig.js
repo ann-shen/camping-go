@@ -142,6 +142,7 @@ const firebase = {
       return paramIdProfile.data();
     }
   },
+  
 };
 
 export default firebase;

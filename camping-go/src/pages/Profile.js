@@ -13,19 +13,15 @@ import {
   query,
   where,
   doc,
-  deleteDoc,
   onSnapshot,
   updateDoc,
-  arrayRemove,
   setDoc,
-  increment,
   getDoc,
-  arrayUnion,
 } from "firebase/firestore";
 import { signOut, getAuth } from "firebase/auth";
 import { db } from "../utils/firebase";
 
-import { Font, Img, Button, Hr, BoxWrap, Cloumn } from "../css/style";
+import { Font, Img, Button, Hr, BoxWrap } from "../css/style";
 import Modal from "react-modal";
 import "../css/modal.css";
 import {
@@ -287,7 +283,6 @@ export default function Profile({ userName }) {
   const [inviteIsOpen, setInviteIsOpen] = useState(false);
   const [inviteInfo, setInviteInfo] = useState("");
   const [inviteInfoIndex, setInviteInfoIndex] = useState("");
-
   const auth = getAuth();
   const Context = useContext(UserContext);
   const navigate = useNavigate();
@@ -296,55 +291,63 @@ export default function Profile({ userName }) {
     if (Context.userId) {
       const unsub = onSnapshot(doc(db, "joinGroup", Context.userId), (doc) => {
         setInviteInfo(doc.data().second_hand);
-        doc.data().second_hand.map((item, index) => {
-          if (item.invite == true) {
+        doc.data().second_hand.forEach((item, index) => {
+          if (item.invite === true) {
             setInviteInfoIndex(index);
             setInviteIsOpen(true);
           }
         });
       });
-      return () => unsub();
+      return () => {
+        unsub();
+      };
     }
   }, []);
 
-  useEffect(async () => {
-    const q = query(
-      collection(db, "CreateCampingGroup"),
-      where("header_id", "==", params.id)
-    );
-    const querySnapshot = await getDocs(q);
-    let Arr = [];
-    querySnapshot.forEach((doc) => {
-      Arr.push(doc.data());
-    });
-    setYourCreateGroup(Arr);
+  useEffect(() => {
+    const getCreateGroupArr = async () => {
+      const q = query(
+        collection(db, "CreateCampingGroup"),
+        where("header_id", "==", params.id)
+      );
+      const querySnapshot = await getDocs(q);
+      let Arr = [];
+      querySnapshot.forEach((doc) => {
+        Arr.push(doc.data());
+      });
+      setYourCreateGroup(Arr);
+    };
+    getCreateGroupArr();
   }, []);
 
-  useEffect(async () => {
+  useEffect(() => {
     setWithDrawGrop(false);
-    let participateGroupArr = [];
-    const q = query(doc(db, "joinGroup", params.id));
-    const docSnap = await getDoc(q);
-    if (docSnap.exists()) {
-      participateGroupArr = docSnap.data().group;
-    }
-
-    if (participateGroupArr.length === 0) {
-      setYourParticipateGroup([]);
-    } else if (participateGroupArr[0].group_id == "") {
-      return;
-    }
-
-    let showGroupArr = [];
-    participateGroupArr.map(async (item) => {
-      const docRef = await getDoc(doc(db, "CreateCampingGroup", item));
-      if (docRef.exists()) {
-        showGroupArr.push(docRef.data());
-        setYourParticipateGroup(showGroupArr);
-      } else {
-        showGroupArr.push(docRef.data());
+    const getParticipateGroupArr = async () => {
+      let participateGroupArr = [];
+      const q = query(doc(db, "joinGroup", params.id));
+      const docSnap = await getDoc(q);
+      if (docSnap.exists()) {
+        participateGroupArr = docSnap.data().group;
       }
-    });
+
+      if (participateGroupArr.length === 0) {
+        setYourParticipateGroup([]);
+      } else if (participateGroupArr[0].group_id == "") {
+        return;
+      }
+
+      let showGroupArr = [];
+      participateGroupArr.map(async (item) => {
+        const docRef = await getDoc(doc(db, "CreateCampingGroup", item));
+        if (docRef.exists()) {
+          showGroupArr.push(docRef.data());
+          setYourParticipateGroup(showGroupArr);
+        } else {
+          showGroupArr.push(docRef.data());
+        }
+      });
+    };
+    getParticipateGroupArr();
   }, [withDrawGrop]);
 
   useEffect(() => {
@@ -375,6 +378,7 @@ export default function Profile({ userName }) {
       });
       setYourCreateGroup(groups);
     });
+    return () => unsubscribe();
   }, []);
 
   async function sweatAlertTowithDrawGrop(id, userId, index) {
@@ -395,9 +399,9 @@ export default function Profile({ userName }) {
           Context.userName,
           yourParticipateGroup[index].group_title
         );
-        firebase.updateDocIncrementTentOfMember(id,userName)
-        firebase.updateDocSuppliesOfMember(id,userName)
-        
+        firebase.updateDocIncrementTentOfMember(id, userName);
+        firebase.updateDocSuppliesOfMember(id, userName);
+
         setWithDrawGrop(true);
         Swal.fire({
           icon: "success",
@@ -488,7 +492,7 @@ export default function Profile({ userName }) {
             )}
           </TabPanel>
           <TabPanel value={value} index={1} dir={theme.direction}>
-            {Context.userId == params.id ? (
+            {Context.userId === params.id ? (
               <>
                 {yourParticipateGroup.length !== 0 ? (
                   <YourParticipateGroup
@@ -514,7 +518,7 @@ export default function Profile({ userName }) {
             )}
           </TabPanel>
           <TabPanel value={value} index={2} dir={theme.direction}>
-            {Context.userId == params.id && (
+            {Context.userId === params.id && (
               <SecondHand userId={Context.userId} userName={userName} />
             )}
           </TabPanel>

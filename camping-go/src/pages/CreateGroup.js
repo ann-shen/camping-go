@@ -238,12 +238,12 @@ function CreateGroup({ userId, }) {
     zoom: 5,
     height: 400,
     mapPosition: {
-      lat: 0,
-      lng: 0,
+      lat: 25.033493,
+      lng: 121.564101,
     },
     markerPosition: {
-      lat: 0,
-      lng: 0,
+      lat: 25.033493,
+      lng: 121.564101,
     },
   });
   const [thisGroupId, setThisGroupID] = useState("");
@@ -308,7 +308,7 @@ function CreateGroup({ userId, }) {
       ...prevState,
       [name]: value,
     }));
-    if (value == "notice") {
+    if (value === "notice") {
       setAddNotice((prev) => [...prev, groupInfo.notice]);
     }
   };
@@ -426,7 +426,7 @@ function CreateGroup({ userId, }) {
 
   const addNewTent = (e) => {
     e.preventDefault();
-    if (tentInfo.max_number == "") {
+    if (tentInfo.max_number === "") {
       return;
     }
     setGetAllTent((prev) => [...prev, tentInfo]);
@@ -509,7 +509,7 @@ function CreateGroup({ userId, }) {
               />
             )}
           />
-          {privacyValue == "私人" && (
+          {privacyValue === "私人" && (
             <TextField
               sx={{ width: "100%", marginLeft: "20px", marginBottom: "30px" }}
               size='small'
@@ -534,9 +534,6 @@ function CreateGroup({ userId, }) {
               </FileLabel>
             </Display>
             {upload.file && upload.file.name}
-            {/* <PriviewImgWrap>
-              {upload.url && <PriviewImg src={upload.url}></PriviewImg>}
-            </PriviewImgWrap> */}
           </Cloumn>
         </Display>
         <Button width='100%' onClick={addNewGroup} mt='40px'>
@@ -585,7 +582,6 @@ function CreateGroup({ userId, }) {
                     size='small'
                     name='notice'
                     helperText='輸入完請按新增事項'
-                    // value={groupInfo.notice}
                     onChange={handleChange}></TextField>
                   <AddAlertItems onClick={addGroupNotice}>
                     新增事項

@@ -298,10 +298,10 @@ function SecondHand({ userName, userId }) {
           {allSupplies.map((item, index) => (
             <Box sx={allSecondHandSuppliesByProfile}>
               <Cloumn>
-                {item.change_status == true && (
+                {item.change_status === true && (
                   <Tag fontSize='14px'>已交換</Tag>
                 )}
-                {item.change_status == false && (
+                {item.change_status === false && (
                   <Tag bgc='#426765' color='white' fontSize='14px'>
                     可交換
                   </Tag>
@@ -311,7 +311,7 @@ function SecondHand({ userName, userId }) {
                 </ImgWrap>
                 <Font mt='10px'> {item.name}</Font>
                 <Hr width='100%'></Hr>
-                {item.change_status == false ? (
+                {item.change_status === false ? (
                   <>
                     <Font fontSize='16px' color='#CFC781'>
                       希望交換的物品
