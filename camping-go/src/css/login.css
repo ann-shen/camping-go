@@ -57,11 +57,14 @@
   height: 40px;
   margin-top: 40px;
   margin-right: 20px;
+  margin-left: 25%;
   border: none;
   background-color: #EAE6C4;
   color: #797659;
+}
 
-
+#register_button{
+  margin-left: 25%;
 }
 .top_wrap{
   display: flex;

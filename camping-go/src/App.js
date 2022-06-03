@@ -23,12 +23,11 @@ function App() {
   const [userId, setUserId] = useState("");
   const auth = getAuth();
 
-
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         if (user.displayName !== null) {
-          console.log(`這是${user.displayName}`)
+          console.log(`這是${user.displayName}`);
           setUserName(user.displayName);
         }
         setUserId(user.uid);

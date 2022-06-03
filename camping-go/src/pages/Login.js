@@ -181,29 +181,28 @@ function Login({ setUserId, setUserName, userName }) {
             <div className='top_wrap'></div>
             <Font>歡迎來到 camping go</Font>
             <Font fontSize='16px'>請登入您的帳號</Font>
-            <Wrap width='auto' m='40px 0px 0px 0px' direction='column'>
-              <label htmlFor=''>UserEmail</label>
-              <input
-                type='text'
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
-              />
-              <label htmlFor=''>Password</label>
-              <input
-                value={password}
-                type='password'
-                name='password'
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                }}
-              />
-              <div className='btnWrap'>
-                <button onClick={handellogin}>Login In</button>
-                <br />
-              </div>
-            </Wrap>
+            <br />
+            <label htmlFor=''>UserEmail</label>
+            <input
+              type='text'
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
+            <label htmlFor=''>Password</label>
+            <input
+              value={password}
+              type='password'
+              name='password'
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
+            />
+            <div className='btnWrap'>
+              <button onClick={handellogin}>Login In</button>
+              <br />
+            </div>
           </div>
         </TabPanel>
         <TabPanel
@@ -214,7 +213,8 @@ function Login({ setUserId, setUserName, userName }) {
           setUserId={setUserId}>
           <div className='orderListWrapn' id='signup'>
             <Font>歡迎來到 camping go</Font>
-            <Font>註冊成為會員</Font>
+            <Font fontSize='16px'>註冊成為會員</Font>
+            <br />
             <label htmlFor=''>Username</label>
             <input
               type='text'
@@ -238,7 +238,9 @@ function Login({ setUserId, setUserName, userName }) {
               }}
             />
             <div className='btnWrap'>
-              <button  id="register_button" onClick={register}>Sign up</button>
+              <button id='register_button' onClick={register}>
+                Sign up
+              </button>
             </div>
           </div>
         </TabPanel>
