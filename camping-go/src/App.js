@@ -23,22 +23,26 @@ function App() {
   const [userId, setUserId] = useState("");
   const auth = getAuth();
 
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUserName(user.displayName);
+        if (user.displayName !== null) {
+          console.log(`這是${user.displayName}`)
+          setUserName(user.displayName);
+        }
         setUserId(user.uid);
         console.log("login");
       } else {
         console.log("logout");
       }
     });
-  }, []);
+  });
 
   const value = {
     userId,
     userName,
-    personName: "",
+    personName: [],
   };
 
   return (
@@ -50,10 +54,7 @@ function App() {
               <Route
                 path='/create_group'
                 element={
-                  <CreateGroup
-                    userId={userId}
-                    userName={userName}
-                  />
+                  <CreateGroup userId={userId} userName={userName} />
                 }></Route>
               <Route
                 path='/'
@@ -78,10 +79,7 @@ function App() {
               <Route
                 path='/:city'
                 element={
-                  <CityCamping
-                    groupId={groupId}
-                    userId={userId}
-                  />
+                  <CityCamping groupId={groupId} userId={userId} />
                 }></Route>
               <Route
                 path='googlemap_basic'

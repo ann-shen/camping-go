@@ -57,7 +57,7 @@ function Login({ setUserId, setUserName, userName }) {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = ( newValue) => {
+  const handleChange = ( event,newValue) => {
     setValue(newValue);
   };
 
@@ -238,7 +238,7 @@ function Login({ setUserId, setUserName, userName }) {
               }}
             />
             <div className='btnWrap'>
-              <button onClick={register}>Sign up</button>
+              <button  id="register_button" onClick={register}>Sign up</button>
             </div>
           </div>
         </TabPanel>

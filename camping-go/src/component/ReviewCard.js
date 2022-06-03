@@ -499,7 +499,11 @@ export default function ReviewCard({
     <>
       <GroupWrap>
         {currentPosts.length === 0 && (
-          <Wrap width='80%' justifyContent='space-between' display="wrap" flexWrap="wrap">
+          <Wrap
+            width='80%'
+            justifyContent='space-between'
+            display='wrap'
+            flexWrap='wrap'>
             {loadingArr.map((_, index) => (
               <Stack spacing={2} style={{ marginRight: 30 }} key={index}>
                 <Skeleton
@@ -637,7 +641,7 @@ export default function ReviewCard({
               header_name={item.header_name}
             />
             <CardActions disableSpacing>
-              {item.select_tag
+              {item.select_tag && item.select_tag
                 .map((obj, index) => <SelectTag key={index}>{obj}</SelectTag>)
                 .slice(0, 3)}
             </CardActions>

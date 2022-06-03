@@ -2,9 +2,6 @@ import styled from "styled-components";
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../utils/userContext";
-
-
-
 import {
   setDoc,
   doc,
@@ -34,8 +31,6 @@ import GoogleMapBasic from "../component/GoogleMapBasic";
 import MultipleSelectChip from "../component/MultipleSelectChip";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { v4 as uuidv4 } from "uuid";
-
-
 
 const RockImg = styled.img`
   width: 150px;
@@ -121,7 +116,6 @@ const Form = styled.form`
 
 const options = ["公開", "私人"];
 
-
 const MeetingTimeWrap = styled.div`
   width: 50%;
   display: flex;
@@ -180,7 +174,6 @@ const AddAlertItems = styled.button`
 function Calander({ setEndDate, setStartDate, startDate, endDate }) {
   // const [startDate, setStartDate] = useState(new Date());
   // const [endDate, setEndDate] = useState(new Date());
-
   const handleSelect = (ranges) => {
     setStartDate(ranges.selection.startDate);
     setEndDate(ranges.selection.endDate);
@@ -225,11 +218,12 @@ function MaterialUIPickers({ setTime }) {
   );
 }
 
+function CreateGroup({ userId, userName }) {
+    console.log(userName);
 
-
-function CreateGroup({ userId, }) {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const Context = useContext(UserContext);
   const [state, setState] = useState({
     address: "",
     city: "",
@@ -249,7 +243,7 @@ function CreateGroup({ userId, }) {
   const [thisGroupId, setThisGroupID] = useState("");
   const [groupInfo, setGroupInfo] = useState({
     header_id: userId,
-    header_name: "",
+    header_name: userName,
     status: "",
     privacy: "公開",
     password: "",
@@ -258,7 +252,7 @@ function CreateGroup({ userId, }) {
     start_date: "",
     end_date: "",
     position: "",
-    city: "",
+    city: null,
     meeting_time: "",
     max_member_number: "",
     current_number: 1,
@@ -292,12 +286,10 @@ function CreateGroup({ userId, }) {
   const [personName, setPersonName] = useState([]);
   const [getAllTent, setGetAllTent] = useState([]);
   const [getAllSupplies, setGetAllSupplies] = useState([]);
-  const Context = useContext(UserContext);
 
   let path = window.location.pathname;
 
-
-  const addNewGroup = async (e) => {
+  const addNewGroup = (e) => {
     e.preventDefault();
     setClickConfirm(true);
   };
@@ -318,32 +310,70 @@ function CreateGroup({ userId, }) {
     setAddNotice((prev) => [...prev, groupInfo.notice]);
   };
 
-  const setUpGroup = async () => {
-    let timerInterval;
-    Swal.fire({
-      title: "創建你的露營團",
-      html: "建立中....",
-      timer: 2000,
-      timerProgressBar: true,
-      didOpen: () => {
-        Swal.showLoading();
-        const b = Swal.getHtmlContainer().querySelector("b");
-        timerInterval = setInterval(() => {
-          b.textContent = Swal.getTimerLeft();
-        }, 100);
-      },
-      willClose: () => {
-        clearInterval(timerInterval);
-      },
-    }).then((result) => {
-      if (result.dismiss === Swal.DismissReason.timer) {
-      }
-    });
-    const groupId = uuidv4();
+  const setUpGroup = async (e) => {
+    if (upload.file === "") {
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        text: "請上傳封面照片",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+      return;
+    }
 
+    const groupId = uuidv4();
     setThisGroupID(groupId);
 
     const docRef = doc(db, "CreateCampingGroup", groupId);
+
+    console.log(Context.personName);
+
+    const comfirm = {
+      address: state.address,
+      addNotice,
+      maxNumber: groupInfo.max_member_number,
+      announcement: groupInfo.announcement,
+      groupTitle: groupInfo.group_title,
+      site: groupInfo.site,
+    };
+
+    for (const key in comfirm) {
+      if (comfirm[key] === "") {
+        console.log(key, comfirm[key]);
+        Swal.fire({
+          position: "center",
+          icon: "warning",
+          text: "請確實填完表格",
+          showConfirmButton: false,
+          timer: 2500,
+        });
+        return;
+      }
+    }
+
+    if (Context.personName.length === 0) {
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        text: "請新增露營團喜愛標籤",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+      return;
+    }
+
+    if (campSupplies.supplies === "") {
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        text: "請新增團員們認領的露營用品",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+      return;
+    }
+
     await setDoc(docRef, {
       group_id: groupId,
       header_id: Context.userId,
@@ -360,7 +390,8 @@ function CreateGroup({ userId, }) {
       select_tag: Context.personName,
       current_number: 1,
       create_time: serverTimestamp(),
-      status: "",
+      status: "進行中",
+      site: groupInfo.site,
       password: groupInfo.password,
       max_member_number: groupInfo.max_member_number,
       announcement: groupInfo.announcement,
@@ -420,9 +451,29 @@ function CreateGroup({ userId, }) {
       member_id: Context.userId,
     });
 
+    let timerInterval;
+    Swal.fire({
+      title: "創建你的露營團",
+      html: "建立中....",
+      timer: 2000,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading();
+        const b = Swal.getHtmlContainer().querySelector("b");
+        // timerInterval = setInterval(() => {
+        //   b.textContent = Swal.getTimerLeft();
+        // }, 100);
+      },
+      willClose: () => {
+        clearInterval(timerInterval);
+      },
+    }).then((result) => {
+      if (result.dismiss === Swal.DismissReason.timer) {
+      }
+    });
+
     navigate("/");
   };
-
 
   const addNewTent = (e) => {
     e.preventDefault();
@@ -466,12 +517,13 @@ function CreateGroup({ userId, }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setUpGroup(e);
   };
 
   return (
     <>
       <Header ContextByUserId={Context} />
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit} name='myform'>
         <RockImg src={landingPage04} alt='' />
         <Title>創建你的露營團</Title>
         <TextField
@@ -513,7 +565,6 @@ function CreateGroup({ userId, }) {
             <TextField
               sx={{ width: "100%", marginLeft: "20px", marginBottom: "30px" }}
               size='small'
-              required
               label='密碼'
               name='password'
               value={groupInfo.password}
@@ -536,7 +587,13 @@ function CreateGroup({ userId, }) {
             {upload.file && upload.file.name}
           </Cloumn>
         </Display>
-        <Button width='100%' onClick={addNewGroup} mt='40px'>
+        <Button
+          width='100%'
+          onClick={(e) => {
+            e.preventDefault();
+            setClickConfirm(true);
+          }}
+          mt='40px'>
           下一步
         </Button>
         {clickConfirm && (
@@ -602,7 +659,7 @@ function CreateGroup({ userId, }) {
                 thisGroupId={thisGroupId}
                 setPersonName={setPersonName}
                 personName={personName}
-                condiion="create"
+                condiion='create'
               />
               <br></br>
               <br></br>
@@ -680,13 +737,10 @@ function CreateGroup({ userId, }) {
                   </Cloumn>
                 </Display>
               </SuppliesWrap>
-              {/* <Display>
-                <Multiple setUpLoadFile={setUpLoadFile} />
-              </Display> */}
-              <Button width='100%' mt='60px' onClick={setUpGroup}>
-                建立露營團
-              </Button>
             </Cloumn>
+            <Button type='submit' width='100%' mt='60px' onClick={handleSubmit}>
+              建立露營團
+            </Button>
           </SecondSection>
         )}
       </Form>
