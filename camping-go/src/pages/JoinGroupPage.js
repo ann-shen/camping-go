@@ -416,10 +416,11 @@ function JoinGroupPage({ userName }) {
   const dragStart = async (e) => {
     e.dataTransfer.setData("text/plain", e.target.id);
     e.target.style = "drop-shadow(0px 0px 0px white)";
-
     let secondTargetTentId = e.target.getAttribute("data-key");
     setAlreadyTentId(secondTargetTentId);
+    setCurrentTentId(secondTargetTentId);
   };
+  console.log(currentTentId);
 
   const drop = async (e) => {
     let targetTentId = e.target.getAttribute("data-key");

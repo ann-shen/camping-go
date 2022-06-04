@@ -301,6 +301,6 @@ function CampingGroup({ setGroupId }) {
 }
 
 CampingGroup.propTypes = {
-  setGroupId: PropTypes.string,
+  setGroupId: PropTypes.func,
 };
 export default CampingGroup;
