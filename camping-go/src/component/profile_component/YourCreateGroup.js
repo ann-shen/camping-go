@@ -12,6 +12,7 @@ import {
   where,
   doc,
   deleteDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import {
   Font,
@@ -88,12 +89,13 @@ function YourCreateGroup() {
       collection(db, "CreateCampingGroup"),
       where("header_id", "==", params.id)
     );
-    const querySnapshot = await getDocs(q);
-    let Arr = [];
-    querySnapshot.forEach((doc) => {
-      Arr.push(doc.data());
+    onSnapshot(q, (snapshot) => {
+      let createArr = [];
+      snapshot.forEach((doc) => {
+        createArr.push(doc.data());
+      });
+      setYourCreateGroup(createArr);
     });
-    setYourCreateGroup(Arr);
   }, []);
 
   const deleteThisGroup = async (id) => {

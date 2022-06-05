@@ -115,7 +115,6 @@ const Form = styled.form`
 `;
 
 const options = ["公開", "私人"];
-
 const MeetingTimeWrap = styled.div`
   width: 50%;
   display: flex;
@@ -198,7 +197,6 @@ function Calander({ setEndDate, setStartDate, startDate, endDate }) {
 //time
 function MaterialUIPickers({ setTime }) {
   const [value, setValue] = useState(new Date());
-
   const handleChange = (newValue) => {
     setTime(newValue);
     setValue(newValue);
@@ -219,11 +217,9 @@ function MaterialUIPickers({ setTime }) {
 }
 
 function CreateGroup({ userId, userName }) {
-    console.log(userName);
-
+  const Context = useContext(UserContext);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const Context = useContext(UserContext);
   const [state, setState] = useState({
     address: "",
     city: "",
@@ -252,7 +248,7 @@ function CreateGroup({ userId, userName }) {
     start_date: "",
     end_date: "",
     position: "",
-    city: null,
+    city: "",
     meeting_time: "",
     max_member_number: "",
     current_number: 1,
@@ -288,11 +284,6 @@ function CreateGroup({ userId, userName }) {
   const [getAllSupplies, setGetAllSupplies] = useState([]);
 
   let path = window.location.pathname;
-
-  const addNewGroup = (e) => {
-    e.preventDefault();
-    setClickConfirm(true);
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -374,6 +365,18 @@ function CreateGroup({ userId, userName }) {
       return;
     }
 
+    if (time === "") {
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        text: "請填寫集合時間",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+      return;
+    }
+
+
     await setDoc(docRef, {
       group_id: groupId,
       header_id: Context.userId,
@@ -382,7 +385,7 @@ function CreateGroup({ userId, userName }) {
       end_date: endDate,
       meeting_time: time,
       position: state.address,
-      city: state.city,
+      city: state.city ? state.city : state.state,
       picture: upload.url,
       detail_picture: upload.detail_picture,
       privacy: privacyValue,
@@ -412,6 +415,8 @@ function CreateGroup({ userId, userName }) {
         }
       );
     });
+    
+    console.log(getAllSupplies)
 
     getAllSupplies.map(async (item) => {
       const ondocRefNewSupplies = doc(
@@ -424,18 +429,6 @@ function CreateGroup({ userId, userName }) {
           supplies_id: ondocRefNewSupplies.id,
         }
       );
-    });
-
-    const docRefObject = await doc(
-      db,
-      "CreateCampingGroup",
-      groupId,
-      "supplies",
-      groupId
-    );
-    setDoc(docRefObject, campSupplies);
-    updateDoc(doc(db, "CreateCampingGroup", groupId, "supplies", groupId), {
-      supplies_id: docRefObject.id,
     });
 
     const docRefMember = await doc(
@@ -494,6 +487,7 @@ function CreateGroup({ userId, userName }) {
     e.preventDefault();
     setGetAllSupplies((prev) => [...prev, campSupplies]);
   };
+  console.log(getAllSupplies);
 
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));
