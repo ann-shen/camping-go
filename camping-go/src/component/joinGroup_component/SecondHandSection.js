@@ -47,13 +47,20 @@ function SecondHandSection({ thisGroupMember }) {
         return;
       }
     });
+    let memberIdArr = [];
+    thisGroupMember.forEach((item) => {
+      memberIdArr.push(item.info.user_id);
+    });
+    console.log(memberIdArr);
 
     if (second_hand_Arr.length !== 0) {
       second_hand_Arr.map((item) => {
         item.map((obj) => {
           if (obj.change_status == true) {
             if (obj.inviteSupplies_index !== "") {
-              objArr.push(obj);
+              if (memberIdArr.includes(obj.buyer_id)){
+                objArr.push(obj);
+              }
             }
           }
         });
@@ -100,7 +107,9 @@ function SecondHandSection({ thisGroupMember }) {
           ))}
         </>
       ) : (
-        <Font m="30px 0px 0px 0px" fontSize="16px">快上傳你的二手露營用品跟團員們交換吧！</Font>
+        <Font m='30px 0px 0px 0px' fontSize='16px'>
+          快上傳你的二手露營用品跟團員們交換吧！
+        </Font>
       )}
     </>
   );
