@@ -62,6 +62,7 @@ export const Img = styled.img`
 `;
 
 export const ImgWrap = styled.div`
+display: flex;
   align-items: center;
   justify-content: center;
   margin: ${(props) => props.m || "0px"};

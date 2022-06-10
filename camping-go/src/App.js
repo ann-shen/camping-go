@@ -1,5 +1,5 @@
 import { UserContext } from "./utils/userContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect,useMemo } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import "react-date-range/dist/styles.css";
@@ -23,6 +23,7 @@ function App() {
   const [userId, setUserId] = useState("");
   const auth = getAuth();
 
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -36,7 +37,7 @@ function App() {
         console.log("logout");
       }
     });
-  });
+  },[]);
 
   const value = {
     userId,

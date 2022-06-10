@@ -58,7 +58,7 @@ function SecondHandSection({ thisGroupMember }) {
         item.map((obj) => {
           if (obj.change_status == true) {
             if (obj.inviteSupplies_index !== "") {
-              if (memberIdArr.includes(obj.buyer_id)){
+              if (memberIdArr.includes(obj.buyer_id)) {
                 objArr.push(obj);
               }
             }
