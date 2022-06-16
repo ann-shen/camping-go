@@ -139,6 +139,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
 
   const sendComment = async () => {
     if (ifClick === true) {
+      console.log("已傳送")
       setAlertOpen(true);
       ifClick = false;
       const feedbackInCreateRef = doc(
@@ -193,7 +194,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
       }, 1000);
       setTimeout(() => {
         ifClick = true;
-      }, 2000);
+      }, 3000);
     }
   };
 

@@ -36,7 +36,8 @@ function CampSupplies({ setCampSupplies, campSupplies }) {
         name='supplies'
         label='新增露營用品'
         onChange={handleChange}
-        size='small'></TextField>
+        size='small'
+        value={campSupplies.supplies}></TextField>
       <TextField
         name='note'
         label='備註'

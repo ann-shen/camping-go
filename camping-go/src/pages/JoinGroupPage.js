@@ -386,6 +386,8 @@ const SuppliesSection = styled.div`
 `;
 
 let tentIsClick = true;
+let suppliesIsClick = true;
+
 function JoinGroupPage({ userName }) {
   const [homePageCampGroup, setHomePageCampGroup] = useState("");
   const [allTentArr, setAllTentArr] = useState([]);
@@ -580,6 +582,7 @@ function JoinGroupPage({ userName }) {
       const ondocRefNewTent = doc(
         collection(db, "CreateCampingGroup", params.id, "tent")
       );
+      console.log("gogo");
       await setDoc(ondocRefNewTent, tentInfo);
       updateDoc(
         doc(db, "CreateCampingGroup", params.id, "tent", ondocRefNewTent.id),
@@ -592,29 +595,49 @@ function JoinGroupPage({ userName }) {
       );
       setTimeout(() => {
         tentIsClick = true;
-      }, 2500);
+      }, 3000);
     }
   };
 
   const addSupplies = async () => {
-    const ondocRefNewSupplies = doc(
-      collection(db, "CreateCampingGroup", params.id, "supplies")
-    );
-    await setDoc(ondocRefNewSupplies, campSupplies);
-    updateDoc(
-      doc(
-        db,
-        "CreateCampingGroup",
-        params.id,
-        "supplies",
-        ondocRefNewSupplies.id
-      ),
-      {
-        supplies_id: ondocRefNewSupplies.id,
+    if (suppliesIsClick) {
+      if( (campSupplies.note === "") || (campSupplies.supplies === "") ){
+        return
       }
-    );
+      suppliesIsClick = false
+      const ondocRefNewSupplies = doc(
+        collection(db, "CreateCampingGroup", params.id, "supplies")
+      );
+      await setDoc(ondocRefNewSupplies, campSupplies);
+      updateDoc(
+        doc(
+          db,
+          "CreateCampingGroup",
+          params.id,
+          "supplies",
+          ondocRefNewSupplies.id
+        ),
+        {
+          supplies_id: ondocRefNewSupplies.id,
+        }
+      );
 
-    setCampSupplies((prevState) => ({ ...prevState, note: "", supplies: "" }));
+      setCampSupplies((prevState) => ({
+        ...prevState,
+        note: "",
+        supplies: "",
+      }));
+    }
+    setCampSupplies((prevState)=>({
+      ...prevState,
+      bring_person:"",
+      note:"",
+      supplies:""
+    }))
+
+    setTimeout(() => {
+      suppliesIsClick = true;
+    }, 3000);
   };
 
   const handleAddTentSection = () => {
