@@ -395,7 +395,7 @@ function JoinGroupPage({ userName }) {
   const [thisGroupMember, setThisGroupMember] = useState([]);
   const [tentInfo, setTentInfo] = useState({
     current_number: 0,
-    max_number: 0,
+    max_number: "",
     member: [],
     create_time: serverTimestamp(),
   });
@@ -575,14 +575,42 @@ function JoinGroupPage({ userName }) {
       bring_person: userName,
     });
   };
+  console.log(tentInfo.max_number);
 
   const addNewTent = async () => {
     if (tentIsClick) {
+      if(tentInfo.max_number == 0){
+        Swal.fire({
+          position: "center",
+          icon: "warning",
+          text: "容納人數不可等於0",
+          showConfirmButton: false,
+          timer: 2500,
+        });
+        return
+      }else if (tentInfo.max_number < 0){
+        Swal.fire({
+          position: "center",
+          icon: "warning",
+          text: "容納人數不可為負數",
+          showConfirmButton: false,
+          timer: 2500,
+        });
+        return;
+      }else if (tentInfo.max_number > 5) {
+        Swal.fire({
+          position: "center",
+          icon: "warning",
+          text: "容納人數不可大於五人",
+          showConfirmButton: false,
+          timer: 2500,
+        });
+        return;
+      }
       tentIsClick = false;
       const ondocRefNewTent = doc(
         collection(db, "CreateCampingGroup", params.id, "tent")
       );
-      console.log("gogo");
       await setDoc(ondocRefNewTent, tentInfo);
       updateDoc(
         doc(db, "CreateCampingGroup", params.id, "tent", ondocRefNewTent.id),
@@ -593,9 +621,14 @@ function JoinGroupPage({ userName }) {
           who_create: userName,
         }
       );
+      setTentInfo((prevState)=>({
+        ...prevState,
+        max_number:"",
+      }))
       setTimeout(() => {
         tentIsClick = true;
       }, 3000);
+
     }
   };
 
