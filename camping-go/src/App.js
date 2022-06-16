@@ -1,6 +1,6 @@
 import { UserContext } from "./utils/userContext";
-import { useState, useEffect,useMemo } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { BrowserRouter, Route, Routes,Navigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -23,27 +23,24 @@ function App() {
   const [userId, setUserId] = useState("");
   const auth = getAuth();
 
-
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         if (user.displayName !== null) {
-          console.log(`這是${user.displayName}`);
           setUserName(user.displayName);
         }
         setUserId(user.uid);
-        console.log("login");
       } else {
-        console.log("logout");
       }
     });
-  },[]);
+  }, []);
 
   const value = {
     userId,
     userName,
     personName: [],
   };
+
 
   return (
     <div className='App'>
@@ -62,11 +59,11 @@ function App() {
               <Route
                 path='joinGroup/:id'
                 element={<JoinGroupPage userName={userName} />}></Route>
-              <Route
-                path='profile/:id'
-                element={
-                  <Profile userName={userName} userId={userId} />
-                }></Route>
+                <Route
+                  path='profile/:id'
+                  element={
+                    <Profile userName={userName} userId={userId} />
+                  }></Route>
               <Route
                 path='login'
                 element={

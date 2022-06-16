@@ -51,7 +51,6 @@ function SecondHandSection({ thisGroupMember }) {
     thisGroupMember.forEach((item) => {
       memberIdArr.push(item.info.user_id);
     });
-    console.log(memberIdArr);
 
     if (second_hand_Arr.length !== 0) {
       second_hand_Arr.map((item) => {

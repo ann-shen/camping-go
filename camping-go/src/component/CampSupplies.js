@@ -24,7 +24,6 @@ function CampSupplies({ setCampSupplies, campSupplies }) {
     }));
   };
 
-  console.log(campSupplies);
 
   return (
     <Wrap

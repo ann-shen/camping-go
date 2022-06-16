@@ -18,7 +18,7 @@ import {
   setDoc,
   getDoc,
 } from "firebase/firestore";
-import { signOut, getAuth } from "firebase/auth";
+import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
 import { db } from "../utils/firebase";
 
 import { Font, Img, Button, Hr, BoxWrap } from "../css/style";
@@ -126,6 +126,7 @@ function a11yProps(index) {
   };
 }
 
+let ifClick = true;
 function SentCommentToHeader({ groupId, userName, userId }) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
@@ -137,63 +138,68 @@ function SentCommentToHeader({ groupId, userName, userId }) {
   };
 
   const sendComment = async () => {
-    setAlertOpen(true);
-
-    const feedbackInCreateRef = doc(
-      db,
-      "CreateCampingGroup",
-      groupId,
-      "feedback",
-      userId
-    );
-
-    let profile_img;
-
-    const docRefJoinGroup = doc(db, "joinGroup", userId);
-    const docMemberInfo = await getDoc(docRefJoinGroup);
-    if (docMemberInfo.exists()) {
-      profile_img = docMemberInfo.data().profile_img;
-    }
-
-    await setDoc(feedbackInCreateRef, {
-      name: userName,
-      note: value,
-      score: startValue,
-      user_id: userId,
-      profile_img: profile_img,
-    }).then(async () => {
-      let scoreArr = [];
-      let commentArr = [];
-      const commentRef = collection(
+    if (ifClick === true) {
+      setAlertOpen(true);
+      ifClick = false;
+      const feedbackInCreateRef = doc(
         db,
         "CreateCampingGroup",
         groupId,
-        "feedback"
+        "feedback",
+        userId
       );
 
-      const querySnapshot = await getDocs(commentRef);
-      querySnapshot.forEach((doc) => {
-        scoreArr.push(Number(doc.data().score));
-        commentArr.push(doc.data().note);
-      });
-      let totalScore = scoreArr.reduce(function (total, e) {
-        return total + e;
-      }, 0);
+      let profile_img;
 
-      updateDoc(doc(db, "CreateCampingGroup", groupId), {
-        total_score: totalScore / scoreArr.length,
-        comment: commentArr,
-      });
-    });
+      const docRefJoinGroup = doc(db, "joinGroup", userId);
+      const docMemberInfo = await getDoc(docRefJoinGroup);
+      if (docMemberInfo.exists()) {
+        profile_img = docMemberInfo.data().profile_img;
+      }
 
-    setTimeout(() => {
-      setAlertOpen(false);
-    }, 1000);
+      await setDoc(feedbackInCreateRef, {
+        name: userName,
+        note: value,
+        score: startValue,
+        user_id: userId,
+        profile_img: profile_img,
+      }).then(async () => {
+        let scoreArr = [];
+        let commentArr = [];
+        const commentRef = collection(
+          db,
+          "CreateCampingGroup",
+          groupId,
+          "feedback"
+        );
+
+        const querySnapshot = await getDocs(commentRef);
+        querySnapshot.forEach((doc) => {
+          scoreArr.push(Number(doc.data().score));
+          commentArr.push(doc.data().note);
+        });
+        let totalScore = scoreArr.reduce(function (total, e) {
+          return total + e;
+        }, 0);
+
+        updateDoc(doc(db, "CreateCampingGroup", groupId), {
+          total_score: totalScore / scoreArr.length,
+          comment: commentArr,
+        });
+      });
+
+      setTimeout(() => {
+        setAlertOpen(false);
+      }, 1000);
+      setTimeout(() => {
+        ifClick = true;
+      }, 2000);
+    }
   };
 
   return (
     <div className='App'>
-      <Button onClick={() => setIsOpen(true)} width=' 200px'>
+      <Button onClick={() => setIsOpen(true)} width=' 150px'>
         評論
       </Button>
       <Modal
@@ -224,7 +230,6 @@ function SentCommentToHeader({ groupId, userName, userId }) {
                 "0.3rem 0.3rem 0.8rem #E2E1D3 , -0.2rem -0.2rem 0.2rem #ffffff",
             }}
             multiline
-            // label='評論'
             rows={4}
             variant='filled'
             onChange={handleChange}
@@ -380,7 +385,16 @@ export default function Profile({ userName }) {
     });
     return () => unsubscribe();
   }, []);
-  
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        return;
+      } else {
+        navigate("/login");
+      }
+    });
+  }, []);
 
   async function sweatAlertTowithDrawGrop(id, userId, index) {
     Swal.fire({
@@ -411,6 +425,7 @@ export default function Profile({ userName }) {
         });
       }
     });
+    setWithDrawGrop(true);
   }
 
   const memberWithdrawGroup = async (id, userId, index) => {
@@ -431,7 +446,7 @@ export default function Profile({ userName }) {
       .catch((error) => {});
     navigate("/login");
   }
-
+  
   return (
     <>
       <Header ContextByUserId={Context} />
@@ -525,9 +540,11 @@ export default function Profile({ userName }) {
           </TabPanel>
         </SwipeableViews>
       </Box>
-      <Button width='100px' onClick={getLogout}>
-        登出
-      </Button>
+      {Context.userId === params.id && (
+        <Button width='100px' onClick={getLogout}>
+          登出
+        </Button>
+      )}
       <Footer />
     </>
   );

@@ -17,8 +17,10 @@ import {
   getDoc,
   deleteDoc,
 } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect, useRef, useContext } from "react";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../utils/data";
 import { UserContext } from "../utils/userContext";
 import {
@@ -52,7 +54,6 @@ import loading from "../image/loading.gif";
 
 import { v4 as uuidv4 } from "uuid";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-
 
 const Alink = styled.a`
   text-decoration: none;
@@ -384,6 +385,7 @@ const SuppliesSection = styled.div`
   }
 `;
 
+let tentIsClick = true;
 function JoinGroupPage({ userName }) {
   const [homePageCampGroup, setHomePageCampGroup] = useState("");
   const [allTentArr, setAllTentArr] = useState([]);
@@ -400,7 +402,6 @@ function JoinGroupPage({ userName }) {
   const [isMemberInTheTent, setIsMemberInTheTent] = useState(false);
 
   const [currentTentId, setCurrentTentId] = useState("");
-  const [alreadyTentId, setAlreadyTentId] = useState("");
   const ContextByUserId = useContext(UserContext);
   const [campSupplies, setCampSupplies] = useState({
     bring_person: "",
@@ -411,16 +412,16 @@ function JoinGroupPage({ userName }) {
   const dragSource = useRef();
   const dropTarget = useRef();
 
+  const auth = getAuth();
   let params = useParams();
+  const navigate = useNavigate();
 
   const dragStart = async (e) => {
     e.dataTransfer.setData("text/plain", e.target.id);
     e.target.style = "drop-shadow(0px 0px 0px white)";
     let secondTargetTentId = e.target.getAttribute("data-key");
-    setAlreadyTentId(secondTargetTentId);
     setCurrentTentId(secondTargetTentId);
   };
-  console.log(currentTentId);
 
   const drop = async (e) => {
     let targetTentId = e.target.getAttribute("data-key");
@@ -448,16 +449,10 @@ function JoinGroupPage({ userName }) {
     );
     setCurrentTentId(targetTentId);
     if (currentTentId === " ") {
+      return;
+    } else if (currentTentId) {
       await updateDoc(
         doc(db, "CreateCampingGroup", params.id, "tent", currentTentId),
-        {
-          current_number: increment(-1),
-          member: arrayRemove(userName),
-        }
-      );
-    } else if (alreadyTentId) {
-      await updateDoc(
-        doc(db, "CreateCampingGroup", params.id, "tent", alreadyTentId),
         {
           current_number: increment(-1),
           member: arrayRemove(userName),
@@ -474,7 +469,7 @@ function JoinGroupPage({ userName }) {
 
   const onDragEnter = (e) => {
     let targetTentId = e.target.getAttribute("data-key");
-    if (targetTentId === alreadyTentId) {
+    if (targetTentId === currentTentId) {
       return;
     }
     e.target.style.transform = "scale(1.2)";
@@ -562,7 +557,16 @@ function JoinGroupPage({ userName }) {
       setIsMemberInTheTent(true);
     });
   }, [homePageCampGroup]);
-  console.log(isMemberInTheTent);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        return;
+      } else {
+        navigate("/");
+      }
+    });
+  }, []);
 
   const takeAway = async (id) => {
     await updateDoc(doc(db, "CreateCampingGroup", params.id, "supplies", id), {
@@ -571,19 +575,25 @@ function JoinGroupPage({ userName }) {
   };
 
   const addNewTent = async () => {
-    const ondocRefNewTent = doc(
-      collection(db, "CreateCampingGroup", params.id, "tent")
-    );
-    await setDoc(ondocRefNewTent, tentInfo);
-    updateDoc(
-      doc(db, "CreateCampingGroup", params.id, "tent", ondocRefNewTent.id),
-      {
-        tent_id: ondocRefNewTent.id,
-        member: [],
-        create_time: serverTimestamp(),
-        who_create: userName,
-      }
-    );
+    if (tentIsClick) {
+      tentIsClick = false;
+      const ondocRefNewTent = doc(
+        collection(db, "CreateCampingGroup", params.id, "tent")
+      );
+      await setDoc(ondocRefNewTent, tentInfo);
+      updateDoc(
+        doc(db, "CreateCampingGroup", params.id, "tent", ondocRefNewTent.id),
+        {
+          tent_id: ondocRefNewTent.id,
+          member: [],
+          create_time: serverTimestamp(),
+          who_create: userName,
+        }
+      );
+      setTimeout(() => {
+        tentIsClick = true;
+      }, 2500);
+    }
   };
 
   const addSupplies = async () => {
@@ -1152,6 +1162,5 @@ function JoinGroupPage({ userName }) {
     </div>
   );
 }
-
 
 export default JoinGroupPage;

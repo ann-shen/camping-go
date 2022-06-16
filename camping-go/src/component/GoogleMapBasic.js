@@ -56,7 +56,6 @@ function GoogleMapBasic({ state, setState }) {
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
-        console.log(position.coords.latitude)
         setState(
           {
             mapPosition: {

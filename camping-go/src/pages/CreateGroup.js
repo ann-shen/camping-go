@@ -318,7 +318,6 @@ function CreateGroup({ userId, userName }) {
 
     const docRef = doc(db, "CreateCampingGroup", groupId);
 
-    console.log(Context.personName);
 
     const comfirm = {
       address: state.address,
@@ -331,7 +330,6 @@ function CreateGroup({ userId, userName }) {
 
     for (const key in comfirm) {
       if (comfirm[key] === "") {
-        console.log(key, comfirm[key]);
         Swal.fire({
           position: "center",
           icon: "warning",
@@ -416,7 +414,6 @@ function CreateGroup({ userId, userName }) {
       );
     });
     
-    console.log(getAllSupplies)
 
     getAllSupplies.map(async (item) => {
       const ondocRefNewSupplies = doc(
@@ -487,7 +484,6 @@ function CreateGroup({ userId, userName }) {
     e.preventDefault();
     setGetAllSupplies((prev) => [...prev, campSupplies]);
   };
-  console.log(getAllSupplies);
 
   const handleFiles = (e) => {
     setUpLoadFile((prevState) => ({ ...prevState, file: e.target.files[0] }));

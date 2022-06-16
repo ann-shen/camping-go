@@ -149,6 +149,7 @@ function NavBar({ userId }) {
   const [navSize, setnavSize] = useState("6rem");
   const [navbar, setNavbar] = useState(false);
   const navigate = useNavigate();
+  
   const listenScrollEvent = () => {
     window.scrollY > 10 ? setnavColor("#426765") : setnavColor("transparent");
     window.scrollY > 10 ? setnavSize("5.5rem") : setnavSize("7rem");
