@@ -14,6 +14,7 @@ const Input = styled.input`
   height: 30px;
   margin: 20px;
 `;
+
 function CampSupplies({ setCampSupplies, campSupplies }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,6 +23,7 @@ function CampSupplies({ setCampSupplies, campSupplies }) {
       [name]: value,
     }));
   };
+
 
   return (
     <Wrap

@@ -1,6 +1,6 @@
 import { UserContext } from "./utils/userContext";
-import { useState, useEffect } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { BrowserRouter, Route, Routes,Navigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -26,11 +26,11 @@ function App() {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUserName(user.displayName);
+        if (user.displayName !== null) {
+          setUserName(user.displayName);
+        }
         setUserId(user.uid);
-        console.log("login");
       } else {
-        console.log("logout");
       }
     });
   }, []);
@@ -38,8 +38,9 @@ function App() {
   const value = {
     userId,
     userName,
-    personName: "",
+    personName: [],
   };
+
 
   return (
     <div className='App'>
@@ -50,10 +51,7 @@ function App() {
               <Route
                 path='/create_group'
                 element={
-                  <CreateGroup
-                    userId={userId}
-                    userName={userName}
-                  />
+                  <CreateGroup userId={userId} userName={userName} />
                 }></Route>
               <Route
                 path='/'
@@ -61,11 +59,11 @@ function App() {
               <Route
                 path='joinGroup/:id'
                 element={<JoinGroupPage userName={userName} />}></Route>
-              <Route
-                path='profile/:id'
-                element={
-                  <Profile userName={userName} userId={userId} />
-                }></Route>
+                <Route
+                  path='profile/:id'
+                  element={
+                    <Profile userName={userName} userId={userId} />
+                  }></Route>
               <Route
                 path='login'
                 element={
@@ -78,10 +76,7 @@ function App() {
               <Route
                 path='/:city'
                 element={
-                  <CityCamping
-                    groupId={groupId}
-                    userId={userId}
-                  />
+                  <CityCamping groupId={groupId} userId={userId} />
                 }></Route>
               <Route
                 path='googlemap_basic'

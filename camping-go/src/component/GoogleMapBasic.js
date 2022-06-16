@@ -18,37 +18,37 @@ let key = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 Geocode.setApiKey(`${key}`);
 const MapWithAMarker = withScriptjs(
   withGoogleMap(({ state, onMakerDragEnd, onPlaceSelected }) => (
-      <GoogleMap
-        defaultZoom={16}
-        defaultCenter={{
-          lat: state.mapPosition.lat,
-          lng: state.mapPosition.lng,
+    <GoogleMap
+      defaultZoom={16}
+      defaultCenter={{
+        lat: state.mapPosition.lat,
+        lng: state.mapPosition.lng,
+      }}>
+      <Marker
+        draggable={true}
+        onDragEnd={onMakerDragEnd}
+        position={{
+          lat: state.markerPosition.lat,
+          lng: state.markerPosition.lng,
         }}>
-        <Marker
-          draggable={true}
-          onDragEnd={onMakerDragEnd}
-          position={{
-            lat: state.markerPosition.lat,
-            lng: state.markerPosition.lng,
-          }}>
-          <InfoWindow>
-            <div>{state.address}</div>
-          </InfoWindow>
-        </Marker>
-        <Autocomplete
-          style={{
-            width: "98%",
-            height: "30px",
-            margin: "20px 0px 0px 0px",
-            backgroundColor: "#F4F4EE",
-            border: "1px solid gray",
-            borderRadius: "5px",
-            padding: "5px",
-          }}
-          types={["geocode", "establishment"]}
-          onPlaceSelected={onPlaceSelected}
-        />
-      </GoogleMap>
+        <InfoWindow>
+          <div>{state.address === "" ? "請至下方輸入位置地址" : state.address}</div>
+        </InfoWindow>
+      </Marker>
+      <Autocomplete
+        style={{
+          width: "98%",
+          height: "30px",
+          margin: "20px 0px 0px 0px",
+          backgroundColor: "#F4F4EE",
+          border: "1px solid gray",
+          borderRadius: "5px",
+          padding: "5px",
+        }}
+        types={["geocode", "establishment"]}
+        onPlaceSelected={onPlaceSelected}
+      />
+    </GoogleMap>
   ))
 );
 
@@ -79,7 +79,7 @@ function GoogleMapBasic({ state, setState }) {
                   area = getArea(addressArray),
                   state = getState(addressArray);
                 setState({
-                  address: address ? address : "",
+                  address: address ? address : "請新增地址",
                   area: area ? area : "",
                   city: city ? city : "",
                   state: state ? state : "",

@@ -93,7 +93,7 @@ const ImgGroupPeopleWrap = styled.div`
   display: flex;
   justify-content: start;
   margin: 0px 0px 0px 9%;
-  width: 110%;
+  width: 85%;
   @media (max-width: 768px) {
     width: 80%;
   }
@@ -301,6 +301,6 @@ function CampingGroup({ setGroupId }) {
 }
 
 CampingGroup.propTypes = {
-  setGroupId: PropTypes.string,
+  setGroupId: PropTypes.func,
 };
 export default CampingGroup;
