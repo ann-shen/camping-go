@@ -41,13 +41,12 @@ Password: moonmo
 
 # Features
 
-- efficient tent arrangement planning.
+- **efficient tent arrangement planning.**
 
 select the tent with drag and drop, claim necessary camping supplies of the group.
 
 ![supplies](./read_img/tent_supplies.gif)
 
-</br>
 
 - **second-hand camping supplies exchanges.**
 
@@ -55,7 +54,6 @@ upload second-hand camping supplies to exchanges with your group members.
 
 ![second-hand camping supplies exchanges](./read_img/exchamge_supplies.gif)
 
- <br>
 
 
 - **personal recommendation**
@@ -67,7 +65,6 @@ Personalized recommendation with the camping group that suits you best.
 ![recommendation](./read_img/recommendation.gif)
 
 
- <br>
 
 - **Choose your purpose city to go**
 
