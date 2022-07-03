@@ -139,6 +139,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
 
   const sendComment = async () => {
     if (ifClick === true) {
+      console.log("已傳送")
       setAlertOpen(true);
       ifClick = false;
       const feedbackInCreateRef = doc(
@@ -193,7 +194,7 @@ function SentCommentToHeader({ groupId, userName, userId }) {
       }, 1000);
       setTimeout(() => {
         ifClick = true;
-      }, 2000);
+      }, 3000);
     }
   };
 
@@ -502,7 +503,7 @@ export default function Profile({ userName }) {
               <DefaultWrap>
                 <Img src={initial} width='300px' m='100px 10px 0px 0px'></Img>
                 <Font m='30px 0px 0px 0px' letterSpacing='2px'>
-                  點選<Span>建立露營團揪</Span>大家一起露營吧！
+                  點選<Span>建立露營團</Span>揪大家一起露營吧！
                 </Font>
               </DefaultWrap>
             )}
