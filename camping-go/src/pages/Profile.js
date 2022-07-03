@@ -503,7 +503,7 @@ export default function Profile({ userName }) {
               <DefaultWrap>
                 <Img src={initial} width='300px' m='100px 10px 0px 0px'></Img>
                 <Font m='30px 0px 0px 0px' letterSpacing='2px'>
-                  點選<Span>建立露營團揪</Span>大家一起露營吧！
+                  點選<Span>建立露營團</Span>揪大家一起露營吧！
                 </Font>
               </DefaultWrap>
             )}

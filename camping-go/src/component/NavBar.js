@@ -155,6 +155,19 @@ function NavBar({ userId }) {
     window.scrollY > 10 ? setnavSize("5.5rem") : setnavSize("7rem");
     window.scrollY > 10 ? setnavFontColor("#F4F4EE") : setnavFontColor("gray");
   };
+
+  function debounce(func, delay = 50) {
+    let timer = null;
+    return () => {
+      let context = this;
+      let args = arguments;
+
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        func.apply(context, args);
+      }, delay);
+    };
+  }
   const matches = useMediaQuery("(max-width:766px)");
   const auth = getAuth();
 

@@ -252,7 +252,7 @@ function CampingGroup({ setGroupId }) {
         </LandingSubTitleWrap>
 
         <LandingImgWrap>
-          <LandingImg src={landingpage}></LandingImg>
+          <LandingImg src={landingpage} loading='lazy'></LandingImg>
         </LandingImgWrap>
       </HeaderSection>
       <Section>

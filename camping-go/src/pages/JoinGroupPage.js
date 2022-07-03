@@ -36,6 +36,7 @@ import {
   suppliesSectionByJoinGroup,
 } from "../css/style";
 import "../css/member.css";
+import firebase from "../utils/firebaseConfig";
 
 import Tent from "../component/Tent";
 import Header from "../component/Header";
@@ -214,9 +215,14 @@ const TentSectionWrap = styled.div`
   width: 100%;
   display: flex;
   flex-wrap: wrap;
+  margin-left: 30px;
+  @media (max-width: 968px) {
+    margin-left: 10px;
+  }
   @media (max-width: 768px) {
     align-items: center;
     justify-content: center;
+    margin-left: 0px;
   }
 `;
 
@@ -570,16 +576,35 @@ function JoinGroupPage({ userName }) {
     });
   }, []);
 
+  useEffect(() => {
+    const isMemberInThisGroup = () => {
+      firebase.getDocsOfSubCollectionMember(params.id).then((res) => {
+        let memberIdArr = [];
+        res.forEach((item) => {
+          memberIdArr.push(item.member_id);
+        });
+        if (memberIdArr.indexOf(ContextByUserId.userId) === -1) {
+          console.log(memberIdArr.indexOf(ContextByUserId.userId));
+            // navigate("/");
+        }
+      });
+    };
+    isMemberInThisGroup();
+
+    return () => {
+      isMemberInThisGroup();
+    };
+  }, [thisGroupMember]);
+
   const takeAway = async (id) => {
     await updateDoc(doc(db, "CreateCampingGroup", params.id, "supplies", id), {
       bring_person: userName,
     });
   };
-  console.log(tentInfo.max_number);
 
   const addNewTent = async () => {
     if (tentIsClick) {
-      if(tentInfo.max_number == 0){
+      if (tentInfo.max_number == 0) {
         Swal.fire({
           position: "center",
           icon: "warning",
@@ -587,8 +612,8 @@ function JoinGroupPage({ userName }) {
           showConfirmButton: false,
           timer: 2500,
         });
-        return
-      }else if (tentInfo.max_number < 0){
+        return;
+      } else if (tentInfo.max_number < 0) {
         Swal.fire({
           position: "center",
           icon: "warning",
@@ -597,7 +622,7 @@ function JoinGroupPage({ userName }) {
           timer: 2500,
         });
         return;
-      }else if (tentInfo.max_number > 5) {
+      } else if (tentInfo.max_number > 5) {
         Swal.fire({
           position: "center",
           icon: "warning",
@@ -621,23 +646,22 @@ function JoinGroupPage({ userName }) {
           who_create: userName,
         }
       );
-      setTentInfo((prevState)=>({
+      setTentInfo((prevState) => ({
         ...prevState,
-        max_number:"",
-      }))
+        max_number: "",
+      }));
       setTimeout(() => {
         tentIsClick = true;
       }, 3000);
-
     }
   };
 
   const addSupplies = async () => {
     if (suppliesIsClick) {
-      if( (campSupplies.note === "") || (campSupplies.supplies === "") ){
-        return
+      if (campSupplies.note === "" || campSupplies.supplies === "") {
+        return;
       }
-      suppliesIsClick = false
+      suppliesIsClick = false;
       const ondocRefNewSupplies = doc(
         collection(db, "CreateCampingGroup", params.id, "supplies")
       );
@@ -661,12 +685,12 @@ function JoinGroupPage({ userName }) {
         supplies: "",
       }));
     }
-    setCampSupplies((prevState)=>({
+    setCampSupplies((prevState) => ({
       ...prevState,
-      bring_person:"",
-      note:"",
-      supplies:""
-    }))
+      bring_person: "",
+      note: "",
+      supplies: "",
+    }));
 
     setTimeout(() => {
       suppliesIsClick = true;
@@ -745,7 +769,9 @@ function JoinGroupPage({ userName }) {
                 {homePageCampGroup.select_tag &&
                   homePageCampGroup.select_tag.map((item) => (
                     <>
-                      <Tag m='3px'>{item}</Tag>
+                      <Tag m='3px' mt='-1px'>
+                        {item}
+                      </Tag>
                     </>
                   ))}
               </Display>
@@ -874,6 +900,7 @@ function JoinGroupPage({ userName }) {
                 "@media (max-width:768px)": {
                   marginLeft: 0,
                   marginBottom: 5,
+                  width: "100%",
                 },
               }}>
               <NoticeWrap>
@@ -945,9 +972,9 @@ function JoinGroupPage({ userName }) {
                           alignItems='center'
                           m='0px 20px 10px 0px'
                           mb='20px'>
-                          <Font margin='10px' marginLeft='10px'>
+                          <Font>
                             {seat !== userName && (
-                              <Font fontSize='18px' m='0px 0px 10px 0px'>
+                              <Font fontSize='18px' m='7px 0px 12px 0px'>
                                 {seat}
                               </Font>
                             )}
@@ -963,7 +990,7 @@ function JoinGroupPage({ userName }) {
                               fontSize='large'
                               sx={{
                                 color: "#CFC781",
-                                marginBottom: "16px",
+                                marginBottom: "20px",
                                 fontSize: "45px",
                               }}></AccountCircleIcon>
                           )}

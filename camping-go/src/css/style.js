@@ -109,6 +109,7 @@ export const Tag = styled.div`
   border-radius: ${(props) => props.borderRadius || "12px"};
   padding: ${(props) => props.p || "3px"};
   margin: ${(props) => props.m || "0px"};
+  margin-top: ${(props) => props.mt || "0px"};
   background-color: ${(props) => props.bgc || ""};
   border: ${(props) => props.border || "2px solid #CFC781"};
   font-size: ${(props) => props.fontSize || "15px"};
