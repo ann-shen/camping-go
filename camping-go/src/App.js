@@ -23,6 +23,7 @@ import SecondHand from "./pages/SecondHand";
 
 import ScrollToTop from "./component/ScrollToTop";
 import GoogleMapBasic from "./component/GoogleMapBasic";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const [userName, setUserName] = useState("");
@@ -100,21 +101,17 @@ function App() {
                       <Profile userName={userName} userId={userId} />
                     }></Route>
                 </Route>
-                <Route path='/'>
-                  <Route
-                    path=':city'
-                    element={
-                      <CityCamping groupId={groupId} userId={userId} />
-                    }></Route>
-                </Route>
                 <Route
                   path='*'
-                  element={
-                    <main style={{ padding: "1rem" }}>
-                      <p>There's nothing here!</p>
-                    </main>
-                  }
+                  element={<NotFound />}
                 />
+              </Route>
+              <Route path='target'>
+                <Route
+                  path=':city'
+                  element={
+                    <CityCamping groupId={groupId} userId={userId} />
+                  }></Route>
               </Route>
             </Routes>
           </ScrollToTop>
