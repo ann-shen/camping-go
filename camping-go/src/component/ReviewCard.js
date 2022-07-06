@@ -170,6 +170,7 @@ const TentImg = styled.img`
   }
 `;
 
+
 function IsModal({
   modalIsOpen,
   setIsOpen,
@@ -204,7 +205,7 @@ function IsModal({
         onRequestClose={() => setIsOpen(false)}
         overlayClassName={{
           base: "overlay-base",
-          afterOpen: "overlay-after",
+          afterOpen: "overlay-after-reviewCard",
           beforeClose: "overlay-before",
         }}
         className={{
@@ -341,15 +342,13 @@ function Recommend({ recommendIsOpen, setRecommendIsOpen, joinThisGroup }) {
 
 export default function ReviewCard({
   currentPosts,
-  setIsOpen,
-  modalIsOpen,
   setGroupId,
 }) {
   const [recommendIsOpen, setRecommendIsOpen] = useState(false);
+  const [modalIsOpen, setIsOpen] = useState(false);
   const [targetIndex, setTargetIndex] = useState("");
   const Context = useContext(UserContext);
   const navigate = useNavigate();
-
   const confirmJoinThisGroup = (index) => {
     if (!Context.userId) {
       Swal.fire({
@@ -641,9 +640,10 @@ export default function ReviewCard({
               header_name={item.header_name}
             />
             <CardActions disableSpacing>
-              {item.select_tag && item.select_tag
-                .map((obj, index) => <SelectTag key={index}>{obj}</SelectTag>)
-                .slice(0, 3)}
+              {item.select_tag &&
+                item.select_tag
+                  .map((obj, index) => <SelectTag key={index}>{obj}</SelectTag>)
+                  .slice(0, 3)}
             </CardActions>
           </Card>
         ))}

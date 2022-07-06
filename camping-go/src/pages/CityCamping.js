@@ -124,7 +124,7 @@ const GroupWrap = styled.div`
   }
 `;
 
-function IsModal({ modalIsOpen, setIsOpen, currentPosts, index, userId }) {
+function TaiwanMapModal({ modalIsOpen, setIsOpen, currentPosts, index, userId }) {
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState(false);
   const navigate = useNavigate();
@@ -703,7 +703,7 @@ function CityCamping({ userId }) {
                     </Button>
                   )}
                 </ButtonWrap>
-                <IsModal
+                <TaiwanMapModal
                   modalIsOpen={modalIsOpen}
                   setIsOpen={setIsOpen}
                   currentPosts={targetCityArr}

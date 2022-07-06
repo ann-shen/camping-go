@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
-
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -154,6 +152,14 @@ function Login({ setUserId, setUserName, userName }) {
         marginBottom: "100px",
         marginTop: "100px",
         paddingBottom: "50px",
+        "@media (max-width:600px)": {
+          width: "90%",
+        },
+        "@media (max-width:420px)": {
+          width: "90%",
+          padding: 0,
+          height:"570px",
+        },
       }}>
       <AppBar position='static' sx={{ bgcolor: "#426765" }}>
         <Tabs

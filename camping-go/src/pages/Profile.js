@@ -130,7 +130,7 @@ let ifClick = true;
 function SentCommentToHeader({ groupId, userName, userId }) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
-  const [value, setValue] = useState("Controlled");
+  const [value, setValue] = useState("");
   const [startValue, setStartValue] = React.useState(2);
 
   const handleChange = (event) => {
@@ -138,8 +138,10 @@ function SentCommentToHeader({ groupId, userName, userId }) {
   };
 
   const sendComment = async () => {
+    if(value ===""){
+      return
+    }
     if (ifClick === true) {
-      console.log("已傳送")
       setAlertOpen(true);
       ifClick = false;
       const feedbackInCreateRef = doc(

@@ -12,14 +12,14 @@
 
 }
 .orderListWrapn{
-  width: 300px;
-  margin: 20px auto ;
-  padding: 10px 50px;
+  width: 70%;
+  margin: 30px auto ;
+  padding: 10px 20px;
   display: flex;
   flex-direction: column;
   padding-bottom: 10px;
   border-radius: 20px;
-  /* box-shadow: 7px 5px 20px 2px rgba(0,1,0,0.1); */
+  align-items: center;
 
 }
 
@@ -38,6 +38,7 @@
 }
 
 .orderListWrapn input{
+  width: 50%;
   border-radius: 20px;
   height: 30px;
   border: 1px solid rgb(209, 209, 209);
@@ -56,16 +57,11 @@
   width: 150px;
   height: 40px;
   margin-top: 40px;
-  margin-right: 20px;
-  margin-left: 25%;
   border: none;
   background-color: #EAE6C4;
   color: #797659;
 }
 
-#register_button{
-  margin-left: 25%;
-}
 .top_wrap{
   display: flex;
   justify-content: flex-end;
@@ -141,9 +137,17 @@ span.buttonText {
   font-size: 14px;
 }
 
+
+@media screen and (min-width: 1280px) {
+  .orderListWrapn {
+    width: 95%;
+  }
+}
+
+
 @media screen and (max-width: 768px) {
   .orderListWrapn{
-    width: 300px;
+    width: 95%;
     margin: 60px auto;
     padding: 10px 12px;
   }
@@ -163,8 +167,15 @@ span.buttonText {
 
 
 
-@media screen and (min-width: 1280px) {
-  .orderListWrapn{
-    width: 300pxpx;
+@media screen and (max-width: 380px) {
+  .orderListWrapn {
+    width: 95%;
+    margin: 30px auto;
+    margin-left: -6px;
+    padding: 10px 12px;
+  }
+
+  .orderListWrapn button{
+    margin: 60px auto;
   }
 }

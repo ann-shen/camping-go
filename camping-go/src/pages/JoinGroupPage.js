@@ -494,6 +494,7 @@ function JoinGroupPage({ userName }) {
     e.target.style.transform = "scale(1)";
   };
 
+
   useEffect(() => {
     onSnapshot(doc(db, "CreateCampingGroup", params.id), (doc) => {
       setHomePageCampGroup(doc.data());
@@ -585,7 +586,7 @@ function JoinGroupPage({ userName }) {
         });
         if (memberIdArr.indexOf(ContextByUserId.userId) === -1) {
           console.log(memberIdArr.indexOf(ContextByUserId.userId));
-            // navigate("/");
+            navigate("/");
         }
       });
     };

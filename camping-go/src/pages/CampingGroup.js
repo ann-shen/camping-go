@@ -171,7 +171,7 @@ const Title = styled.p`
 
 function CampingGroup({ setGroupId }) {
   const [homePageCampGroup, sethomePageCampGroup] = useState([]);
-  const [modalIsOpen, setIsOpen] = useState(false);
+  // const [modalIsOpen, setIsOpen] = useState(false);
   const [pagination, setPaagination] = useState({
     loading: false,
     currentPage: 1,
@@ -269,9 +269,6 @@ function CampingGroup({ setGroupId }) {
 
         <ReviewCard
           currentPosts={currentPosts}
-          setIsOpen={setIsOpen}
-          modalIsOpen={modalIsOpen}
-          userId={Context.userId}
           setGroupId={setGroupId}
         />
         <PaginationBar
